@@ -36,7 +36,6 @@
     if(which==='rumahdinas') loadRwRumahDinas();
   }
 
-  function isRdApp(a){ return /rumah dinas/i.test(a && a.nama || ''); }
   function rdAppRow(a){
     var pending = a.status === 'menunggu';
     var ic = pending
@@ -48,7 +47,7 @@
       + '<div class="m">'
       + '<div class="tt">' + a.nama + '</div>'
       + '<div class="ts">' + tgl + 'Permohonan ' + a.id + '<br>'
-      + (pending ? 'Menunggu verifikasi OPD' : 'SK terbit · menunggu pembayaran') + '</div>'
+      + PRONTT.statusOf(a.status) + '</div>'
       + '</div>'
       + '<div class="r"><div class="amt">' + rupiah(a.total) + '</div><div class="st pending">Belum Dibayar</div></div>'
       + '</div>';
@@ -56,9 +55,8 @@
   function loadRwRumahDinas(){
     var el = document.getElementById('riw-rd-list');
     if(!el) return;
-    var rows;
-    try{ rows = JSON.parse(localStorage.getItem('prontt.rdbayar.v1') || '[]'); }catch(e){ rows = []; }
-    var running = apps.filter(function(a){ return isRdApp(a) && (a.status === 'menunggu' || a.status === 'sk'); });
+    var rows = PRONTT.payments();
+    var running = PRONTT.runningApps(apps);
     var runningHtml = running.length
       ? '<div class="section-title" style="margin:2px 0 8px">Permohonan Berjalan</div>' + running.map(rdAppRow).join('')
         + '<div class="section-title" style="margin:14px 0 8px">Pembayaran</div>'
@@ -101,24 +99,6 @@
     var p = (iso||'').split('-'); if(p.length!==3) return iso||'-';
     var d = new Date(+p[0], +p[1]-1, +p[2]);
     return d.getDate()+' '+BULAN[d.getMonth()]+' '+d.getFullYear();
-  }
-  function fmtMasa(iso, days){
-    var p = (iso||'').split('-'); if(p.length!==3) return iso||'-';
-    var s = new Date(+p[0], +p[1]-1, +p[2]);
-    var e = new Date(s.getTime() + Math.max(1,days-1)*86400000);
-    var label = fmtTgl(iso);
-    if(e.getTime()!==s.getTime()) label = s.getDate()+' '+BULAN[s.getMonth()]+' – '+e.getDate()+' '+BULAN[e.getMonth()]+' '+e.getFullYear();
-    return label+' · '+Math.max(1,days)+' hari';
-  }
-  function fmtMasaBulan(iso, months){
-    var p = (iso||'').split('-'); if(p.length!==3) return iso||'-';
-    var n = Math.max(1, Math.min(12, parseInt(months,10)||1));
-    var s = new Date(+p[0], +p[1]-1, +p[2]);
-    var e = new Date(s.getFullYear(), s.getMonth()+n, s.getDate());
-    e.setDate(e.getDate()-1);
-    var label = fmtTgl(iso);
-    if(e.getTime()!==s.getTime()) label = s.getDate()+' '+BULAN[s.getMonth()]+' – '+e.getDate()+' '+BULAN[e.getMonth()]+' '+e.getFullYear();
-    return label+' · '+n+' bulan';
   }
   function rupiah(n){ return 'Rp '+Number(n||0).toLocaleString('id-ID'); }
   function unitShort(u){ return (u||'').replace('per ',''); }
@@ -170,13 +150,7 @@
       if(a){
         a.status='aktif'; a.bayar=metode;
         saveApps();
-        try{
-          var rows = JSON.parse(localStorage.getItem('prontt.rdbayar.v1') || '[]');
-          var now = new Date();
-          rows.unshift({ref:'RD-'+now.getTime(), id:a.id, nama:a.nama, nominal:a.total, metode:metode,
-            periode: now.getFullYear()+'-'+('0'+(now.getMonth()+1)).slice(-2), tanggal: now.toISOString()});
-          localStorage.setItem('prontt.rdbayar.v1', JSON.stringify(rows));
-        }catch(e){}
+        PRONTT.recordPayment(a, metode);
       }
       document.getElementById('rc-jenis').textContent = payCtx.item;
       document.getElementById('rc-metode').textContent = metode;
@@ -375,7 +349,7 @@
   function openAset(key, i){
     var g = LISTS[key].items[i];
     rd.sewa = true; rd.key = key; rd.idx = i;
-    rd.unit = g.p; rd.qty = 1; rd.months = /bulan/i.test(g.un||'');
+    rd.unit = g.p; rd.qty = 1; rd.months = /bulan/i.test(g.un || '') || PRONTT.isRumahDinas(g);
     rd.name = g.n; rd.cat = 'Sewa Aset'; rd.from = 'itemlist';
     document.getElementById('rd-cat').textContent = 'Detail Aset';
     document.getElementById('rd-sub').textContent = 'Sewa aset daerah';
@@ -415,7 +389,7 @@
     }).join('');
   }
 
-  function rdQty(d){ rd.qty = Math.max(1, Math.min(rd.months ? 12 : 999, rd.qty + d)); rdRender(); }
+  function rdQty(d){ var max = rd.months ? 12 : 999; rd.qty = Math.max(1, Math.min(max, rd.qty + d)); rdRender(); }
   function rdRender(){
     document.getElementById('rd-qty').textContent = rd.qty;
     document.getElementById('rd-total').textContent = rupiah(rd.unit * rd.qty);
@@ -481,14 +455,9 @@
   }
 
   // ===== permohonan sewa =====
-  var APP_KEY = 'prontt.apps.v1', APP_SEQ_KEY = 'prontt.appseq.v1';
-  function loadApps(){
-    try{ var r = JSON.parse(localStorage.getItem(APP_KEY) || '[]'); return Array.isArray(r) ? r : []; }catch(e){ return []; }
-  }
-  function saveApps(){
-    try{ localStorage.setItem(APP_KEY, JSON.stringify(apps)); }catch(e){}
-  }
-  var apps = loadApps(), appSeq = parseInt(localStorage.getItem(APP_SEQ_KEY) || '8', 10), skSeq = 57, justSubmitted = false;
+  function loadApps(){ return PRONTT.apps(); }
+  function saveApps(){ return PRONTT.saveApps(apps); }
+  var apps = loadApps(), appSeq = parseInt(localStorage.getItem(PRONTT.KEYS.appSeq) || '8', 10), skSeq = 57, justSubmitted = false;
 
   function findApp(id){
     for(var i=0;i<apps.length;i++){ if(apps[i].id===id) return apps[i]; }
@@ -508,24 +477,24 @@
   }
   function pfDurasi(){
     var el = document.getElementById('pf-durasi');
-    var d = Math.max(1, Math.min(12, parseInt(el.value,10)||1));
+    var d = PRONTT.clampBulan(el.value);
     if(el.value !== String(d)) el.value = String(d);
     document.getElementById('pf-total').textContent = rupiah(rd.unit*d);
   }
   function submitPermohonan(){
     var g = LISTS[rd.key].items[rd.idx];
-    var durasi = Math.max(1, Math.min(12, parseInt(document.getElementById('pf-durasi').value,10)||1));
+    var durasi = PRONTT.clampBulan(document.getElementById('pf-durasi').value);
     var mulai = document.getElementById('pf-mulai').value || isoDate(new Date());
     apps.unshift({
       id:'PRM-'+('000'+appSeq++).slice(-4), nama:g.n, kode:g.k, unit:g.un,
       pemohon:valOr('pf-nama','Muhammad Ihsanul'),
       instansi:valOr('pf-opd','Perorangan'),
       keperluan:valOr('pf-keperluan','Kegiatan'),
-      mulai:mulai, masa:fmtMasaBulan(mulai,durasi), total:g.p*durasi,
+      mulai:mulai, masa:PRONTT.bulanRange(mulai,durasi), total:g.p*durasi,
       dibuat:isoDate(new Date()),
       status:'menunggu', sk:'', bayar:''
     });
-    localStorage.setItem(APP_SEQ_KEY, String(appSeq));
+    localStorage.setItem(PRONTT.KEYS.appSeq, String(appSeq));
     saveApps();
     justSubmitted = true;
     renderMyApps();

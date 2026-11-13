@@ -2,8 +2,8 @@
 
 var rState = {cat:null, idx:0, qty:1};
 var BULAN_LONG = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-var APP_KEY = 'prontt.apps.v1';
-var APP_SEQ = 'prontt.appseq.v1';
+var APP_KEY = PRONTT.KEYS.apps;
+var APP_SEQ = PRONTT.KEYS.appSeq;
 
 function goList(cat){ location.href = 'itemlist.html?cat=' + encodeURIComponent(cat); }
 
@@ -86,10 +86,10 @@ function openItem(i){
 
 // ================= detail aset / layanan =================
 function isRumahDinas(key,g){
-  return key==='gedung' && !!g && /rumah dinas/i.test(g.n||'');
+  return key==='gedung' && PRONTT.isRumahDinas(g);
 }
 function isRumahDinasApp(a){
-  return !!a && a.cat==='gedung' && /rumah dinas/i.test(a.nama||'');
+  return PRONTT.isRumahDinasApp(a);
 }
 function renderDetail(){
   var L = LISTS[rState.cat], g = L.items[rState.idx];
@@ -171,7 +171,7 @@ function initDetail(){
   var key = qs('cat'), i = parseInt(qs('item'),10);
   if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi.html'); return; }
   rState.cat = key; rState.idx = i;
-  rState.qty = Math.max(1, Math.min(12, parseInt(qs('qty'),10)||1));
+  rState.qty = PRONTT.clampBulan(qs('qty'));
   renderDetail();
 }
 function rdQty(d){
@@ -217,7 +217,7 @@ function initForm(){
   var key = qs('cat'), i = parseInt(qs('item'),10);
   if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi.html'); return; }
   rState.cat = key; rState.idx = i;
-  rState.qty = Math.max(1, Math.min(12, parseInt(qs('qty'),10)||1));
+  rState.qty = PRONTT.clampBulan(qs('qty'));
   var g = LISTS[key].items[i];
   if(!isRumahDinas(key,g)){
     location.replace('bill.html?cat='+key+'&item='+i+'&qty='+rState.qty);
@@ -264,7 +264,7 @@ function pfDrive(){
   var v = inp ? inp.value.trim() : '';
   pfDriveLink = '';
   if(!v){ pfDriveHint(''); return; }
-  if(!/^https?:\/\/(drive|docs)\.google\.com\//i.test(v)){
+  if(!PRONTT.isDriveLink(v)){
     pfDriveHint('err', 'Link harus dari Google Drive (contoh: https://drive.google.com/...).');
     return;
   }
@@ -274,7 +274,7 @@ function pfDrive(){
 function pfDurasi(){
   var g = LISTS[rState.cat].items[rState.idx];
   var el = document.getElementById('pf-durasi');
-  var d = Math.max(1, Math.min(12, parseInt(el.value,10)||1));
+  var d = PRONTT.clampBulan(el.value);
   if(el.value !== String(d)) el.value = String(d);
   document.getElementById('pf-total').textContent = rupiah(g.p*d);
 }
@@ -284,7 +284,7 @@ function submitPermohonan(){
     location.replace('bill.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty);
     return;
   }
-  var durasi = Math.max(1, Math.min(12, parseInt(document.getElementById('pf-durasi').value,10)||1));
+  var durasi = PRONTT.clampBulan(document.getElementById('pf-durasi').value);
   var mulai = document.getElementById('pf-mulai').value || isoDate(new Date());
   var apps = loadApps();
   var seq = parseInt(localStorage.getItem(APP_SEQ)||'8',10);
@@ -295,7 +295,7 @@ function submitPermohonan(){
     pemohon:valOr('pf-nama','Muhammad Ihsanul'),
     instansi:valOr('pf-opd','Perorangan'),
     keperluan:valOr('pf-keperluan','Kegiatan'),
-    mulai:mulai, masa:fmtMasaBulan(mulai,durasi), total:g.p*durasi,
+    mulai:mulai, masa:PRONTT.bulanRange(mulai,durasi), total:g.p*durasi,
     status:'menunggu', sk:'', bayar:''
   };
   if(pfDriveLink){
@@ -308,17 +308,9 @@ function submitPermohonan(){
 }
 
 // ================= permohonan saya =================
-function loadApps(){
-  try{ return JSON.parse(localStorage.getItem(APP_KEY)||'[]'); }catch(e){ return []; }
-}
-function saveApps(apps){
-  try{ localStorage.setItem(APP_KEY, JSON.stringify(apps)); }catch(e){}
-}
-function findApp(id){
-  var apps = loadApps();
-  for(var i=0;i<apps.length;i++){ if(apps[i].id===id) return apps[i]; }
-  return null;
-}
+function loadApps(){ return PRONTT.apps(); }
+function saveApps(apps){ return PRONTT.saveApps(apps); }
+function findApp(id){ return PRONTT.findApp(id); }
 var WA_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.5-.5-.4-.7-.4h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.6s1.1 3 1.3 3.2c.2.2 2.2 3.4 5.3 4.7.7.3 1.3.5 1.8.7.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/><path d="M12 2a10 10 0 00-8.6 15L2 22l5.2-1.4A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20z"/></svg>';
 var FILE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>';
 function dataURLtoBlob(d){
@@ -332,7 +324,7 @@ function dataURLtoBlob(d){
 }
 function viewBerkas(id){
   var raw = null;
-  try{ raw = sessionStorage.getItem('prontt.file.'+id); }catch(e){}
+  try{ raw = sessionStorage.getItem(PRONTT.KEYS.file+id); }catch(e){}
   if(!raw){ alert('Berkas hanya tersimpan selama sesi ini. Silakan unggah ulang atau kirim langsung ke admin OPD.'); return; }
   var f = null;
   try{ f = JSON.parse(raw); }catch(e){ return; }

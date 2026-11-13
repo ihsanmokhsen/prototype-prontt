@@ -8,24 +8,6 @@ function fmtTgl(iso){
   var d = new Date(+p[0], +p[1]-1, +p[2]);
   return d.getDate()+' '+BULAN[d.getMonth()]+' '+d.getFullYear();
 }
-function fmtMasa(iso, days){
-  var p = (iso||'').split('-'); if(p.length!==3) return iso||'-';
-  var s = new Date(+p[0], +p[1]-1, +p[2]);
-  var e = new Date(s.getTime() + Math.max(1,days-1)*86400000);
-  var label = fmtTgl(iso);
-  if(e.getTime()!==s.getTime()) label = s.getDate()+' '+BULAN[s.getMonth()]+' – '+e.getDate()+' '+BULAN[e.getMonth()]+' '+e.getFullYear();
-  return label+' · '+Math.max(1,days)+' hari';
-}
-function fmtMasaBulan(iso, months){
-  var p = (iso||'').split('-'); if(p.length!==3) return iso||'-';
-  var n = Math.max(1, Math.min(12, parseInt(months,10)||1));
-  var s = new Date(+p[0], +p[1]-1, +p[2]);
-  var e = new Date(s.getFullYear(), s.getMonth()+n, s.getDate());
-  e.setDate(e.getDate()-1);
-  var label = fmtTgl(iso);
-  if(e.getTime()!==s.getTime()) label = s.getDate()+' '+BULAN[s.getMonth()]+' – '+e.getDate()+' '+BULAN[e.getMonth()]+' '+e.getFullYear();
-  return label+' · '+n+' bulan';
-}
 function rupiah(n){ return 'Rp '+Number(n||0).toLocaleString('id-ID'); }
 function unitShort(u){ return (u||'').replace('per ',''); }
 function chipCls(s){
@@ -125,7 +107,7 @@ function initData(cb) {
 }
 
 /* ===== Rumah dinas: tagihan & pembayaran milik pengguna ===== */
-var RD_BAYAR_KEY = 'prontt.rdbayar.v1';
+var RD_BAYAR_KEY = PRONTT.KEYS.rdBayar;
 
 function periodeIni(){
   var d = new Date();
@@ -139,21 +121,17 @@ function cariTagihanRD(idPegawai){
   return null;
 }
 function pembayaranRD(){
-  try { return JSON.parse(localStorage.getItem(RD_BAYAR_KEY) || '[]'); } catch (e) { return []; }
+  return PRONTT.payments();
 }
 function sudahBayarRD(idPegawai){
   var per = periodeIni();
   return pembayaranRD().some(function(p){ return p.id === idPegawai && p.periode === per; });
 }
 function simpanBayarRD(tagihan, metode){
-  var list = pembayaranRD();
   var now = new Date();
-  var entri = {
+  return PRONTT.addPayment({
     ref: 'RD-' + now.getTime(),
     id: tagihan.id, nama: tagihan.nama, alamat: tagihan.alamat, tipe: tagihan.tipe,
     nominal: tagihan.biaya, metode: metode, periode: periodeIni(), tanggal: now.toISOString()
-  };
-  list.unshift(entri);
-  try { localStorage.setItem(RD_BAYAR_KEY, JSON.stringify(list)); } catch (e) {}
-  return entri;
+  });
 }
