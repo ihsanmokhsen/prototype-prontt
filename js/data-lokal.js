@@ -802,3 +802,8 @@ var DATA_TAGIHAN_RD = [
   "statusAsn": "PNS Aktif"
  }
 ];
+
+/* Kode bayar contoh (pada produksi diterbitkan PIC OPD). */
+DATA_TAGIHAN_RD.forEach(function(t, i){
+  t.kodeBayar = '88' + ('00000' + (101 + i*37)).slice(-6) + ('0000' + (4821 + i*53)).slice(-4);
+});

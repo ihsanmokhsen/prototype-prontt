@@ -116,6 +116,29 @@
       font-size:11px; color:var(--muted); margin-top:8px; padding-left:2px;
     }
     .ck-hint svg{width:13px;height:13px;flex:0 0 13px; color:var(--blue-400)}
+    .ck-field + .ck-field{margin-top:13px}
+
+    /* ---- minta kode bayar via WA ---- */
+    .ck-wa{
+      display:flex; align-items:center; gap:11px;
+      margin:12px 16px 0; padding:12px;
+      background:#e9f9f0; border:1px solid #bfe9d4; border-radius:14px;
+    }
+    .ck-wa-icon{
+      width:38px; height:38px; border-radius:11px; background:#25d366; color:#fff;
+      display:grid; place-items:center; flex:0 0 38px;
+    }
+    .ck-wa-icon svg{width:20px;height:20px}
+    .ck-wa-txt{flex:1; min-width:0}
+    .ck-wa-t{font-family:var(--ff-display); font-weight:800; font-size:11.5px; color:#0f7a48}
+    .ck-wa-d{font-size:10.5px; color:var(--ink-2); margin-top:2px; line-height:1.4}
+    .ck-wa-demo{font-size:9.5px; color:var(--muted); margin-top:3px}
+    .ck-wa-btn{
+      flex:0 0 auto; background:#25d366; color:#fff; border-radius:9px;
+      padding:9px 11px; font-family:var(--ff-display); font-weight:700; font-size:11px;
+      text-decoration:none; white-space:nowrap;
+    }
+    .ck-wa-btn:active{transform:scale(.96)}
 
     /* ---- loading ---- */
     .ck-loading{
@@ -266,8 +289,8 @@
     </div>
 
       <div class="ck-search-card">
-        <div class="ck-search-label">ID Pegawai Anda</div>
-        <div class="ck-search-row">
+        <div class="ck-field">
+          <div class="ck-search-label">ID Pegawai Anda</div>
           <div class="ck-input-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             <input class="ck-inp" id="ck-idsewa"
@@ -276,13 +299,30 @@
               oninput="onSearchInput()"
               onkeydown="if(event.key==='Enter')cekRetribusi()">
           </div>
-          <button class="ck-search-btn" onclick="cekRetribusi()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          </button>
+          <div class="ck-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+            ID Pegawai tercantum pada SK Penghuni Rumah Dinas.
+          </div>
         </div>
-        <div class="ck-hint">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
-          ID Pegawai tercantum pada SK Penghuni Rumah Dinas.
+        <div class="ck-field">
+          <div class="ck-search-label">Kode Bayar</div>
+          <div class="ck-search-row">
+            <div class="ck-input-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <input class="ck-inp" id="ck-kode"
+                placeholder="Contoh: 880001014821"
+                inputmode="numeric" maxlength="16" autocomplete="off"
+                oninput="onSearchInput()"
+                onkeydown="if(event.key==='Enter')cekRetribusi()">
+            </div>
+            <button class="ck-search-btn" onclick="cekRetribusi()" aria-label="Cek tagihan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            </button>
+          </div>
+          <div class="ck-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+            Minta kode bayar ke PIC OPD melalui WhatsApp.
+          </div>
         </div>
       </div>
 
@@ -292,10 +332,22 @@
         </div>
         <h3>Cek tagihan sewa rumah dinas</h3>
         <ol>
-          <li>Masukkan ID Pegawai sesuai SK penghuni.</li>
-          <li>Periksa data rumah dinas dan tagihan bulan ini.</li>
-          <li>Bayar lewat QRIS, e-wallet, atau virtual account.</li>
+          <li>Minta kode bayar ke PIC OPD lewat WhatsApp.</li>
+          <li>Masukkan ID Pegawai dan kode bayar.</li>
+          <li>Periksa tagihan bulan ini, lalu bayar lewat QRIS, e-wallet, atau virtual account.</li>
         </ol>
+      </div>
+
+      <div class="ck-wa">
+        <div class="ck-wa-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.7-.8-2-.9-.3-.1-.5-.2-.7.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.8-2.8-1.5-3.9-3.4-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5s-.7-1.6-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3 1.8.8 2.5.8 3.4.7.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 00-8.6 15L2 22l5.2-1.4A10 10 0 1012 2z"/></svg>
+        </div>
+        <div class="ck-wa-txt">
+          <div class="ck-wa-t">Minta kode bayar ke PIC OPD</div>
+          <div class="ck-wa-d">Hubungi PIC lewat WhatsApp untuk mendapatkan kode bayar.</div>
+          <div class="ck-wa-demo">Demo: RD-001 · kode 880001014821</div>
+        </div>
+        <a class="ck-wa-btn" id="ck-wa-link" href="https://wa.me/6280000000003" target="_blank" rel="noopener">Chat WA</a>
       </div>
 
       <!-- Tidak ditemukan -->
@@ -303,8 +355,8 @@
         <div class="ck-notfound-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
         </div>
-        <h3>Data Tidak Ditemukan</h3>
-        <p>ID Pegawai tidak terdaftar pada SK Penghuni Rumah Dinas.<br>Hubungi BPAD Provinsi NTT untuk informasi lebih lanjut.</p>
+        <h3 id="rd-nf-title">Data Tidak Ditemukan</h3>
+        <p id="rd-nf-msg">ID Pegawai tidak terdaftar pada SK Penghuni Rumah Dinas.<br>Hubungi BPAD Provinsi NTT untuk informasi lebih lanjut.</p>
       </div>
 
       <!-- RESULT -->
@@ -332,6 +384,11 @@
           <div class="rd-row">
             <div class="rd-label">Alamat</div>
             <div class="rd-value" id="rd-alamat">—</div>
+          </div>
+          <div class="rd-divider"></div>
+          <div class="rd-row">
+            <div class="rd-label">Kode Bayar</div>
+            <div class="rd-value" id="rd-kode">—</div>
           </div>
           <div class="rd-divider"></div>
           <div class="rd-grid">
@@ -389,11 +446,24 @@
   <script src="../js/shell.js"></script>
   <script>
     var _rdData = null;
+    var PIC_WA = '6280000000003';
 
     function ru(n){ return 'Rp ' + Number(n||0).toLocaleString('id-ID'); }
 
+    function updateWaLink(){
+      var a = document.getElementById('ck-wa-link');
+      if(!a) return;
+      var id = (document.getElementById('ck-idsewa').value||'').trim().toUpperCase();
+      var msg = 'Halo PIC OPD Rumah Dinas BPAD Provinsi NTT, saya ingin meminta kode bayar retribusi sewa rumah dinas.';
+      if(id) msg += ' ID Pegawai saya: ' + id + '.';
+      a.href = 'https://wa.me/' + PIC_WA + '?text=' + encodeURIComponent(msg);
+    }
+
     function onSearchInput(){
-      if(!(document.getElementById('ck-idsewa').value||'').trim()) hideResult();
+      updateWaLink();
+      var id = (document.getElementById('ck-idsewa').value||'').trim();
+      var kode = (document.getElementById('ck-kode').value||'').trim();
+      if(!id && !kode) hideResult();
     }
 
     function hideResult(){
@@ -404,14 +474,34 @@
       _rdData = null;
     }
 
+    function showNotFound(title, msg){
+      document.getElementById('rd-guide').style.display = 'none';
+      document.getElementById('rd-nf-title').textContent = title;
+      document.getElementById('rd-nf-msg').innerHTML = msg;
+      document.getElementById('rd-notfound').style.display = 'block';
+    }
+
     function cekRetribusi(){
-      var v = (document.getElementById('ck-idsewa').value||'').trim();
-      if(!v) return;
+      var id = (document.getElementById('ck-idsewa').value||'').trim().toUpperCase();
+      var kode = (document.getElementById('ck-kode').value||'').replace(/\s+/g,'');
       hideResult();
-      _rdData = cariTagihanRD(v);
+      if(!id){
+        showNotFound('ID Pegawai Belum Diisi','Masukkan ID Pegawai sesuai SK Penghuni Rumah Dinas.');
+        return;
+      }
+      if(!kode){
+        showNotFound('Kode Bayar Belum Diisi','Minta kode bayar ke PIC OPD melalui WhatsApp, lalu masukkan pada kolom Kode Bayar.');
+        return;
+      }
+      _rdData = cariTagihanRD(id);
       document.getElementById('rd-guide').style.display = 'none';
       if(!_rdData){
-        document.getElementById('rd-notfound').style.display = 'block';
+        showNotFound('Data Tidak Ditemukan','ID Pegawai tidak terdaftar pada SK Penghuni Rumah Dinas.<br>Periksa kembali atau hubungi BPAD Provinsi NTT.');
+        return;
+      }
+      if(String(_rdData.kodeBayar) !== kode){
+        _rdData = null;
+        showNotFound('Kode Bayar Salah','Kode bayar tidak sesuai dengan ID Pegawai tersebut.<br>Minta kode terbaru ke PIC OPD melalui WhatsApp.');
         return;
       }
       showResult(_rdData);
@@ -419,6 +509,7 @@
 
     function showResult(d){
       document.getElementById('rd-id-pill').textContent   = d.id;
+      document.getElementById('rd-kode').textContent      = d.kodeBayar || '—';
       document.getElementById('rd-nama').textContent      = d.nama || '—';
       document.getElementById('rd-jabatan').textContent   = d.jabatan || '—';
       document.getElementById('rd-alamat').textContent    = d.alamat || '—';
@@ -468,10 +559,14 @@
       );
     }
 
-    /* pre-fill from URL ?id=RD-001 */
+    /* pre-fill from URL ?id=RD-001&kode=... */
     (function(){
-      var id = new URLSearchParams(location.search).get('id');
-      if(id){ document.getElementById('ck-idsewa').value = id; cekRetribusi(); }
+      var p = new URLSearchParams(location.search);
+      var id = p.get('id'), kode = p.get('kode');
+      if(id) document.getElementById('ck-idsewa').value = id;
+      if(kode) document.getElementById('ck-kode').value = kode;
+      updateWaLink();
+      if(id) cekRetribusi();
     })();
   </script>
 </body>
