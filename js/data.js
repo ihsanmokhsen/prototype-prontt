@@ -168,7 +168,8 @@ var SK_SEED = [
   {
     sk:'SK/118/PRO-NTT/2025', kerjasama:'PKS/118/PRO-NTT/2025',
     nama:'Sewa Rumah Dinas Type E', kode:'RTB-SWA-214',
-    pemohon:'Dinas Pendidikan Prov. NTT', instansi:'Dinas Pendidikan Prov. NTT',
+    pemohon:'Yohanes Bria, S.Pd', instansi:'Dinas Pendidikan Prov. NTT',
+    penyewa:['Yohanes Bria, S.Pd','Maria Goreti Bria, S.Pd','Fransiska D. Leki, S.Pd'],
     keperluan:'Penempatan tenaga pendidik', mulai:'2025-12-20',
     masa:'20 Des 2025 – 19 Jan 2026 · 1 bulan', tglSk:'12 Des 2025',
     opd:'Biro Umum Setda Prov. NTT', pokok:400000, denda:20000, status:'belum'

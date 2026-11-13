@@ -395,17 +395,17 @@ function verifyApp(id){
 }
 function openSheetApp(id){
   var a = findApp(id); if(!a) return;
-  openSheet('Retribusi Sewa · '+a.id, rupiah(a.total), function(metode){
+  openSheet('Retribusi Sewa · '+a.sk+' · '+a.pemohon, rupiah(a.total), function(metode){
     var apps = loadApps();
     for(var i=0;i<apps.length;i++){
       if(apps[i].id===id){ apps[i].status='aktif'; apps[i].bayar=metode; }
     }
     saveApps(apps);
     goSukses({
-      jenis:'Retribusi Sewa · '+a.id,
+      jenis:'Retribusi Sewa · '+a.sk,
       total:rupiah(a.total),
       metode:metode,
-      sub:'Retribusi sewa berhasil dibayar.<br>Sewa aktif hingga '+a.masa+'. SK: '+a.sk+'.',
+      sub:'Retribusi sewa berhasil dibayar.<br>No. SK: '+a.sk+'<br>Nama: '+a.pemohon+'<br>Sewa aktif hingga '+a.masa+'.',
       back:'permohonansaya.html'
     });
   });
@@ -513,6 +513,11 @@ var CEK_PAID = 'prontt.skpaid.v1';
 var cekState = null;
 
 function normNo(s){ return String(s||'').toUpperCase().replace(/\s+/g,'').replace(/^#/,''); }
+function labelPembayar(c){
+  var n = (c && c.penyewa) || [];
+  if(n.length > 1) return n[0]+' dkk ('+n.length+' nama)';
+  return (c && c.pemohon) || '';
+}
 function loadPaid(){
   try{ return JSON.parse(localStorage.getItem(CEK_PAID)||'{}'); }catch(e){ return {}; }
 }
@@ -525,6 +530,7 @@ function appToBill(a){
     source:'app', appId:a.id, sk:a.sk,
     kerjasama:'PKS/'+a.sk.replace(/^SK\//,''),
     nama:a.nama, kode:a.kode, pemohon:a.pemohon, instansi:a.instansi,
+    penyewa:[a.pemohon],
     keperluan:a.keperluan, masa:a.masa, tglSk:a.tglSk || '—',
     opd:a.instansi, pokok:a.total, denda:0, total:a.total,
     status: paid ? 'lunas' : 'belum'
@@ -535,6 +541,7 @@ function seedToBill(s, paidMap){
   return {
     source:'seed', sk:s.sk, kerjasama:s.kerjasama,
     nama:s.nama, kode:s.kode, pemohon:s.pemohon, instansi:s.instansi,
+    penyewa:s.penyewa || [],
     keperluan:s.keperluan, masa:s.masa, tglSk:s.tglSk, opd:s.opd,
     pokok:s.pokok, denda:s.denda || 0, total:s.pokok + (s.denda||0),
     status: paid ? 'lunas' : 'belum'
@@ -603,6 +610,16 @@ function initCekHasil(){
   document.getElementById('ck-keperluan').textContent = c.keperluan;
   document.getElementById('ck-masa').textContent = c.masa;
   document.getElementById('ck-tglsk').textContent = c.tglSk;
+  var pbox = document.getElementById('ck-penyewabox');
+  if(pbox){
+    var names = c.penyewa || [];
+    pbox.hidden = names.length < 2;
+    if(names.length > 1){
+      document.getElementById('ck-penyewa-list').innerHTML = names.map(function(n,i){
+        return '<div class="penyewa-item"><span class="n">'+(i+1)+'</span><span>'+n+'</span></div>';
+      }).join('');
+    }
+  }
   document.getElementById('ck-pokok').textContent = rupiah(c.pokok);
   document.getElementById('ck-denda').textContent = rupiah(c.denda);
   document.getElementById('ck-dendarow').hidden = !c.denda;
@@ -622,7 +639,7 @@ function backCek(){
 function bayarCek(){
   var c = cekState;
   if(!c || c.status === 'lunas') return;
-  openSheet('Retribusi · '+c.sk, rupiah(c.total), function(metode){
+  openSheet('Retribusi · '+c.sk+' · '+labelPembayar(c), rupiah(c.total), function(metode){
     if(c.source === 'app'){
       var apps = loadApps();
       for(var i=0;i<apps.length;i++){
