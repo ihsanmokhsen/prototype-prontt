@@ -115,10 +115,16 @@ function periodeIni(){
 }
 function cariTagihanRD(idPegawai){
   var q = String(idPegawai || '').trim().toUpperCase();
+  // terima "RD001", "rd 1", "1" -> "RD-001"
+  var m = q.match(/^(?:RD)?[\s\-]*(\d{1,3})$/);
+  if (m) q = 'RD-' + ('00' + m[1]).slice(-3);
   for (var i = 0; i < DATA_TAGIHAN_RD.length; i++) {
-    if (DATA_TAGIHAN_RD[i].id === q) return DATA_TAGIHAN_RD[i];
+    var t = DATA_TAGIHAN_RD[i];
+    if (t.skTerbit === false) continue; // SK belum terbit: hanya lewat kode bayar
+    if (t.id === q) return t;
   }
-  return null;
+  // penghuni baru: SK terbit dari permohonan di aplikasi ini (ID Penyewa PW-xxxx)
+  return PRONTT.cariTagihanApp(q);
 }
 function pembayaranRD(){
   return PRONTT.payments();
@@ -129,9 +135,11 @@ function sudahBayarRD(idPegawai){
 }
 function simpanBayarRD(tagihan, metode){
   var now = new Date();
-  return PRONTT.addPayment({
+  var rec = PRONTT.addPayment({
     ref: 'RD-' + now.getTime(),
     id: tagihan.id, nama: tagihan.nama, alamat: tagihan.alamat, tipe: tagihan.tipe,
     nominal: tagihan.biaya, metode: metode, periode: periodeIni(), tanggal: now.toISOString()
   });
+  if (tagihan.appId) PRONTT.aktifkanApp(tagihan.appId, metode);
+  return rec;
 }

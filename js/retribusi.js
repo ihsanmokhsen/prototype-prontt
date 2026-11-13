@@ -31,6 +31,14 @@ function renderFilters(){
       var n = L.items.filter(function(g){ return g.st === st; }).length;
       if(n) opts.push([st, st+' ('+n+')']);
     });
+  } else if(listState.key === 'ternak'){
+    opts = [['all','Semua ('+L.items.length+')']];
+    listState.tags = [];
+    L.items.forEach(function(g){ if(listState.tags.indexOf(g.tag) < 0) listState.tags.push(g.tag); });
+    listState.tags.forEach(function(t, i){
+      var n = L.items.filter(function(g){ return g.tag === t; }).length;
+      opts.push(['t:'+i, t+' ('+n+')']);
+    });
   } else {
     opts = [['all','Semua ('+L.items.length+')']];
     [['p:low','< Rp 100 rb'],['p:mid','Rp 100 rb – 1 jt'],['p:high','> Rp 1 jt']].forEach(function(b){
@@ -40,7 +48,10 @@ function renderFilters(){
   }
   var valid = opts.some(function(o){ return o[0] === listState.f; });
   if(!valid) listState.f = 'all';
-  document.getElementById('il-filters').innerHTML = opts.map(function(o){
+  var box = document.getElementById('il-filters');
+  // satu kelompok saja = filter tidak berguna, sembunyikan
+  box.hidden = opts.length <= 2;
+  box.innerHTML = opts.map(function(o){
     return '<button class="fchip'+(listState.f===o[0]?' on':'')+'" onclick="setFilter(\''+o[0]+'\')">'+o[1]+'</button>';
   }).join('');
 }
@@ -58,7 +69,8 @@ function applyFilter(){
     var hay = (g.n+' '+g.loc+' '+g.cap+' '+g.tag+' '+g.k).toLowerCase();
     var okQ = !q || hay.indexOf(q) >= 0;
     var okF = f === 'all'
-      || (f.indexOf('p:') === 0 ? priceBand(g.p) === f.slice(2) : g.st === f);
+      || (f.indexOf('t:') === 0 ? g.tag === listState.tags[+f.slice(2)]
+        : f.indexOf('p:') === 0 ? priceBand(g.p) === f.slice(2) : g.st === f);
     if(okQ && okF) rows.push({g:g, i:i});
   });
   document.getElementById('item-list').innerHTML = rows.map(function(r){ return itemCard(listState.key, r.g, r.i); }).join('');
@@ -365,11 +377,11 @@ function renderMyApps(){
   }
   el.innerHTML = head + apps.map(function(a){
     var chip = a.status==='menunggu' ? '<span class="chip proses">Menunggu Verifikasi OPD</span>'
-      : a.status==='sk' ? '<span class="chip disewa">SK Terbit · Menunggu Retribusi</span>'
+      : a.status==='sk' ? '<span class="chip disewa">SK Terbit · Bayar Bulanan</span>'
       : '<span class="chip tersedia">Aktif</span>';
     var act = '';
     if(a.status==='menunggu') act = '<button class="btn-sm" onclick="verifyApp(\''+a.id+'\')">Simulasi Verifikasi OPD</button>';
-    if(a.status==='sk') act = '<button class="btn-sm gold" onclick="openSheetApp(\''+a.id+'\')">Bayar Retribusi</button>';
+    if(a.status==='sk' || a.status==='aktif') act = '<button class="btn-sm gold" onclick="location.href=\'cek-retribusi.html?id='+encodeURIComponent(idSewaOfApp(a))+'\'">Bayar Bulan Ini</button>';
     var berkasBlock = a.driveLink
       ? '<div class="berkas">'+FILE_ICON+'<span>Surat Permohonan (Google Drive)</span><a href="'+a.driveLink+'" target="_blank" rel="noopener">Buka</a></div>'
       : (a.berkas
@@ -394,7 +406,8 @@ function renderMyApps(){
       + (a.sk?'<br>No. SK: '+a.sk:'') + '<br>Keperluan: '+a.keperluan+'</div>'
       + berkasBlock
       + waBlock
-      + '<div class="afoot"><span class="anilai">'+rupiah(a.total)+'</span>'+act+'</div></div>';
+      + (a.sk ? '<div class="hint" style="margin:8px 0 0">Bayar tiap bulan di Cek &amp; Bayar dengan ID <b>'+idSewaOfApp(a)+'</b>.</div>' : '')
+      + '<div class="afoot"><span class="anilai">'+rupiah(PRONTT.tarifBulananApp(a))+' <small style="font-weight:600;color:var(--muted)">/ bulan</small></span>'+act+'</div></div>';
   }).join('');
 }
 function verifyApp(id){
@@ -420,6 +433,7 @@ function openSheetApp(id){
       if(apps[i].id===id){ apps[i].status='aktif'; apps[i].bayar=metode; }
     }
     saveApps(apps);
+    PRONTT.recordPayment(a, metode);
     goSukses({
       jenis:'Retribusi Sewa · '+a.sk,
       total:rupiah(a.total),

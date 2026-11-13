@@ -51,6 +51,20 @@
     .ck-appbar .sub{font-size:12px; color:rgba(255,255,255,.75); font-weight:500; margin-top:2px}
 
     /* ---- search card floating ---- */
+    .rd-rw-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+    .rd-rw-row:first-child{border-top:none;padding-top:2px}
+    .rd-rw-p{font-weight:700;font-size:14px}
+    .rd-rw-d{font-size:12px;color:var(--muted);margin-top:2px}
+    .rd-rw-r{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+    .rd-rw-a{font-weight:700;font-size:14px}
+    .rd-rw-empty{font-size:13px;color:var(--muted);padding:2px 0 4px}
+    .ck-or{display:flex;align-items:center;gap:10px;margin:2px 0 12px;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+    .ck-or::before,.ck-or::after{content:'';flex:1;height:1px;background:var(--line)}
+    .ck-new{display:flex;align-items:center;gap:12px;margin:12px 16px 0;padding:14px;background:#fff;border:1px solid var(--line);border-radius:16px;text-decoration:none;color:inherit}
+    .ck-new-icon{width:42px;height:42px;flex:0 0 42px;border-radius:12px;background:var(--blue-50);color:var(--blue-600);display:grid;place-items:center}
+    .ck-new-icon svg{width:22px;height:22px}
+    .ck-new .ck-wa-t{color:inherit}
+    .ck-new-ch{width:18px;height:18px;flex:0 0 18px;color:var(--muted)}
     .ck-guide{
       margin:16px 16px 0; padding:20px 18px;
       background:#fff; border:1px dashed var(--blue-100); border-radius:var(--r-md);
@@ -290,22 +304,23 @@
 
       <div class="ck-search-card">
         <div class="ck-field">
-          <div class="ck-search-label">ID Pegawai Anda</div>
+          <div class="ck-search-label">ID Pegawai (sesuai SK)</div>
           <div class="ck-input-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             <input class="ck-inp" id="ck-idsewa"
-              placeholder="Contoh: RD-001"
+              placeholder="Contoh: RD-001 atau PW-0008"
               autocomplete="off"
               oninput="onSearchInput()"
               onkeydown="if(event.key==='Enter')cekRetribusi()">
           </div>
           <div class="ck-hint">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
-            Cukup ID Pegawai saja — atau gunakan kode bayar.
+            SK sudah terbit? Pakai ID Pegawai yang tertera di SK.
           </div>
         </div>
         <div class="ck-field">
-          <div class="ck-search-label">Kode Bayar</div>
+          <div class="ck-or"><span>atau</span></div>
+          <div class="ck-search-label">Kode Bayar (SK belum terbit)</div>
           <div class="ck-search-row">
             <div class="ck-input-wrap">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
@@ -321,7 +336,7 @@
           </div>
           <div class="ck-hint">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
-            Cukup kode bayar saja — atau gunakan ID Pegawai.
+            SK belum terbit? Pakai kode bayar dari PIC OPD.
           </div>
         </div>
       </div>
@@ -330,11 +345,11 @@
         <div class="ck-guide-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-        <h3>Cek tagihan sewa rumah dinas</h3>
+        <h3>Pilih yang sesuai kondisi Anda</h3>
         <ol>
-          <li>Minta kode bayar ke PIC OPD lewat WhatsApp.</li>
-          <li>Masukkan ID Pegawai atau kode bayar (salah satu saja).</li>
-          <li>Periksa tagihan bulan ini, lalu bayar lewat QRIS, e-wallet, atau virtual account.</li>
+          <li><b>SK sudah terbit</b> — isi ID Pegawai yang tertera di SK, lalu bayar tagihan bulan ini.</li>
+          <li><b>SK belum terbit</b> — minta kode bayar ke PIC OPD lewat WhatsApp, lalu isi kode bayar.</li>
+          <li><b>Belum menghuni</b> — ajukan permohonan baru di bawah, unggah surat, dan tunggu SK terbit.</li>
         </ol>
       </div>
 
@@ -343,12 +358,23 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.7-.8-2-.9-.3-.1-.5-.2-.7.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.8-2.8-1.5-3.9-3.4-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5s-.7-1.6-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3 1.8.8 2.5.8 3.4.7.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 00-8.6 15L2 22l5.2-1.4A10 10 0 1012 2z"/></svg>
         </div>
         <div class="ck-wa-txt">
-          <div class="ck-wa-t">Minta kode bayar ke PIC OPD</div>
+          <div class="ck-wa-t">SK belum terbit? Minta kode bayar</div>
           <div class="ck-wa-d">Hubungi PIC lewat WhatsApp untuk mendapatkan kode bayar.</div>
-          <div class="ck-wa-demo">Demo: RD-001 · kode 880001014821</div>
+          <div class="ck-wa-demo">Demo: ID RD-001 · kode (belum SK) 880009015507</div>
         </div>
         <a class="ck-wa-btn" id="ck-wa-link" href="https://wa.me/6280000000003" target="_blank" rel="noopener">Chat WA</a>
       </div>
+
+      <a class="ck-new" id="ck-new" href="retribusi.html">
+        <div class="ck-new-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 12v6M9 15h6"/></svg>
+        </div>
+        <div class="ck-wa-txt">
+          <div class="ck-wa-t">Belum menghuni? Ajukan permohonan baru</div>
+          <div class="ck-wa-d">Isi formulir, unggah surat permohonan, lalu tunggu SK terbit.</div>
+        </div>
+        <svg class="ck-new-ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
 
       <!-- Tidak ditemukan -->
       <div class="ck-notfound" id="rd-notfound">
@@ -426,6 +452,15 @@
           </div>
         </div>
 
+        <!-- Riwayat bayar -->
+        <div class="rd-detail-card">
+          <div class="rd-detail-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2M3 12a9 9 0 109-9 9 9 0 00-7 3.3M3 4v4h4"/></svg>
+            Riwayat Bayar
+          </div>
+          <div id="rd-riwayat"></div>
+        </div>
+
       </div>
 
       <div style="height:16px"></div>
@@ -472,6 +507,7 @@
       document.getElementById('rd-notfound').style.display = 'none';
       document.getElementById('ck-footer').style.display   = 'none';
       document.getElementById('rd-guide').style.display    = 'block';
+      document.getElementById('ck-new').style.display      = 'flex';
       _rdData = null;
     }
 
@@ -501,7 +537,7 @@
       _rdData = id ? cariTagihanRD(id) : cariTagihanByKode(kode);
       if(!_rdData){
         if(id){
-          showNotFound('Data Tidak Ditemukan','ID Pegawai tidak terdaftar pada SK Penghuni Rumah Dinas.<br>Periksa kembali atau hubungi BPAD Provinsi NTT.');
+          showNotFound('ID Tidak Ada di SK','ID Pegawai ini tidak tercantum di SK Penghuni Rumah Dinas.<br>Jika SK Anda belum terbit, kosongkan ID lalu isi kode bayar dari PIC OPD.');
         } else {
           showNotFound('Kode Bayar Tidak Dikenali','Kode bayar tidak ditemukan. Periksa kembali atau minta kode terbaru ke PIC OPD melalui WhatsApp.');
         }
@@ -516,13 +552,15 @@
     }
 
     function showResult(d){
-      document.getElementById('rd-id-pill').textContent   = d.id;
+      var belumSk = d.skTerbit === false;
+      document.getElementById('rd-id-pill').textContent   = belumSk ? 'SK belum terbit · bayar dengan kode' : (d.sk ? d.id + ' · ' + d.sk : d.id);
+      document.getElementById('ck-new').style.display     = 'none';
       document.getElementById('rd-kode').textContent      = d.kodeBayar || '—';
       document.getElementById('rd-nama').textContent      = d.nama || '—';
       document.getElementById('rd-jabatan').textContent   = d.jabatan || '—';
       document.getElementById('rd-alamat').textContent    = d.alamat || '—';
-      document.getElementById('rd-tipe').textContent      = 'Tipe ' + (d.tipe||'—');
-      document.getElementById('rd-luas').textContent      = (d.luas||0) + ' m²';
+      document.getElementById('rd-tipe').textContent      = d.tipe ? 'Tipe ' + d.tipe : '—';
+      document.getElementById('rd-luas').textContent      = d.luas ? d.luas + ' m²' : '—';
       document.getElementById('rd-status-asn').textContent = d.statusAsn || '—';
       document.getElementById('rd-biaya').textContent     = ru(d.biaya);
       var bln = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -534,6 +572,7 @@
         '<span class="rd-badge ' + (lunas?'lunas':'belum') + '">' +
         (lunas ? 'Lunas' : 'Belum Bayar') + '</span>';
 
+      renderRiwayat(d.id);
       document.getElementById('rd-result').style.display = 'block';
 
       var footer = document.getElementById('ck-footer');
@@ -547,6 +586,25 @@
         btn.disabled = false;
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Bayar Sekarang · ' + ru(d.biaya);
       }
+    }
+
+    function renderRiwayat(id){
+      var bln = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+      var rows = pembayaranRD().filter(function(p){ return p.id === id; });
+      var el = document.getElementById('rd-riwayat');
+      if(!rows.length){
+        el.innerHTML = '<div class="rd-rw-empty">Belum ada pembayaran yang tercatat.</div>';
+        return;
+      }
+      el.innerHTML = rows.map(function(p){
+        var t = new Date(p.tanggal), per = String(p.periode||'').split('-');
+        var periode = per.length === 2 ? bln[+per[1]-1] + ' ' + per[0] : '—';
+        var tgl = t.getDate() + ' ' + bln[t.getMonth()] + ' ' + t.getFullYear();
+        return '<div class="rd-rw-row"><div><div class="rd-rw-p">' + periode + '</div>'
+          + '<div class="rd-rw-d">Dibayar ' + tgl + ' · ' + (p.metode||'—') + '</div></div>'
+          + '<div class="rd-rw-r"><div class="rd-rw-a">' + ru(p.nominal) + '</div>'
+          + '<span class="rd-badge lunas">Lunas</span></div></div>';
+      }).join('');
     }
 
     function bayarRumahDinas(){
@@ -566,6 +624,17 @@
         }
       );
     }
+
+    /* tautan permohonan baru: unit rumah dinas pertama yang tersedia */
+    (function(){
+      var items = (DATA_LISTS.gedung && DATA_LISTS.gedung.items) || [];
+      for(var i=0;i<items.length;i++){
+        if(PRONTT.isRumahDinas(items[i]) && items[i].st === 'Tersedia'){
+          document.getElementById('ck-new').href = 'retridetail.html?cat=gedung&item=' + i;
+          return;
+        }
+      }
+    })();
 
     /* pre-fill from URL ?id=RD-001&kode=... */
     (function(){

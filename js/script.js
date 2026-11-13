@@ -49,7 +49,7 @@
       + '<div class="ts">' + tgl + 'Permohonan ' + a.id + '<br>'
       + PRONTT.statusOf(a.status) + '</div>'
       + '</div>'
-      + '<div class="r"><div class="amt">' + rupiah(a.total) + '</div><div class="st pending">Belum Dibayar</div></div>'
+      + '<div class="r"><div class="amt">' + rupiah(PRONTT.tarifBulananApp(a)) + '</div><div class="st pending">' + (pending ? 'Menunggu SK' : 'Per bulan') + '</div></div>'
       + '</div>';
   }
   function loadRwRumahDinas(){
@@ -517,11 +517,11 @@
     }
     el.innerHTML = head + apps.map(function(a){
       var chip = a.status==='menunggu' ? '<span class="chip proses">Menunggu Verifikasi OPD</span>'
-        : a.status==='sk' ? '<span class="chip disewa">SK Terbit · Menunggu Retribusi</span>'
+        : a.status==='sk' ? '<span class="chip disewa">SK Terbit · Bayar Bulanan</span>'
         : '<span class="chip tersedia">Aktif</span>';
       var act = '';
       if(a.status==='menunggu') act = '<button class="btn-sm" onclick="verifyApp(\''+a.id+'\')">Simulasi Verifikasi OPD</button>';
-      if(a.status==='sk') act = '<button class="btn-sm gold" onclick="openSheetApp(\''+a.id+'\')">Bayar Retribusi</button>';
+      if(a.status==='sk' || a.status==='aktif') act = '<button class="btn-sm gold" onclick="location.href=\'pages/cek-retribusi.html?id='+encodeURIComponent(PRONTT.idSewaApp(a))+'\'">Bayar Bulan Ini</button>';
       return '<div class="approw"><div class="ar1"><div><div class="aid">'+a.id+'</div><div class="anm">'+a.nama+'</div></div>'+chip+'</div>'
         + '<div class="ameta">Pemohon: '+a.pemohon+' ('+a.instansi+')<br>Masa sewa: '+a.masa
         + (a.sk?'<br>No. SK: '+a.sk:'') + '<br>Keperluan: '+a.keperluan+'</div>'

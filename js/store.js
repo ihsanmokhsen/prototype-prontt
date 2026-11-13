@@ -78,8 +78,50 @@ window.PRONTT = (function(){
   }
   function statusOf(status){
     if(status === 'menunggu') return 'Menunggu verifikasi OPD';
-    if(status === 'sk') return 'SK terbit · menunggu pembayaran';
+    if(status === 'sk') return 'SK terbit · bayar bulanan di Cek & Bayar';
     return 'Aktif';
+  }
+
+  function idSewaApp(a){
+    if(!a) return '';
+    if(a.idsewa) return a.idsewa;
+    var n = String(a.id || '').replace(/\D/g, '').slice(-4);
+    return n ? 'PW-' + n : '';
+  }
+  function durasiApp(a){
+    var m = String((a && a.masa) || '').match(/(\d+)\s*bulan/);
+    return clampBulan((a && a.durasi) || (m && m[1]) || 1);
+  }
+  function tarifBulananApp(a){ return Math.round((a.total || 0) / durasiApp(a)); }
+  // permohonan rumah dinas yang SK-nya sudah terbit -> tagihan bulanan di Cek & Bayar
+  function tagihanApp(a){
+    return {
+      id: idSewaApp(a), appId: a.id, sk: a.sk,
+      nama: a.pemohon, jabatan: a.instansi,
+      alamat: a.nama + (a.kode ? ' · ' + a.kode : ''),
+      luas: null, tipe: null, statusAsn: null, kodeBayar: null,
+      biaya: tarifBulananApp(a)
+    };
+  }
+  function cariTagihanApp(query){
+    var q = String(query || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    var m = q.match(/^PW0*(\d+)$/);
+    if(!m) return null;
+    var list = apps();
+    for(var i=0;i<list.length;i++){
+      var a = list[i];
+      if(!isRumahDinasApp(a) || !a.sk) continue;
+      var n = idSewaApp(a).replace(/\D/g, '').replace(/^0+/, '');
+      if(n === m[1]) return tagihanApp(a);
+    }
+    return null;
+  }
+  function aktifkanApp(id, metode){
+    var list = apps();
+    for(var i=0;i<list.length;i++){
+      if(list[i].id === id){ list[i].status = 'aktif'; list[i].bayar = metode; }
+    }
+    saveApps(list);
   }
 
   function clampBulan(n){ return Math.max(1, Math.min(12, parseInt(n, 10) || 1)); }
@@ -120,6 +162,7 @@ window.PRONTT = (function(){
     payments: payments, addPayment: addPayment, recordPayment: recordPayment,
     isRumahDinas: isRumahDinas, isRumahDinasApp: isRumahDinasApp,
     runningApps: runningApps, statusOf: statusOf,
+    idSewaApp: idSewaApp, tarifBulananApp: tarifBulananApp, cariTagihanApp: cariTagihanApp, aktifkanApp: aktifkanApp,
     clampBulan: clampBulan, bulanRange: bulanRange, isDriveLink: isDriveLink
   };
 })();
