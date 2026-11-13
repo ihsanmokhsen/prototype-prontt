@@ -99,9 +99,9 @@
   function valOr(id,fb){ var el=document.getElementById(id); var v=el?el.value.trim():''; return v||fb; }
 
   // ===== payment sheet =====
-  var payCtx = {item:'Pajak Kendaraan Bermotor', total:'Rp 1.247.500', jenis:'Pajak Kendaraan (PKB)', appId:null, bill:false};
+  var payCtx = {item:'Pajak Kendaraan Bermotor', total:'Rp 1.247.500', jenis:'Pajak Kendaraan (PKB)', appId:null, bill:false, kendaraanId:null};
   function openSheet(item,total){
-    payCtx.appId = null; payCtx.bill = false;
+    payCtx.appId = null; payCtx.bill = false; payCtx.kendaraanId = null;
     if(item){ payCtx.item=item; payCtx.total=total; payCtx.jenis=item; }
     else { payCtx.item='Pajak Kendaraan Bermotor'; payCtx.total='Rp 1.247.500'; payCtx.jenis='Pajak Kendaraan (PKB)'; }
     document.getElementById('sheet-item').textContent = payCtx.item;
@@ -149,7 +149,18 @@
     document.getElementById('rc-total').textContent = payCtx.total;
     var sub = document.getElementById('sukses-sub');
     if(payCtx.jenis.indexOf('Pajak')>=0){
-      sub.innerHTML = 'Pajak kendaraan DH 1234 ABC telah lunas.<br>E-TBPKP &amp; bukti bayar dikirim ke akun Anda.';
+      var kv = payCtx.kendaraanId ? cariKendaraan(payCtx.kendaraanId) : null;
+      if(kv){
+        var list = loadKendaraan();
+        for(var i=0;i<list.length;i++){
+          if(list[i].id===kv.id){ kv = list[i]; kv.tempo = tambahTahun(kv.tempo); break; }
+        }
+        simpanKendaraan(list);
+        renderKendaraanList();
+        sub.innerHTML = 'Pajak kendaraan '+kv.nopol+' telah lunas.<br>Masa berlaku diperbarui hingga '+fmtTgl(kv.tempo)+'.';
+      } else {
+        sub.innerHTML = 'Pajak kendaraan DH 1234 ABC telah lunas.<br>E-TBPKP &amp; bukti bayar dikirim ke akun Anda.';
+      }
     } else {
       sub.innerHTML = payCtx.item+' telah lunas.<br>Bukti bayar dikirim ke akun Anda.';
     }
@@ -495,9 +506,171 @@
   }
   function openMyApps(){ renderMyApps(); go('permohonansaya'); }
 
+  // ===== kendaraan saya & pengingat pajak =====
+  var KD_KEY = 'prontt.kendaraan.v1';
+  var kdAktif = null;
+
+  function gv(id){ var e=document.getElementById(id); return e ? e.value.trim() : ''; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  }); }
+  function tambahHari(n){
+    var d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+n);
+    return isoDate(d);
+  }
+  function tambahTahun(iso){
+    var p=(iso||'').split('-'); if(p.length!==3) return iso;
+    return (+p[0]+1)+'-'+pad(+p[1])+'-'+pad(+p[2]);
+  }
+  function hariKeTempo(iso){
+    var p=(iso||'').split('-'); if(p.length!==3) return null;
+    var t=new Date(+p[0],+p[1]-1,+p[2]); var now=new Date(); now.setHours(0,0,0,0);
+    return Math.round((t.getTime()-now.getTime())/86400000);
+  }
+  function loadKendaraan(){
+    var raw = localStorage.getItem(KD_KEY);
+    if(raw===null){
+      var seed = [
+        {id:'K'+Date.now(), nopol:'DH 1234 ABC', merk:'Toyota Avanza 1.3 G', tahun:2019, warna:'Hitam', rangka:'84213', tempo:tambahHari(24), pkb:1045000, swd:143000},
+        {id:'K'+(Date.now()+1), nopol:'DH 8821 AB', merk:'Honda Vario 125', tahun:2021, warna:'Merah', rangka:'55120', tempo:tambahHari(-61), pkb:248000, swd:35000}
+      ];
+      localStorage.setItem(KD_KEY, JSON.stringify(seed));
+      return seed;
+    }
+    try{ return JSON.parse(raw) || []; }catch(e){ return []; }
+  }
+  function simpanKendaraan(list){ try{ localStorage.setItem(KD_KEY, JSON.stringify(list)); }catch(e){} }
+  function cariKendaraan(id){
+    var list=loadKendaraan();
+    for(var i=0;i<list.length;i++){ if(list[i].id===id) return list[i]; }
+    return null;
+  }
+  function statusTempo(d){
+    if(d===null) return {cls:'tidak', text:'Tempo belum diisi'};
+    if(d<0) return {cls:'tidak', text:'Lewat '+Math.abs(d)+' hari'};
+    if(d===0) return {cls:'proses', text:'Jatuh tempo hari ini'};
+    if(d<=30) return {cls:'proses', text:d+' hari lagi'};
+    return {cls:'tersedia', text:'Aktif · '+d+' hari lagi'};
+  }
+  function renderKendaraanList(){
+    var el=document.getElementById('kendaraan-list'); if(!el) return;
+    var list=loadKendaraan();
+    if(!list.length){
+      el.innerHTML = '<div class="empty"><div class="t">Belum ada kendaraan</div><div class="d">Tambahkan kendaraan untuk melihat masa berlaku dan jadwal bayar pajaknya.</div></div>';
+      return;
+    }
+    var overdue = 0;
+    var cards = list.map(function(v){
+      var d=hariKeTempo(v.tempo); var st=statusTempo(d);
+      if(d!==null && d<0) overdue++;
+      return '<div class="vcard" onclick="bukaKendaraan(\''+v.id+'\')">'
+        + '<div class="vc-top"><span class="plate-badge sm">'+esc(v.nopol)+'</span>'
+        +   '<span class="chip '+st.cls+'">'+st.text+'</span></div>'
+        + '<div class="vc-name">'+esc(v.merk||'Kendaraan')+'</div>'
+        + '<div class="vc-sub">Tahun '+esc(v.tahun||'-')+' · '+esc(v.warna||'-')+' · Rangka ••••'+esc(v.rangka||'')+'</div>'
+        + '<div class="vc-due"><span class="k">Jatuh tempo pajak</span><span class="v">'+fmtTgl(v.tempo)+'</span></div>'
+        + '<div class="vc-actions"><button class="vc-del" onclick="event.stopPropagation();hapusKendaraan(\''+v.id+'\')">Hapus</button>'
+        +   '<button class="btn-sm gold" onclick="event.stopPropagation();bukaKendaraan(\''+v.id+'\')">Cek &amp; Bayar</button></div>'
+        + '</div>';
+    }).join('');
+    var note = overdue
+      ? '<div class="note-warn">'+overdue+' kendaraan melewati jatuh tempo pajak. Segera lakukan pembayaran.</div>'
+      : '';
+    el.innerHTML = note + cards;
+  }
+  function hapusKendaraan(id){
+    simpanKendaraan(loadKendaraan().filter(function(v){ return v.id!==id; }));
+    renderKendaraanList();
+  }
+  function openTambahKendaraan(){
+    ['tk2','tk3','tk-merk','tk-tahun','tk-warna','tk-rangka','tk-tempo'].forEach(function(id){
+      var e=document.getElementById(id); if(e) e.value='';
+    });
+    var p1=document.getElementById('tk1'); if(p1) p1.value='DH';
+    var pkb=document.getElementById('tk-pkb'); if(pkb) pkb.value='1045000';
+    var err=document.getElementById('tk-error'); if(err) err.hidden=true;
+    go('tambahkendaraan');
+  }
+  function simpanKendaraanBaru(){
+    var err=document.getElementById('tk-error');
+    var p1=gv('tk1'), p2=gv('tk2'), p3=gv('tk3');
+    var tempo=gv('tk-tempo');
+    var pkb=parseInt(gv('tk-pkb'),10)||0;
+    var msg='';
+    if(!p1 || !p2 || !p3) msg='Nomor polisi belum lengkap.';
+    else if(!tempo) msg='Jatuh tempo pajak wajib diisi.';
+    else if(pkb<=0) msg='Nilai PKB wajib diisi.';
+    if(msg){ if(err){ err.textContent=msg; err.hidden=false; } return; }
+    if(err) err.hidden=true;
+    var list=loadKendaraan();
+    list.unshift({
+      id:'K'+Date.now(), nopol:(p1+' '+p2+' '+p3).toUpperCase(),
+      merk:gv('tk-merk')||'Kendaraan', tahun:gv('tk-tahun')||'-', warna:gv('tk-warna')||'-',
+      rangka:gv('tk-rangka'), tempo:tempo, pkb:pkb, swd:143000
+    });
+    simpanKendaraan(list);
+    renderKendaraanList();
+    go('samsat');
+  }
+  function hitungPajak(v){
+    var d=hariKeTempo(v.tempo);
+    var bln = (d!==null && d<0) ? Math.min(24, Math.ceil(Math.abs(d)/30)) : 0;
+    var pkb=+v.pkb||0, swd=+v.swd||143000;
+    var dpkb=Math.round(pkb*0.02*bln);
+    var dswd=bln>0 ? 7000 : 0;
+    return {hari:d, bln:bln, pkb:pkb, swd:swd, dpkb:dpkb, dswd:dswd, total:pkb+swd+dpkb+dswd};
+  }
+  function renderHasilPajak(v){
+    var h=hitungPajak(v), st=statusTempo(h.hari);
+    document.getElementById('hp-plate').textContent=v.nopol;
+    document.getElementById('hp-name').textContent=v.merk||'Kendaraan';
+    document.getElementById('hp-meta').textContent='Tahun '+(v.tahun||'-')+' · '+(v.warna||'-')+' · Rangka ••••'+(v.rangka||'');
+    document.getElementById('hp-sub').textContent='Jatuh tempo '+fmtTgl(v.tempo);
+    document.getElementById('hp-tags').innerHTML =
+      '<span class="tag '+(h.hari<0?'warn':'info')+'">'+st.text+'</span>'
+      + (h.bln>0 ? '<span class="tag info">Terlambat '+h.bln+' bulan</span>' : '');
+    document.getElementById('hp-pkb').textContent=rupiah(h.pkb);
+    document.getElementById('hp-swd').textContent=rupiah(h.swd);
+    document.getElementById('hp-dendapkb').textContent=rupiah(h.dpkb);
+    document.getElementById('hp-dendaswd').textContent=rupiah(h.dswd);
+    document.getElementById('hp-dendapkb-row').hidden = h.dpkb===0;
+    document.getElementById('hp-dendaswd-row').hidden = h.dswd===0;
+    document.getElementById('hp-tempo').textContent=fmtTgl(v.tempo);
+    document.getElementById('hp-total').textContent=rupiah(h.total);
+    document.getElementById('hp-btn').textContent='Bayar Sekarang · '+rupiah(h.total);
+  }
+  function bukaKendaraan(id){
+    var v=cariKendaraan(id); if(!v) return;
+    kdAktif=id;
+    renderHasilPajak(v);
+    go('hasilpajak');
+  }
+  function bayarKendaraan(){
+    var v=cariKendaraan(kdAktif); if(!v) return;
+    var h=hitungPajak(v);
+    openSheet('Pajak Kendaraan · '+v.nopol, rupiah(h.total));
+    payCtx.kendaraanId=v.id;
+  }
+  function cekPajakManual(){
+    var nopol=(gv('p1')+' '+gv('p2')+' '+gv('p3')).replace(/\s+/g,'').toUpperCase();
+    var rangka=gv('rangka');
+    var list=loadKendaraan(), found=null;
+    for(var i=0;i<list.length;i++){
+      var v=list[i];
+      if(String(v.nopol).replace(/\s+/g,'').toUpperCase()===nopol && (!rangka || String(v.rangka)===rangka)){ found=v; break; }
+    }
+    var err=document.getElementById('cp-error');
+    if(!found){
+      if(err){ err.textContent='Kendaraan tidak ditemukan. Tambahkan kendaraan terlebih dahulu di menu Samsat.'; err.hidden=false; }
+      return;
+    }
+    if(err) err.hidden=true;
+    bukaKendaraan(found.id);
+  }
+
   // live-ish clock
   function tick(){
     var d=new Date(), h=('0'+d.getHours()).slice(-2), m=('0'+d.getMinutes()).slice(-2);
     var c=document.getElementById('clock'); if(c) c.textContent=h+':'+m;
   }
-  buildTabs(); tick(); setInterval(tick, 10000);
+  buildTabs(); tick(); renderKendaraanList(); setInterval(tick, 10000);
