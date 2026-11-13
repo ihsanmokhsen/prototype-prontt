@@ -217,6 +217,9 @@
   .inp::placeholder{color:var(--faint);font-weight:500;letter-spacing:1px}
   .inp:focus{border-color:var(--blue-400);box-shadow:0 0 0 4px var(--blue-50)}
   .inp.text-left{text-align:left;letter-spacing:0}
+  select.inp{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:44px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7c8f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;background-position:right 14px center}
   .hint{font-size:11.5px;color:var(--muted);margin-top:8px;display:flex;gap:6px;align-items:flex-start}
   .hint svg{width:14px;height:14px;flex:0 0 14px;margin-top:1px;color:var(--blue-400)}
 

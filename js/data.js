@@ -16,6 +16,16 @@ function fmtMasa(iso, days){
   if(e.getTime()!==s.getTime()) label = s.getDate()+' '+BULAN[s.getMonth()]+' – '+e.getDate()+' '+BULAN[e.getMonth()]+' '+e.getFullYear();
   return label+' · '+Math.max(1,days)+' hari';
 }
+function fmtMasaBulan(iso, months){
+  var p = (iso||'').split('-'); if(p.length!==3) return iso||'-';
+  var n = Math.max(1, Math.min(12, parseInt(months,10)||1));
+  var s = new Date(+p[0], +p[1]-1, +p[2]);
+  var e = new Date(s.getFullYear(), s.getMonth()+n, s.getDate());
+  e.setDate(e.getDate()-1);
+  var label = fmtTgl(iso);
+  if(e.getTime()!==s.getTime()) label = s.getDate()+' '+BULAN[s.getMonth()]+' – '+e.getDate()+' '+BULAN[e.getMonth()]+' '+e.getFullYear();
+  return label+' · '+n+' bulan';
+}
 function rupiah(n){ return 'Rp '+Number(n||0).toLocaleString('id-ID'); }
 function unitShort(u){ return (u||'').replace('per ',''); }
 function chipCls(s){

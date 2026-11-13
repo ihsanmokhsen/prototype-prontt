@@ -146,7 +146,7 @@ function renderDetail(){
         + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Tanpa permohonan &amp; SK</span>';
       stokrow.hidden = true;
     }
-    document.getElementById('rd-qtylabel').textContent = 'Durasi ('+unitShort(g.un)+')';
+    document.getElementById('rd-qtylabel').textContent = rumahDinas ? 'Durasi (bulan)' : 'Durasi ('+unitShort(g.un)+')';
     if(flowblock) flowblock.hidden = !rumahDinas;
     var avail = g.st === 'Tersedia';
     btn.disabled = rumahDinas ? !avail : false;
@@ -171,11 +171,13 @@ function initDetail(){
   var key = qs('cat'), i = parseInt(qs('item'),10);
   if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi.html'); return; }
   rState.cat = key; rState.idx = i;
-  rState.qty = Math.max(1, parseInt(qs('qty'),10)||1);
+  rState.qty = Math.max(1, Math.min(12, parseInt(qs('qty'),10)||1));
   renderDetail();
 }
 function rdQty(d){
-  rState.qty = Math.max(1, Math.min(999, rState.qty + d));
+  var g = LISTS[rState.cat].items[rState.idx];
+  var max = isRumahDinas(rState.cat,g) ? 12 : 999;
+  rState.qty = Math.max(1, Math.min(max, rState.qty + d));
   if(history.replaceState){
     var url = 'retridetail.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
     history.replaceState(null, '', url);
@@ -215,7 +217,7 @@ function initForm(){
   var key = qs('cat'), i = parseInt(qs('item'),10);
   if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi.html'); return; }
   rState.cat = key; rState.idx = i;
-  rState.qty = Math.max(1, parseInt(qs('qty'),10)||1);
+  rState.qty = Math.max(1, Math.min(12, parseInt(qs('qty'),10)||1));
   var g = LISTS[key].items[i];
   if(!isRumahDinas(key,g)){
     location.replace('bill.html?cat='+key+'&item='+i+'&qty='+rState.qty);
@@ -227,7 +229,7 @@ function initForm(){
   document.getElementById('pf-opd').value = '';
   document.getElementById('pf-keperluan').value = '';
   document.getElementById('pf-mulai').value = isoDate(new Date());
-  document.getElementById('pf-durasi').value = rState.qty;
+  document.getElementById('pf-durasi').value = String(rState.qty);
   pfDurasi();
   var drv = document.getElementById('pf-drive');
   if(drv) drv.value = '';
@@ -271,7 +273,9 @@ function pfDrive(){
 }
 function pfDurasi(){
   var g = LISTS[rState.cat].items[rState.idx];
-  var d = Math.max(1, parseInt(document.getElementById('pf-durasi').value,10)||1);
+  var el = document.getElementById('pf-durasi');
+  var d = Math.max(1, Math.min(12, parseInt(el.value,10)||1));
+  if(el.value !== String(d)) el.value = String(d);
   document.getElementById('pf-total').textContent = rupiah(g.p*d);
 }
 function submitPermohonan(){
@@ -280,7 +284,7 @@ function submitPermohonan(){
     location.replace('bill.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty);
     return;
   }
-  var durasi = Math.max(1, parseInt(document.getElementById('pf-durasi').value,10)||1);
+  var durasi = Math.max(1, Math.min(12, parseInt(document.getElementById('pf-durasi').value,10)||1));
   var mulai = document.getElementById('pf-mulai').value || isoDate(new Date());
   var apps = loadApps();
   var seq = parseInt(localStorage.getItem(APP_SEQ)||'8',10);
@@ -291,7 +295,7 @@ function submitPermohonan(){
     pemohon:valOr('pf-nama','Muhammad Ihsanul'),
     instansi:valOr('pf-opd','Perorangan'),
     keperluan:valOr('pf-keperluan','Kegiatan'),
-    mulai:mulai, masa:fmtMasa(mulai,durasi), total:g.p*durasi,
+    mulai:mulai, masa:fmtMasaBulan(mulai,durasi), total:g.p*durasi,
     status:'menunggu', sk:'', bayar:''
   };
   if(pfDriveLink){

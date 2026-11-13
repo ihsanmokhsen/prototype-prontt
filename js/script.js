@@ -88,6 +88,16 @@
     if(e.getTime()!==s.getTime()) label = s.getDate()+' '+BULAN[s.getMonth()]+' – '+e.getDate()+' '+BULAN[e.getMonth()]+' '+e.getFullYear();
     return label+' · '+Math.max(1,days)+' hari';
   }
+  function fmtMasaBulan(iso, months){
+    var p = (iso||'').split('-'); if(p.length!==3) return iso||'-';
+    var n = Math.max(1, Math.min(12, parseInt(months,10)||1));
+    var s = new Date(+p[0], +p[1]-1, +p[2]);
+    var e = new Date(s.getFullYear(), s.getMonth()+n, s.getDate());
+    e.setDate(e.getDate()-1);
+    var label = fmtTgl(iso);
+    if(e.getTime()!==s.getTime()) label = s.getDate()+' '+BULAN[s.getMonth()]+' – '+e.getDate()+' '+BULAN[e.getMonth()]+' '+e.getFullYear();
+    return label+' · '+n+' bulan';
+  }
   function rupiah(n){ return 'Rp '+Number(n||0).toLocaleString('id-ID'); }
   function unitShort(u){ return (u||'').replace('per ',''); }
   function chipCls(s){
@@ -333,7 +343,7 @@
   function openAset(key, i){
     var g = LISTS[key].items[i];
     rd.sewa = true; rd.key = key; rd.idx = i;
-    rd.unit = g.p; rd.qty = 1;
+    rd.unit = g.p; rd.qty = 1; rd.months = /bulan/i.test(g.un||'');
     rd.name = g.n; rd.cat = 'Sewa Aset'; rd.from = 'itemlist';
     document.getElementById('rd-cat').textContent = 'Detail Aset';
     document.getElementById('rd-sub').textContent = 'Sewa aset daerah';
@@ -373,7 +383,7 @@
     }).join('');
   }
 
-  function rdQty(d){ rd.qty = Math.max(1, rd.qty + d); rdRender(); }
+  function rdQty(d){ rd.qty = Math.max(1, Math.min(rd.months ? 12 : 999, rd.qty + d)); rdRender(); }
   function rdRender(){
     document.getElementById('rd-qty').textContent = rd.qty;
     document.getElementById('rd-total').textContent = rupiah(rd.unit * rd.qty);
@@ -453,24 +463,26 @@
     document.getElementById('pf-opd').value = '';
     document.getElementById('pf-keperluan').value = '';
     document.getElementById('pf-mulai').value = isoDate(new Date());
-    document.getElementById('pf-durasi').value = rd.qty;
+    document.getElementById('pf-durasi').value = String(rd.qty);
     pfDurasi();
     go('permohonan');
   }
   function pfDurasi(){
-    var d = Math.max(1, parseInt(document.getElementById('pf-durasi').value,10)||1);
+    var el = document.getElementById('pf-durasi');
+    var d = Math.max(1, Math.min(12, parseInt(el.value,10)||1));
+    if(el.value !== String(d)) el.value = String(d);
     document.getElementById('pf-total').textContent = rupiah(rd.unit*d);
   }
   function submitPermohonan(){
     var g = LISTS[rd.key].items[rd.idx];
-    var durasi = Math.max(1, parseInt(document.getElementById('pf-durasi').value,10)||1);
+    var durasi = Math.max(1, Math.min(12, parseInt(document.getElementById('pf-durasi').value,10)||1));
     var mulai = document.getElementById('pf-mulai').value || isoDate(new Date());
     apps.unshift({
       id:'PRM-'+('000'+appSeq++).slice(-4), nama:g.n, kode:g.k, unit:g.un,
       pemohon:valOr('pf-nama','Muhammad Ihsanul'),
       instansi:valOr('pf-opd','Perorangan'),
       keperluan:valOr('pf-keperluan','Kegiatan'),
-      mulai:mulai, masa:fmtMasa(mulai,durasi), total:g.p*durasi,
+      mulai:mulai, masa:fmtMasaBulan(mulai,durasi), total:g.p*durasi,
       status:'menunggu', sk:'', bayar:''
     });
     justSubmitted = true;
