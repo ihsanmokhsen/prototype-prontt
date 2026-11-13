@@ -529,7 +529,7 @@
   .berkas{display:flex;align-items:center;gap:8px;background:var(--blue-50);border-radius:9px;padding:8px 10px;margin-top:9px;font-size:11px;color:var(--ink-2)}
   .berkas svg{width:15px;height:15px;color:var(--blue-600);flex:0 0 15px}
   .berkas span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
-  .berkas button{border:0;background:#fff;color:var(--blue-700);font-family:var(--ff-display);font-weight:700;font-size:10.5px;padding:5px 8px;border-radius:7px;cursor:pointer}
+  .berkas button,.berkas a{border:0;background:#fff;color:var(--blue-700);font-family:var(--ff-display);font-weight:700;font-size:10.5px;padding:5px 8px;border-radius:7px;cursor:pointer;text-decoration:none;flex:0 0 auto}
   .hist{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px}
   .hist .h1{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--ff-display);font-weight:700;font-size:12.5px;color:var(--ink)}
   .hist .hstat{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.3px;text-transform:uppercase}

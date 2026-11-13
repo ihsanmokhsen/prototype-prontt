@@ -229,6 +229,10 @@ function initForm(){
   document.getElementById('pf-mulai').value = isoDate(new Date());
   document.getElementById('pf-durasi').value = rState.qty;
   pfDurasi();
+  var drv = document.getElementById('pf-drive');
+  if(drv) drv.value = '';
+  pfDriveLink = '';
+  pfDriveHint('');
 
   var rumahDinas = isRumahDinas(key,g);
   var docblock = document.getElementById('pf-docblock');
@@ -242,35 +246,28 @@ function initForm(){
       + '<a class="wbtn" href="https://wa.me/'+c.wa+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">Chat WA</a>';
   }
 }
-var pfFileData = null;
-function pfFile(){
-  var inp = document.getElementById('pf-file');
-  var f = inp && inp.files ? inp.files[0] : null;
-  var lbl = document.getElementById('pf-filelabel');
-  var dsc = document.getElementById('pf-filedesc');
-  pfFileData = null;
-  if(!f){
-    lbl.textContent = 'Unggah surat yang sudah diisi';
-    dsc.textContent = 'PDF, DOC/DOCX, atau foto · maks 5 MB';
+var pfDriveLink = '';
+function pfDriveHint(state, msg){
+  var h = document.getElementById('pf-drivehint');
+  if(!h) return;
+  var icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>';
+  if(state === 'ok') icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  if(state === 'err') icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>';
+  var text = msg || 'Tempelkan link file/folder Drive yang sudah diatur <b>open access</b> (siapa saja yang memiliki link).';
+  h.innerHTML = icon + '<span>' + text + '</span>';
+  h.style.color = state === 'ok' ? '#0f7a4d' : state === 'err' ? '#b3261e' : '';
+}
+function pfDrive(){
+  var inp = document.getElementById('pf-drive');
+  var v = inp ? inp.value.trim() : '';
+  pfDriveLink = '';
+  if(!v){ pfDriveHint(''); return; }
+  if(!/^https?:\/\/(drive|docs)\.google\.com\//i.test(v)){
+    pfDriveHint('err', 'Link harus dari Google Drive (contoh: https://drive.google.com/...).');
     return;
   }
-  if(!/\.(pdf|docx?|jpe?g|png)$/i.test(f.name)){
-    alert('Format berkas harus PDF, DOC/DOCX, JPG, atau PNG.');
-    inp.value = '';
-    return;
-  }
-  if(f.size > 5*1024*1024){
-    alert('Ukuran berkas maksimal 5 MB.');
-    inp.value = '';
-    return;
-  }
-  var r = new FileReader();
-  r.onload = function(){
-    pfFileData = {name:f.name, type:f.type, size:f.size, data:r.result};
-    lbl.textContent = f.name;
-    dsc.textContent = Math.max(1, Math.round(f.size/1024))+' KB · siap diunggah';
-  };
-  r.readAsDataURL(f);
+  pfDriveLink = v;
+  pfDriveHint('ok', 'Link Drive siap dikirim. Pastikan aksesnya sudah <b>open access</b>.');
 }
 function pfDurasi(){
   var g = LISTS[rState.cat].items[rState.idx];
@@ -297,9 +294,8 @@ function submitPermohonan(){
     mulai:mulai, masa:fmtMasa(mulai,durasi), total:g.p*durasi,
     status:'menunggu', sk:'', bayar:''
   };
-  if(pfFileData){
-    app.berkas = pfFileData.name;
-    try{ sessionStorage.setItem('prontt.file.'+id, JSON.stringify(pfFileData)); }catch(e){}
+  if(pfDriveLink){
+    app.driveLink = pfDriveLink;
   }
   apps.unshift(app);
   localStorage.setItem(APP_SEQ, String(seq+1));
@@ -363,7 +359,7 @@ function renderMyApps(){
   if(qs('submitted')){
     var latest = apps[0];
     head = '<div class="note-ok">Permohonan berhasil dikirim'
-      + (latest && latest.berkas ? ' beserta surat permohonan' : '')
+      + (latest && (latest.driveLink || latest.berkas) ? ' beserta surat permohonan' : '')
       + '. Menunggu verifikasi OPD.</div>';
     if(history.replaceState) history.replaceState(null, '', 'permohonansaya.html');
   }
@@ -378,15 +374,17 @@ function renderMyApps(){
     var act = '';
     if(a.status==='menunggu') act = '<button class="btn-sm" onclick="verifyApp(\''+a.id+'\')">Simulasi Verifikasi OPD</button>';
     if(a.status==='sk') act = '<button class="btn-sm gold" onclick="openSheetApp(\''+a.id+'\')">Bayar Retribusi</button>';
-    var berkasBlock = a.berkas
-      ? '<div class="berkas">'+FILE_ICON+'<span>'+a.berkas+'</span><button onclick="viewBerkas(\''+a.id+'\')">Lihat</button></div>'
-      : '';
+    var berkasBlock = a.driveLink
+      ? '<div class="berkas">'+FILE_ICON+'<span>Surat Permohonan (Google Drive)</span><a href="'+a.driveLink+'" target="_blank" rel="noopener">Buka</a></div>'
+      : (a.berkas
+        ? '<div class="berkas">'+FILE_ICON+'<span>'+a.berkas+'</span><button onclick="viewBerkas(\''+a.id+'\')">Lihat</button></div>'
+        : '');
     var waBlock = '';
     if(a.status==='menunggu'){
       var opdName = a.opd || (a.cat && LISTS[a.cat] ? LISTS[a.cat].opd : '');
       var c = contactOf(opdName);
       var msg = 'Halo '+c.nama+', saya ingin menindaklanjuti permohonan sewa aset PRO NTT '+a.id+' ('+a.nama+').'
-        + (a.berkas ? ' Saya sudah mengunggah surat permohonan ('+a.berkas+').' : '')
+        + (a.driveLink ? ' Link surat permohonan: '+a.driveLink+'.' : (a.berkas ? ' Saya sudah mengunggah surat permohonan ('+a.berkas+').' : ''))
         + ' Mohon bantu verifikasi. Terima kasih.';
       waBlock = '<div class="wa-follow">'
         + '<div class="wi">'+WA_ICON+'</div>'

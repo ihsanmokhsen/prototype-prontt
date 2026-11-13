@@ -24,18 +24,20 @@
         </div>
         <div class="docbox" id="pf-docblock" hidden>
           <div class="dt">Lampiran Surat Permohonan</div>
-          <div class="dd">Unduh template, isi dan tanda tangani, lalu unggah di sini. Belum sempat mengisi? Hubungi admin OPD lewat WhatsApp.</div>
+          <div class="dd">Unduh template, isi dan tanda tangani, lalu simpan di Google Drive dan tempelkan link-nya di sini. Jangan lupa atur akses menjadi <b>"Siapa saja yang memiliki link"</b> (open access) agar OPD dapat membukanya.</div>
           <a class="docrow" href="../docs/Surat_Permohonan_Sewa_Rumah_Dinas.docx?v=2" download="Surat_Permohonan_Rumah_Dinas.docx">
             <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div>
-            <div class="dn">Surat Permohonan Rumah Dinas<small>Template DOCX · isi lalu unggah</small></div>
+            <div class="dn">Surat Permohonan Rumah Dinas<small>Template DOCX · isi lalu simpan di Drive</small></div>
             <span class="pdf">DOCX</span>
           </a>
-          <label class="upload" for="pf-file">
-            <span class="uic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg></span>
-            <span><span class="ut" id="pf-filelabel">Unggah surat yang sudah diisi</span><span class="ud" id="pf-filedesc">PDF, DOC/DOCX, atau foto · maks 5 MB</span></span>
-            <span class="ubtn">Pilih</span>
-            <input id="pf-file" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" hidden onchange="pfFile()">
-          </label>
+          <div class="field" style="margin:12px 0 0">
+            <label class="label">Link Google Drive Surat Permohonan</label>
+            <input class="inp text-left" id="pf-drive" placeholder="https://drive.google.com/..." autocomplete="off" oninput="pfDrive()">
+            <div class="hint" id="pf-drivehint" style="margin-top:7px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+              <span>Tempelkan link file/folder Drive yang sudah diatur <b>open access</b> (siapa saja yang memiliki link).</span>
+            </div>
+          </div>
           <div class="wa-follow" id="pf-wa"></div>
         </div>
         <div class="field">
