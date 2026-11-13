@@ -24,6 +24,9 @@ Foto contoh diambil dari Wikimedia Commons. Lisensi sesuai kolom; atribusi dican
 | pakan-gung.jpg | [Sesbania grandiflora seedling.jpg](https://commons.wikimedia.org/wiki/File:Sesbania_grandiflora_seedling.jpg) | Vijayanrajapuram | CC BY-SA 4.0 |
 | pakan-lamtoro.jpg | [Leucaena leucocephala. AJT Johnsingh. P1000746.jpg](https://commons.wikimedia.org/wiki/File:Leucaena_leucocephala._AJT_Johnsingh._P1000746.jpg) | Ajtjohnsingh | CC BY-SA 4.0 |
 | ruko-friendship.jpg | [Ruko Cempaka Mas-10.jpg](https://commons.wikimedia.org/wiki/File:Ruko_Cempaka_Mas-10.jpg) | Indonesiagood | CC BY 4.0 |
+| rumah-dinas-1.jpg | [Rumah Dinas Pegawai Stasiun Kalimenur (1).jpg](https://commons.wikimedia.org/wiki/File:Rumah_Dinas_Pegawai_Stasiun_Kalimenur_(1).jpg) | Ozymandros Caelum | CC BY-SA 4.0 |
+| rumah-dinas-2.jpg | [Rumah Dinas Bupati Tasikmalaya - 02.jpg](https://commons.wikimedia.org/wiki/File:Rumah_Dinas_Bupati_Tasikmalaya_-_02.jpg) | Pijri Paijar | CC BY-SA 4.0 |
+| rumah-dinas-3.jpg | [Perumahan Dinas Kalisat Belakang 2023.jpg](https://commons.wikimedia.org/wiki/File:Perumahan_Dinas_Kalisat_Belakang_2023.jpg) | Wong Langsep | CC BY-SA 4.0 |
 | tanah-1.jpg | [Apple 8 Residence - Lahan Kosong 1.jpg](https://commons.wikimedia.org/wiki/File:Apple_8_Residence_-_Lahan_Kosong_1.jpg) | Abdul Hanif Arromy | CC BY 4.0 |
 | tanah-2.jpg | [Apple 8 Residence - Lahan Kosong 2.jpg](https://commons.wikimedia.org/wiki/File:Apple_8_Residence_-_Lahan_Kosong_2.jpg) | Abdul Hanif Arromy | CC BY 4.0 |
 | ternak-ayam.jpg | [Ayam kampung Jantan dan Betina.jpg](https://commons.wikimedia.org/wiki/File:Ayam_kampung_Jantan_dan_Betina.jpg) | Fata Teguh Prasetya | CC BY-SA 4.0 |
