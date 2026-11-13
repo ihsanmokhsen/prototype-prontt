@@ -705,12 +705,24 @@ function initSukses(){
 // ================= router halaman =================
 document.addEventListener('DOMContentLoaded', function(){
   if(document.getElementById('retribusi')) return;
-  if(document.getElementById('itemlist')) return initList();
-  if(document.getElementById('retridetail')) return initDetail();
-  if(document.getElementById('permohonan')) return initForm();
-  if(document.getElementById('permohonansaya')) return renderMyApps();
-  if(document.getElementById('bill')) return initBill();
-  if(document.getElementById('cekretribusi')) return initCek();
-  if(document.getElementById('cekhasil')) return initCekHasil();
-  if(document.getElementById('sukses')) return initSukses();
+  var needsData = document.getElementById('itemlist')
+    || document.getElementById('retridetail')
+    || document.getElementById('permohonan')
+    || document.getElementById('permohonansaya')
+    || document.getElementById('bill')
+    || document.getElementById('cekretribusi')
+    || document.getElementById('cekhasil')
+    || document.getElementById('sukses');
+  if(!needsData) return;
+  initData(function(err){
+    if(err){ console.error('Gagal memuat data:', err); return; }
+    if(document.getElementById('itemlist')) return initList();
+    if(document.getElementById('retridetail')) return initDetail();
+    if(document.getElementById('permohonan')) return initForm();
+    if(document.getElementById('permohonansaya')) return renderMyApps();
+    if(document.getElementById('bill')) return initBill();
+    if(document.getElementById('cekretribusi')) return initCek();
+    if(document.getElementById('cekhasil')) return initCekHasil();
+    if(document.getElementById('sukses')) return initSukses();
+  });
 });

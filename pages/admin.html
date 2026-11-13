@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel – PRO NTT</title>
+  <style>
+    :root {
+      --blue:#1572c7; --blue-d:#0f5fb0; --teal:#0e9e8a;
+      --red:#e5484d;  --green:#2a9d5c;  --orange:#e07b1a;
+      --bg:#f4f6fa; --card:#fff; --border:#e2e8f0;
+      --text:#1a2335; --muted:#6b7a8d; --radius:10px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+    header{background:var(--blue);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    header h1{font-size:17px;font-weight:700}
+    header small{opacity:.75;font-size:12px}
+    .back-btn{margin-left:auto;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);color:#fff;text-decoration:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;transition:.15s}
+    .back-btn:hover{background:rgba(255,255,255,.32)}
+    .api-badge{background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer}
+    .api-badge.ok{background:rgba(42,157,92,.4)}
+    .api-badge.err{background:rgba(229,72,77,.4)}
+    nav.tabs{background:var(--card);border-bottom:1px solid var(--border);display:flex;gap:0;padding:0 24px}
+    nav.tabs button{padding:12px 20px;border:none;background:none;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:.15s}
+    nav.tabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
+    .pane{display:none;padding:28px 36px}
+    .pane.on{display:block}
+    .toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+    .toolbar h2{font-size:16px;font-weight:700;flex:1}
+    button.btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
+    button.btn-primary{background:var(--blue);color:#fff}
+    button.btn-primary:hover{background:var(--blue-d)}
+    button.btn-danger{background:var(--red);color:#fff}
+    button.btn-sm{padding:5px 10px;font-size:12px}
+    button.btn-edit{background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe}
+    button.btn-del{background:#fff1f1;color:var(--red);border:1px solid #fecaca}
+    button.btn-save{background:var(--green);color:#fff}
+    table{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+    th{background:#f8fafc;color:var(--muted);font-size:13px;font-weight:600;padding:12px 16px;text-align:left;border-bottom:1px solid var(--border)}
+    td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#f8fafc}
+    .chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+    .chip.tersedia{background:#dcfce7;color:#15803d}
+    .chip.disewa{background:#fef9c3;color:#a16207}
+    .chip.tidak{background:#f1f5f9;color:#64748b}
+    .chip.aktif{background:#dbeafe;color:#1d4ed8}
+    .chip.selesai{background:#dcfce7;color:#15803d}
+    .chip.belum{background:#fff7ed;color:var(--orange)}
+    .chip.lunas{background:#dcfce7;color:#15803d}
+    /* Modal */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+    .modal-bg.open{display:flex}
+    .modal{background:#fff;border-radius:12px;padding:24px;width:min(560px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+    .modal h3{font-size:16px;font-weight:700;margin-bottom:16px}
+    .form-row{margin-bottom:12px}
+    .form-row label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px}
+    .form-row input,.form-row select,.form-row textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+    .form-row textarea{resize:vertical;min-height:60px}
+    .form-row input:focus,.form-row select:focus,.form-row textarea:focus{outline:none;border-color:var(--blue)}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+    .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+    .msg{padding:10px 14px;border-radius:6px;font-size:13px;margin-bottom:12px;display:none}
+    .msg.ok{background:#dcfce7;color:#15803d;display:block}
+    .msg.err{background:#fef2f2;color:#b91c1c;display:block}
+    .loading{text-align:center;color:var(--muted);padding:32px;font-size:14px}
+    .cat-label{background:#eff6ff;color:var(--blue);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600}
+    /* Accordion per-kategori */
+    .kat-section{margin-bottom:14px;border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+    .kat-section-header{background:var(--blue);color:#fff;padding:11px 20px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+    .kat-section-header:hover{background:var(--blue-d)}
+    .kat-section-header h3{font-size:13px;font-weight:700;flex:1;margin:0}
+    .kat-count{background:rgba(255,255,255,.25);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600}
+    .kat-toggle{font-size:11px;opacity:.85;min-width:12px}
+    .kat-section-body{background:var(--card)}
+    .kat-section-body.collapsed{display:none}
+    .kat-add-btn{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:5px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+    .kat-add-btn:hover{background:rgba(255,255,255,.3)}
+    .kat-empty{padding:14px 20px;color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+
+<header>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  <div><h1>Admin Panel – PRO NTT</h1><small>Kelola data aset, permohonan &amp; riwayat</small></div>
+  <a href="../index.html" class="back-btn" title="Kembali ke Aplikasi PRO NTT">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    PRO NTT
+  </a>
+  <span class="api-badge" id="apiBadge" onclick="checkApi()">⟳ Cek API</span>
+</header>
+
+<nav class="tabs">
+  <button class="on" onclick="showPane('pAset',this)">Aset</button>
+  <button onclick="showPane('pPermohonan',this)">Permohonan / SK</button>
+  <button onclick="showPane('pRiwayat',this)">Riwayat Sewa</button>
+  <button onclick="showPane('pKategori',this)">Kategori</button>
+</nav>
+
+<div id="msg" class="msg"></div>
+
+<!-- ===== ASET ===== -->
+<div id="pAset" class="pane on">
+  <div class="toolbar">
+    <h2>Daftar Aset</h2>
+    <button class="btn btn-primary" onclick="openAsetModal()">+ Tambah Aset</button>
+  </div>
+  <div id="asetTable"><div class="loading">Memuat data…</div></div>
+</div>
+
+<!-- ===== PERMOHONAN ===== -->
+<div id="pPermohonan" class="pane">
+  <div class="toolbar">
+    <h2>Permohonan / SK Sewa</h2>
+    <button class="btn btn-primary" onclick="openPermModal()">+ Tambah</button>
+  </div>
+  <div id="permTable"><div class="loading">Memuat data…</div></div>
+</div>
+
+<!-- ===== RIWAYAT ===== -->
+<div id="pRiwayat" class="pane">
+  <div class="toolbar">
+    <h2>Riwayat Sewa</h2>
+    <button class="btn btn-primary" onclick="openRiwModal()">+ Tambah</button>
+  </div>
+  <div id="riwTable"><div class="loading">Memuat data…</div></div>
+</div>
+
+<!-- ===== KATEGORI ===== -->
+<div id="pKategori" class="pane">
+  <div class="toolbar"><h2>Kategori Aset</h2></div>
+  <div id="katTable"><div class="loading">Memuat data…</div></div>
+</div>
+
+<!-- ===== MODAL ASET ===== -->
+<div class="modal-bg" id="asetModal">
+  <div class="modal">
+    <h3 id="asetModalTitle">Tambah Aset</h3>
+    <div class="form-grid">
+      <div class="form-row"><label>Kategori *</label>
+        <select id="fm_kategori_id"></select></div>
+      <div class="form-row"><label>Kode (k)</label>
+        <input id="fm_k" placeholder="RTB-SWA-999"></div>
+    </div>
+    <div class="form-row"><label>Nama Aset *</label><input id="fm_n"></div>
+    <div class="form-grid">
+      <div class="form-row"><label>Tag</label><input id="fm_tag"></div>
+      <div class="form-row"><label>Status</label>
+        <select id="fm_st">
+          <option>Tersedia</option><option>Disewa</option><option>Tidak Tersedia</option>
+        </select></div>
+    </div>
+    <div class="form-row"><label>Lokasi</label><input id="fm_loc"></div>
+    <div class="form-row"><label>Kapasitas/Keterangan</label><input id="fm_cap"></div>
+    <div class="form-grid">
+      <div class="form-row"><label>Harga (p) *</label><input id="fm_p" type="number" min="0"></div>
+      <div class="form-row"><label>Satuan (un)</label><input id="fm_un" placeholder="per bulan"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label>Stok</label><input id="fm_stok" type="number" min="0" value="0"></div>
+      <div class="form-row"><label>OPD (opsional)</label><input id="fm_opd"></div>
+    </div>
+    <div class="form-row"><label>URL Gambar</label><input id="fm_img"></div>
+    <div class="form-row"><label>Kredit Foto</label><input id="fm_img_credit"></div>
+    <input type="hidden" id="fm_id">
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('asetModal')">Batal</button>
+      <button class="btn btn-save" onclick="saveAset()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL PERMOHONAN ===== -->
+<div class="modal-bg" id="permModal">
+  <div class="modal">
+    <h3 id="permModalTitle">Tambah Permohonan</h3>
+    <div class="form-grid">
+      <div class="form-row"><label>No. SK *</label><input id="pm_sk" placeholder="SK/001/PRO-NTT/2026"></div>
+      <div class="form-row"><label>ID Sewa</label><input id="pm_id_sewa" placeholder="PW-001"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label>No. Kerjasama</label><input id="pm_kerjasama"></div>
+      <div class="form-row"><label>Kode Aset</label><input id="pm_kode"></div>
+    </div>
+    <div class="form-row"><label>Nama Sewa</label><input id="pm_nama"></div>
+    <div class="form-grid">
+      <div class="form-row"><label>Pemohon</label><input id="pm_pemohon"></div>
+      <div class="form-row"><label>Instansi</label><input id="pm_instansi"></div>
+    </div>
+    <div class="form-row"><label>Keperluan</label><input id="pm_keperluan"></div>
+    <div class="form-grid">
+      <div class="form-row"><label>Mulai (tgl)</label><input id="pm_mulai" type="date"></div>
+      <div class="form-row"><label>Masa</label><input id="pm_masa" placeholder="10–12 Feb 2026 · 3 hari"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label>Tgl SK</label><input id="pm_tgl_sk" placeholder="05 Feb 2026"></div>
+      <div class="form-row"><label>OPD</label><input id="pm_opd"></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label>Pokok (Rp)</label><input id="pm_pokok" type="number" min="0"></div>
+      <div class="form-row"><label>Denda (Rp)</label><input id="pm_denda" type="number" min="0" value="0"></div>
+    </div>
+    <div class="form-row"><label>Status</label>
+      <select id="pm_status"><option value="belum">Belum Bayar</option><option value="lunas">Lunas</option></select></div>
+    <input type="hidden" id="pm_id">
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('permModal')">Batal</button>
+      <button class="btn btn-save" onclick="savePerm()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL RIWAYAT ===== -->
+<div class="modal-bg" id="riwModal">
+  <div class="modal">
+    <h3 id="riwModalTitle">Tambah Riwayat</h3>
+    <div class="form-row"><label>Pemohon</label><input id="rw_pemohon"></div>
+    <div class="form-grid">
+      <div class="form-row"><label>No. SK</label><input id="rw_sk"></div>
+      <div class="form-row"><label>Status</label>
+        <select id="rw_status"><option>Aktif</option><option>Selesai</option></select></div>
+    </div>
+    <div class="form-row"><label>Masa</label><input id="rw_masa" placeholder="10–12 Feb 2026"></div>
+    <input type="hidden" id="rw_id">
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('riwModal')">Batal</button>
+      <button class="btn btn-save" onclick="saveRiw()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL KATEGORI ===== -->
+<div class="modal-bg" id="katModal">
+  <div class="modal">
+    <h3>Edit Kategori</h3>
+    <div class="form-row"><label>ID Kategori</label><input id="km_id" readonly style="background:#f1f5f9"></div>
+    <div class="form-row"><label>Title</label><input id="km_title"></div>
+    <div class="form-row"><label>Sub</label><input id="km_sub"></div>
+    <div class="form-row"><label>OPD</label><input id="km_opd"></div>
+    <div class="form-grid">
+      <div class="form-row"><label>Sky Atas</label><input id="km_sky_start" type="color"></div>
+      <div class="form-row"><label>Sky Bawah</label><input id="km_sky_end" type="color"></div>
+      <div class="form-row"><label>Ground</label><input id="km_ground" type="color"></div>
+      <div class="form-row"><label>Sewa?</label>
+        <select id="km_sewa"><option value="1">Ya</option><option value="0">Tidak</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('katModal')">Batal</button>
+      <button class="btn btn-save" onclick="saveKat()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var API_BASE = window.location.hostname === 'localhost' ? '/api' : 'http://localhost:3000/api';
+var KATEGORI = [];
+
+function api(path, opt) {
+  return fetch(API_BASE + path, opt).then(function(r){
+    return r.json().then(function(d){ return {ok: r.ok, status: r.status, data: d}; });
+  });
+}
+
+function showMsg(text, isErr) {
+  var el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = 'msg ' + (isErr ? 'err' : 'ok');
+  setTimeout(function(){ el.className = 'msg'; }, 3000);
+}
+
+function ru(n){ return 'Rp ' + Number(n||0).toLocaleString('id-ID'); }
+
+/* ---- API badge ---- */
+function checkApi() {
+  var badge = document.getElementById('apiBadge');
+  badge.textContent = '⟳ Memeriksa…';
+  badge.className = 'api-badge';
+  api('/ping').then(function(r){
+    if (r.ok) { badge.textContent = '✓ API Online'; badge.className = 'api-badge ok'; }
+    else throw new Error();
+  }).catch(function(){
+    badge.textContent = '✕ API Offline'; badge.className = 'api-badge err';
+  });
+}
+
+/* ---- Tab ---- */
+function showPane(id, btn) {
+  document.querySelectorAll('.pane').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('nav.tabs button').forEach(function(b){ b.classList.remove('on'); });
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  if (id==='pAset') loadAset();
+  if (id==='pPermohonan') loadPerm();
+  if (id==='pRiwayat') loadRiw();
+  if (id==='pKategori') loadKat();
+}
+
+/* ---- Modal ---- */
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+
+/* ========== KATEGORI ========== */
+function loadKat() {
+  document.getElementById('katTable').innerHTML = '<div class="loading">Memuat…</div>';
+  api('/aset/kategori').then(function(r){
+    KATEGORI = r.data;
+    populateKatFilter();
+    var html = '<table><thead><tr><th>ID</th><th>Title</th><th>OPD</th><th>Cat</th><th>Sewa?</th><th></th></tr></thead><tbody>';
+    r.data.forEach(function(k){
+      html += '<tr>'
+        + '<td><span class="cat-label">'+k.id+'</span></td>'
+        + '<td>'+k.title+'</td>'
+        + '<td>'+k.opd+'</td>'
+        + '<td>'+k.cat+'</td>'
+        + '<td>'+(k.sewa?'Ya':'Tidak')+'</td>'
+        + '<td><button class="btn btn-sm btn-edit" onclick="editKat(\''+k.id+'\')">Edit</button></td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('katTable').innerHTML = html;
+  }).catch(function(){ document.getElementById('katTable').innerHTML = '<div class="loading">Gagal memuat. Pastikan backend berjalan.</div>'; });
+}
+
+function populateKatFilter(preselect){
+  var fmSel = document.getElementById('fm_kategori_id');
+  if (fmSel) {
+    var prev = preselect || fmSel.value;
+    fmSel.innerHTML = '';
+    KATEGORI.forEach(function(k){
+      fmSel.innerHTML += '<option value="'+k.id+'"'+(k.id===prev?' selected':'')+'>'+k.title+'</option>';
+    });
+  }
+}
+
+function editKat(id) {
+  var k = KATEGORI.find(function(x){ return x.id === id; });
+  if (!k) return;
+  document.getElementById('km_id').value        = k.id;
+  document.getElementById('km_title').value     = k.title||'';
+  document.getElementById('km_sub').value       = k.sub||'';
+  document.getElementById('km_opd').value       = k.opd||'';
+  document.getElementById('km_sky_start').value = k.sky_start||'#8ec9f2';
+  document.getElementById('km_sky_end').value   = k.sky_end||'#e7f3fd';
+  document.getElementById('km_ground').value    = k.ground||'#d3e4f1';
+  document.getElementById('km_sewa').value      = k.sewa ? '1' : '0';
+  openModal('katModal');
+}
+
+function saveKat() {
+  var id = document.getElementById('km_id').value;
+  var body = {
+    title:     document.getElementById('km_title').value,
+    sub:       document.getElementById('km_sub').value,
+    opd:       document.getElementById('km_opd').value,
+    sky_start: document.getElementById('km_sky_start').value,
+    sky_end:   document.getElementById('km_sky_end').value,
+    ground:    document.getElementById('km_ground').value,
+    sewa:      document.getElementById('km_sewa').value
+  };
+  api('/aset/kategori/'+encodeURIComponent(id), {
+    method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+  }).then(function(r){
+    if (!r.ok) throw new Error(r.data.error||'Error');
+    closeModal('katModal'); showMsg('Kategori diperbarui'); loadKat();
+  }).catch(function(e){ showMsg(e.message, true); });
+}
+
+/* ========== ASET ========== */
+function loadAset() {
+  if (!KATEGORI.length) {
+    api('/aset/kategori').then(function(r){ KATEGORI = r.data; populateKatFilter(); _loadAset(); });
+  } else { _loadAset(); }
+}
+function _loadAset() {
+  document.getElementById('asetTable').innerHTML = '<div class="loading">Memuat…</div>';
+  api('/aset').then(function(r){
+    if (!r.ok) throw new Error();
+    var allAset = r.data;
+    var html = '';
+    KATEGORI.forEach(function(k){
+      var items = allAset.filter(function(a){ return a.kategori_id === k.id; });
+      html += '<div class="kat-section">'
+        + '<div class="kat-section-header" onclick="toggleKatSection(this)">'
+        + '<span class="kat-toggle">▼</span>'
+        + '<h3>'+k.title+'</h3>'
+        + '<span class="kat-count">'+items.length+' item</span>'
+        + '<button class="kat-add-btn" onclick="event.stopPropagation();openAsetModal(null,\''+k.id+'\')">+ Tambah</button>'
+        + '</div>'
+        + '<div class="kat-section-body">';
+      if (items.length === 0) {
+        html += '<div class="kat-empty">Belum ada aset dalam kategori ini.</div>';
+      } else {
+        html += '<table><thead><tr><th>ID</th><th>Nama</th><th>Tag</th><th>Harga</th><th>Status</th><th>Stok</th><th></th></tr></thead><tbody>';
+        items.forEach(function(a){
+          var stCls = a.st==='Tersedia'?'tersedia':(a.st==='Disewa'?'disewa':'tidak');
+          html += '<tr>'
+            + '<td>'+a.id+'</td>'
+            + '<td style="max-width:220px">'+a.n+'</td>'
+            + '<td>'+a.tag+'</td>'
+            + '<td>'+ru(a.p)+'</td>'
+            + '<td><span class="chip '+stCls+'">'+a.st+'</span></td>'
+            + '<td>'+(a.stok||0)+'</td>'
+            + '<td style="white-space:nowrap">'
+              + '<button class="btn btn-sm btn-edit" onclick="editAset('+a.id+')">Edit</button> '
+              + '<button class="btn btn-sm btn-del" onclick="delAset('+a.id+')">Hapus</button>'
+            + '</td></tr>';
+        });
+        html += '</tbody></table>';
+      }
+      html += '</div></div>';
+    });
+    document.getElementById('asetTable').innerHTML = html || '<div class="loading">Tidak ada kategori.</div>';
+  }).catch(function(){ document.getElementById('asetTable').innerHTML = '<div class="loading">Gagal memuat. Pastikan backend berjalan.</div>'; });
+}
+function toggleKatSection(header) {
+  var body = header.nextElementSibling;
+  var toggle = header.querySelector('.kat-toggle');
+  var collapsed = body.classList.toggle('collapsed');
+  toggle.textContent = collapsed ? '▶' : '▼';
+}
+
+function openAsetModal(fill, katId) {
+  document.getElementById('asetModalTitle').textContent = fill ? 'Edit Aset' : 'Tambah Aset';
+  var ids = ['fm_id','fm_kategori_id','fm_k','fm_n','fm_tag','fm_st','fm_loc','fm_cap','fm_p','fm_un','fm_stok','fm_opd','fm_img','fm_img_credit'];
+  ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('fm_st').value = 'Tersedia';
+  if (!KATEGORI.length) {
+    api('/aset/kategori').then(function(r){
+      KATEGORI=r.data;
+      populateKatFilter(fill ? fill.kategori_id : katId);
+      if(fill) _fillAsetForm(fill);
+    });
+  } else {
+    populateKatFilter(fill ? fill.kategori_id : katId);
+    if(fill) _fillAsetForm(fill);
+  }
+  openModal('asetModal');
+}
+function _fillAsetForm(a) {
+  document.getElementById('fm_id').value          = a.id;
+  document.getElementById('fm_kategori_id').value = a.kategori_id;
+  document.getElementById('fm_k').value           = a.k||'';
+  document.getElementById('fm_n').value           = a.n||'';
+  document.getElementById('fm_tag').value         = a.tag||'';
+  document.getElementById('fm_st').value          = a.st||'Tersedia';
+  document.getElementById('fm_loc').value         = a.loc||'';
+  document.getElementById('fm_cap').value         = a.cap||'';
+  document.getElementById('fm_p').value           = a.p||0;
+  document.getElementById('fm_un').value          = a.un||'';
+  document.getElementById('fm_stok').value        = a.stok||0;
+  document.getElementById('fm_opd').value         = a.opd||'';
+  document.getElementById('fm_img').value         = a.img||'';
+  document.getElementById('fm_img_credit').value  = a.img_credit||'';
+}
+function editAset(id) {
+  api('/aset/'+id).then(function(r){ openAsetModal(r.data); });
+}
+function saveAset() {
+  var id = document.getElementById('fm_id').value;
+  var body = {
+    kategori_id: document.getElementById('fm_kategori_id').value,
+    k:  document.getElementById('fm_k').value,
+    n:  document.getElementById('fm_n').value,
+    tag: document.getElementById('fm_tag').value,
+    st:  document.getElementById('fm_st').value,
+    loc: document.getElementById('fm_loc').value,
+    cap: document.getElementById('fm_cap').value,
+    p:   parseFloat(document.getElementById('fm_p').value)||0,
+    un:  document.getElementById('fm_un').value,
+    stok: parseInt(document.getElementById('fm_stok').value)||0,
+    opd: document.getElementById('fm_opd').value,
+    img: document.getElementById('fm_img').value,
+    img_credit: document.getElementById('fm_img_credit').value
+  };
+  if (!body.n||!body.p) return showMsg('Nama dan harga wajib diisi', true);
+  var req = id
+    ? api('/aset/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})
+    : api('/aset',     {method:'POST',headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  req.then(function(r){
+    if (!r.ok) throw new Error(r.data.error||'Error');
+    closeModal('asetModal'); showMsg('Aset berhasil disimpan'); loadAset();
+  }).catch(function(e){ showMsg(e.message, true); });
+}
+function delAset(id) {
+  if (!confirm('Hapus aset ini?')) return;
+  api('/aset/'+id, {method:'DELETE'}).then(function(r){
+    if (!r.ok) throw new Error(r.data.error||'Error');
+    showMsg('Aset dihapus'); loadAset();
+  }).catch(function(e){ showMsg(e.message, true); });
+}
+
+/* ========== PERMOHONAN ========== */
+function loadPerm() {
+  document.getElementById('permTable').innerHTML = '<div class="loading">Memuat…</div>';
+  api('/permohonan').then(function(r){
+    var html = '<table><thead><tr><th>ID</th><th>No. SK</th><th>Pemohon</th><th>Nama Sewa</th><th>Pokok</th><th>Status</th><th></th></tr></thead><tbody>';
+    r.data.forEach(function(p){
+      html += '<tr>'
+        + '<td>'+p.id+'</td>'
+        + '<td style="white-space:nowrap">'+p.sk+'</td>'
+        + '<td>'+p.pemohon+'</td>'
+        + '<td>'+p.nama+'</td>'
+        + '<td>'+ru(p.pokok)+'</td>'
+        + '<td><span class="chip '+p.status+'">'+p.status+'</span></td>'
+        + '<td style="white-space:nowrap">'
+          + '<button class="btn btn-sm btn-edit" onclick="editPerm('+p.id+')">Edit</button> '
+          + '<button class="btn btn-sm btn-del" onclick="delPerm('+p.id+')">Hapus</button>'
+        + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('permTable').innerHTML = html;
+  }).catch(function(){ document.getElementById('permTable').innerHTML = '<div class="loading">Gagal memuat.</div>'; });
+}
+function openPermModal(fill) {
+  document.getElementById('permModalTitle').textContent = fill ? 'Edit Permohonan' : 'Tambah Permohonan';
+  ['pm_id','pm_sk','pm_id_sewa','pm_kerjasama','pm_kode','pm_nama','pm_pemohon','pm_instansi',
+   'pm_keperluan','pm_mulai','pm_masa','pm_tgl_sk','pm_opd','pm_pokok','pm_denda'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('pm_status').value = 'belum';
+  if (fill) {
+    document.getElementById('pm_id').value       = fill.id;
+    document.getElementById('pm_sk').value       = fill.sk||'';
+    document.getElementById('pm_id_sewa').value  = fill.id_sewa||'';
+    document.getElementById('pm_kerjasama').value= fill.kerjasama||'';
+    document.getElementById('pm_kode').value     = fill.kode||'';
+    document.getElementById('pm_nama').value     = fill.nama||'';
+    document.getElementById('pm_pemohon').value  = fill.pemohon||'';
+    document.getElementById('pm_instansi').value = fill.instansi||'';
+    document.getElementById('pm_keperluan').value= fill.keperluan||'';
+    document.getElementById('pm_mulai').value    = (fill.mulai||'').substring(0,10);
+    document.getElementById('pm_masa').value     = fill.masa||'';
+    document.getElementById('pm_tgl_sk').value   = fill.tgl_sk||'';
+    document.getElementById('pm_opd').value      = fill.opd||'';
+    document.getElementById('pm_pokok').value    = fill.pokok||0;
+    document.getElementById('pm_denda').value    = fill.denda||0;
+    document.getElementById('pm_status').value   = fill.status||'belum';
+  }
+  openModal('permModal');
+}
+function editPerm(id) {
+  api('/permohonan/'+id).then(function(r){ openPermModal(r.data); });
+}
+function savePerm() {
+  var id = document.getElementById('pm_id').value;
+  var body = {
+    sk:         document.getElementById('pm_sk').value,
+    id_sewa:    document.getElementById('pm_id_sewa').value,
+    kerjasama:  document.getElementById('pm_kerjasama').value,
+    kode:       document.getElementById('pm_kode').value,
+    nama:       document.getElementById('pm_nama').value,
+    pemohon:    document.getElementById('pm_pemohon').value,
+    instansi:   document.getElementById('pm_instansi').value,
+    keperluan:  document.getElementById('pm_keperluan').value,
+    mulai:      document.getElementById('pm_mulai').value||null,
+    masa:       document.getElementById('pm_masa').value,
+    tgl_sk:     document.getElementById('pm_tgl_sk').value,
+    opd:        document.getElementById('pm_opd').value,
+    pokok:      parseFloat(document.getElementById('pm_pokok').value)||0,
+    denda:      parseFloat(document.getElementById('pm_denda').value)||0,
+    status:     document.getElementById('pm_status').value
+  };
+  if (!body.sk) return showMsg('No. SK wajib diisi', true);
+  var req = id
+    ? api('/permohonan/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})
+    : api('/permohonan',     {method:'POST',headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  req.then(function(r){
+    if (!r.ok) throw new Error(r.data.error||'Error');
+    closeModal('permModal'); showMsg('Permohonan berhasil disimpan'); loadPerm();
+  }).catch(function(e){ showMsg(e.message, true); });
+}
+function delPerm(id) {
+  if (!confirm('Hapus permohonan ini?')) return;
+  api('/permohonan/'+id, {method:'DELETE'}).then(function(r){
+    if (!r.ok) throw new Error(r.data.error||'Error');
+    showMsg('Permohonan dihapus'); loadPerm();
+  }).catch(function(e){ showMsg(e.message, true); });
+}
+
+/* ========== RIWAYAT ========== */
+function loadRiw() {
+  document.getElementById('riwTable').innerHTML = '<div class="loading">Memuat…</div>';
+  api('/riwayat').then(function(r){
+    var html = '<table><thead><tr><th>ID</th><th>Pemohon</th><th>No. SK</th><th>Masa</th><th>Status</th><th></th></tr></thead><tbody>';
+    r.data.forEach(function(w){
+      var stCls = w.status==='Aktif'?'aktif':'selesai';
+      html += '<tr>'
+        + '<td>'+w.id+'</td>'
+        + '<td>'+w.pemohon+'</td>'
+        + '<td>'+w.sk+'</td>'
+        + '<td>'+w.masa+'</td>'
+        + '<td><span class="chip '+stCls+'">'+w.status+'</span></td>'
+        + '<td style="white-space:nowrap">'
+          + '<button class="btn btn-sm btn-edit" onclick="editRiw('+w.id+')">Edit</button> '
+          + '<button class="btn btn-sm btn-del" onclick="delRiw('+w.id+')">Hapus</button>'
+        + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('riwTable').innerHTML = html;
+  }).catch(function(){ document.getElementById('riwTable').innerHTML = '<div class="loading">Gagal memuat.</div>'; });
+}
+function openRiwModal(fill) {
+  document.getElementById('riwModalTitle').textContent = fill ? 'Edit Riwayat' : 'Tambah Riwayat';
+  ['rw_id','rw_pemohon','rw_sk','rw_masa'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('rw_status').value='Aktif';
+  if (fill) {
+    document.getElementById('rw_id').value      = fill.id;
+    document.getElementById('rw_pemohon').value = fill.pemohon||'';
+    document.getElementById('rw_sk').value      = fill.sk||'';
+    document.getElementById('rw_status').value  = fill.status||'Aktif';
+    document.getElementById('rw_masa').value    = fill.masa||'';
+  }
+  openModal('riwModal');
+}
+function editRiw(id) {
+  api('/riwayat').then(function(r){
+    var row = r.data.find(function(x){ return x.id===id; });
+    if (row) openRiwModal(row);
+  });
+}
+function saveRiw() {
+  var id = document.getElementById('rw_id').value;
+  var body = {
+    pemohon: document.getElementById('rw_pemohon').value,
+    sk:      document.getElementById('rw_sk').value,
+    status:  document.getElementById('rw_status').value,
+    masa:    document.getElementById('rw_masa').value
+  };
+  var req = id
+    ? api('/riwayat/'+id, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})
+    : api('/riwayat',     {method:'POST',headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  req.then(function(r){
+    if (!r.ok) throw new Error(r.data.error||'Error');
+    closeModal('riwModal'); showMsg('Riwayat berhasil disimpan'); loadRiw();
+  }).catch(function(e){ showMsg(e.message, true); });
+}
+function delRiw(id) {
+  if (!confirm('Hapus riwayat ini?')) return;
+  api('/riwayat/'+id, {method:'DELETE'}).then(function(r){
+    if (!r.ok) throw new Error(r.data.error||'Error');
+    showMsg('Riwayat dihapus'); loadRiw();
+  }).catch(function(e){ showMsg(e.message, true); });
+}
+
+/* Close modal on background click */
+document.querySelectorAll('.modal-bg').forEach(function(bg){
+  bg.addEventListener('click', function(e){ if(e.target===bg) bg.classList.remove('open'); });
+});
+
+/* Init */
+checkApi();
+loadAset();
+</script>
+</body>
+</html>

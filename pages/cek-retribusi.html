@@ -6,38 +6,487 @@
   <title>Cek &amp; Bayar Retribusi — PRO NTT</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* ---- hero header ---- */
+    .ck-hero{
+      background: linear-gradient(145deg,#0f5fb0 0%,#1572c7 55%,#1b8bd4 100%);
+      padding: 0 18px 44px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ck-hero::after{
+      content:'';
+      position:absolute; bottom:-30px; right:-20px;
+      width:160px; height:160px;
+      border-radius:50%;
+      background: rgba(255,255,255,.06);
+      pointer-events:none;
+    }
+    .ck-hero::before{
+      content:'';
+      position:absolute; top:-40px; left:-30px;
+      width:120px; height:120px;
+      border-radius:50%;
+      background: rgba(255,255,255,.04);
+      pointer-events:none;
+    }
+    .ck-appbar{
+      display:flex; align-items:center; gap:12px;
+      padding: 10px 0 18px;
+      position:relative; z-index:2;
+    }
+    .ck-appbar .back{
+      width:38px; height:38px; border-radius:12px;
+      border:none; background:rgba(255,255,255,.18); color:#fff;
+      display:grid; place-items:center; cursor:pointer; flex:0 0 38px;
+      backdrop-filter:blur(4px);
+    }
+    .ck-appbar .back svg{width:20px;height:20px}
+    .ck-appbar h1{
+      font-family:var(--ff-display); font-size:19px; font-weight:800;
+      color:#fff; letter-spacing:-.2px;
+    }
+    .ck-appbar .sub{font-size:12px; color:rgba(255,255,255,.75); font-weight:500; margin-top:2px}
+
+    .ck-sk-chip{
+      display:inline-flex; align-items:center; gap:6px;
+      background:rgba(255,255,255,.14); backdrop-filter:blur(4px);
+      border:1px solid rgba(255,255,255,.22);
+      color:rgba(255,255,255,.9); font-size:11px; font-weight:600;
+      padding:5px 12px; border-radius:999px;
+      position:relative; z-index:2; letter-spacing:.2px;
+    }
+    .ck-sk-chip svg{width:12px;height:12px;opacity:.8}
+
+    /* ---- search card floating ---- */
+    .ck-guide{
+      margin:16px 16px 0; padding:20px 18px;
+      background:#fff; border:1px dashed var(--blue-100); border-radius:var(--r-md);
+    }
+    .ck-guide-icon{
+      width:44px; height:44px; border-radius:13px; background:var(--blue-50); color:var(--blue-600);
+      display:grid; place-items:center; margin-bottom:12px;
+    }
+    .ck-guide-icon svg{width:22px;height:22px}
+    .ck-guide h3{font-family:var(--ff-display); font-size:14.5px; font-weight:800; margin-bottom:10px}
+    .ck-guide ol{padding-left:18px; margin:0}
+    .ck-guide li{font-size:12.5px; color:var(--ink-2); line-height:1.6; margin-bottom:4px}
+    .ck-guide li::marker{color:var(--blue-500); font-weight:700}
+
+    .rd-grid .rd-row{margin-bottom:0}
+
+    .ck-search-card{
+      margin: -28px 16px 0;
+      background:#fff;
+      border-radius: var(--r-lg);
+      box-shadow: 0 8px 28px rgba(16,36,58,.12);
+      padding: 18px 16px;
+      position: relative; z-index:10;
+    }
+    .ck-search-label{
+      font-size:11px; font-weight:700; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.7px; margin-bottom:10px;
+    }
+    .ck-search-row{display:flex; gap:8px; align-items:center}
+    .ck-input-wrap{
+      flex:1; position:relative;
+    }
+    .ck-input-wrap svg{
+      position:absolute; left:12px; top:50%; transform:translateY(-50%);
+      width:17px; height:17px; color:var(--muted); pointer-events:none;
+    }
+    .ck-inp{
+      width:100%; padding: 11px 12px 11px 38px;
+      border:1.5px solid var(--line);
+      border-radius:12px;
+      font-family:var(--ff-body); font-size:14px; font-weight:500;
+      color:var(--ink); background:#fafcfe;
+      outline:none; transition: border-color .2s, box-shadow .2s;
+    }
+    .ck-inp:focus{
+      border-color:var(--blue-500);
+      box-shadow: 0 0 0 3px rgba(51,181,229,.14);
+      background:#fff;
+    }
+    .ck-inp::placeholder{color:var(--faint)}
+    .ck-search-btn{
+      width:44px; height:44px; border-radius:12px;
+      background: linear-gradient(135deg,var(--blue-500),var(--blue-600));
+      border:none; cursor:pointer; display:grid; place-items:center;
+      flex:0 0 44px; color:#fff;
+      box-shadow: 0 4px 12px rgba(21,114,199,.3);
+      transition: transform .12s, box-shadow .2s;
+    }
+    .ck-search-btn:active{transform:scale(.95)}
+    .ck-search-btn svg{width:18px;height:18px}
+    .ck-hint{
+      display:flex; align-items:center; gap:5px;
+      font-size:11px; color:var(--muted); margin-top:8px; padding-left:2px;
+    }
+    .ck-hint svg{width:13px;height:13px;flex:0 0 13px; color:var(--blue-400)}
+
+    /* ---- loading ---- */
+    .ck-loading{
+      display:none; text-align:center; padding:24px 20px;
+    }
+    .ck-spinner{
+      width:32px; height:32px; border:3px solid var(--line);
+      border-top-color:var(--blue-500); border-radius:50%;
+      animation: spin .7s linear infinite; margin:0 auto 10px;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .ck-loading p{font-size:13px; color:var(--muted)}
+
+    /* ---- not found ---- */
+    .ck-notfound{
+      display:none;
+      margin:20px 16px 0;
+      background:#fff;
+      border-radius:var(--r-md);
+      box-shadow:var(--shadow-sm);
+      padding:28px 20px;
+      text-align:center;
+    }
+    .ck-notfound-icon{
+      width:56px;height:56px; border-radius:16px;
+      background:var(--red-50); display:grid; place-items:center;
+      margin:0 auto 14px; color:var(--red);
+    }
+    .ck-notfound-icon svg{width:28px;height:28px}
+    .ck-notfound h3{font-family:var(--ff-display);font-size:15px;font-weight:700;margin-bottom:6px}
+    .ck-notfound p{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+    /* ---- result ---- */
+    #rd-result{display:none; padding: 20px 16px 0;}
+
+    /* profile card */
+    .rd-profile{
+      background: linear-gradient(135deg,#0f5fb0,#1572c7);
+      border-radius: var(--r-lg);
+      padding: 20px 18px;
+      display:flex; align-items:flex-start; gap:14px;
+      box-shadow: 0 8px 24px rgba(21,114,199,.28);
+      margin-bottom:12px;
+    }
+    .rd-avatar{
+      width:52px; height:52px; border-radius:14px;
+      background:rgba(255,255,255,.18); display:grid; place-items:center;
+      flex:0 0 52px; color:#fff;
+    }
+    .rd-avatar svg{width:28px;height:28px}
+    .rd-profile-info{flex:1; min-width:0}
+    .rd-profile-label{font-size:10.5px; font-weight:700; color:rgba(255,255,255,.65); letter-spacing:.5px; margin-bottom:4px; text-transform:uppercase}
+    .rd-profile-name{font-family:var(--ff-display);font-size:15px;font-weight:800;color:#fff;line-height:1.25; margin-bottom:5px}
+    .rd-profile-jabatan{font-size:12px; color:rgba(255,255,255,.8); line-height:1.4}
+    .rd-id-pill{
+      display:inline-block; margin-top:8px;
+      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.25);
+      color:rgba(255,255,255,.95); font-size:11px; font-weight:700;
+      padding:3px 10px; border-radius:999px; letter-spacing:.5px;
+    }
+
+    /* detail grid */
+    .rd-detail-card{
+      background:#fff; border-radius:var(--r-md);
+      box-shadow:var(--shadow-sm);
+      padding:16px; margin-bottom:12px;
+    }
+    .rd-detail-title{
+      font-family:var(--ff-display); font-size:12px; font-weight:700;
+      color:var(--blue-600); text-transform:uppercase; letter-spacing:.5px;
+      margin-bottom:14px; display:flex; align-items:center; gap:6px;
+    }
+    .rd-detail-title svg{width:14px;height:14px}
+    .rd-row{margin-bottom:12px}
+    .rd-row:last-child{margin-bottom:0}
+    .rd-label{font-size:10.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px}
+    .rd-value{font-size:13.5px; color:var(--ink); font-weight:600; line-height:1.3}
+    .rd-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .rd-divider{height:1px; background:var(--line); margin:12px 0}
+
+    /* status badge */
+    .rd-badge{
+      display:inline-flex; align-items:center; gap:5px;
+      padding:4px 10px; border-radius:8px;
+      font-size:11.5px; font-weight:700;
+    }
+    .rd-badge.belum{background:#fff7ed; color:#c05e00}
+    .rd-badge.belum::before{content:'●'; font-size:7px; color:#f97316}
+    .rd-badge.lunas{background:#dcfce7; color:#15803d}
+    .rd-badge.lunas::before{content:'✓'; font-size:9px}
+
+    /* biaya card */
+    .rd-biaya-card{
+      background:#fff; border-radius:var(--r-md);
+      box-shadow:var(--shadow-sm);
+      padding:16px; margin-bottom:12px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .rd-biaya-label{font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px}
+    .rd-biaya-amount{font-family:var(--ff-display); font-size:26px; font-weight:900; color:var(--blue-700); line-height:1}
+    .rd-biaya-unit{font-size:11.5px; font-weight:500; color:var(--muted); margin-top:4px}
+    .rd-biaya-icon{
+      width:50px; height:50px; border-radius:14px;
+      background:var(--blue-50); display:grid; place-items:center;
+      color:var(--blue-600);
+    }
+    .rd-biaya-icon svg{width:24px;height:24px}
+
+    /* footer */
+    .footer-cta{
+      padding:12px 16px 16px;
+      background:#fff;
+      border-top:1px solid var(--line);
+      position:sticky; bottom:0;
+    }
+    .ck-pay-btn{
+      width:100%; padding:15px;
+      background: linear-gradient(135deg,#1b8bd4,var(--blue-600),#0f5fb0);
+      color:#fff; border:none; border-radius:14px;
+      font-family:var(--ff-display); font-size:16px; font-weight:800;
+      cursor:pointer; letter-spacing:.1px;
+      box-shadow: 0 10px 24px rgba(21,114,199,.35);
+      transition: transform .12s, box-shadow .2s, opacity .2s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .ck-pay-btn:active{transform:scale(.98)}
+    .ck-pay-btn:disabled{
+      background:var(--line); color:var(--muted);
+      box-shadow:none; cursor:not-allowed; transform:none;
+    }
+    .ck-pay-btn svg{width:18px;height:18px}
+  </style>
 </head>
 <body>
   <section class="screen active" id="cekretribusi">
     <div class="scroll">
-      <div class="appbar">
-        <button class="back" onclick="location.href='retribusi.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
-        <div><h1>Cek &amp; Bayar Retribusi</h1><div class="sub">Masukkan ID penyewa</div></div>
+
+    <div class="ck-hero">
+      <div class="ck-appbar">
+        <button class="back" onclick="location.href='retribusi.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div>
+          <h1>Cek &amp; Bayar Retribusi</h1>
+          <div class="sub">Rumah Dinas BPAD Provinsi NTT</div>
+        </div>
       </div>
-      <div class="section" style="padding-top:8px">
-        <div class="field">
-          <label class="label">ID Penyewa</label>
-          <input class="inp text-left" id="ck-idsewa" placeholder="Contoh: PW-001" autocomplete="off" onkeydown="if(event.key==='Enter')cekRetribusi()">
-          <div class="hint">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
-            <span>ID penyewa tercantum pada SK / Perjanjian Kerjasama.</span>
+      <div class="ck-sk-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        SK No. 000.1.4/73/BPAD1.2/2026 &nbsp;·&nbsp; 02 Juni 2026
+      </div>
+    </div>
+
+      <div class="ck-search-card">
+        <div class="ck-search-label">ID Pegawai Anda</div>
+        <div class="ck-search-row">
+          <div class="ck-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input class="ck-inp" id="ck-idsewa"
+              placeholder="Contoh: RD-001"
+              autocomplete="off"
+              oninput="onSearchInput()"
+              onkeydown="if(event.key==='Enter')cekRetribusi()">
+          </div>
+          <button class="ck-search-btn" onclick="cekRetribusi()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+        </div>
+        <div class="ck-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+          ID Pegawai tercantum pada SK Penghuni Rumah Dinas.
+        </div>
+      </div>
+
+      <div class="ck-guide" id="rd-guide">
+        <div class="ck-guide-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <h3>Cek tagihan sewa rumah dinas</h3>
+        <ol>
+          <li>Masukkan ID Pegawai sesuai SK penghuni.</li>
+          <li>Periksa data rumah dinas dan tagihan bulan ini.</li>
+          <li>Bayar lewat QRIS, e-wallet, atau virtual account.</li>
+        </ol>
+      </div>
+
+      <!-- Tidak ditemukan -->
+      <div class="ck-notfound" id="rd-notfound">
+        <div class="ck-notfound-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+        </div>
+        <h3>Data Tidak Ditemukan</h3>
+        <p>ID Pegawai tidak terdaftar pada SK Penghuni Rumah Dinas.<br>Hubungi BPAD Provinsi NTT untuk informasi lebih lanjut.</p>
+      </div>
+
+      <!-- RESULT -->
+      <div id="rd-result">
+
+        <!-- Profile card -->
+        <div class="rd-profile">
+          <div class="rd-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="rd-profile-info">
+            <div class="rd-profile-label">Penghuni Rumah Dinas</div>
+            <div class="rd-profile-name" id="rd-nama">—</div>
+            <div class="rd-profile-jabatan" id="rd-jabatan">—</div>
+            <div class="rd-id-pill" id="rd-id-pill">—</div>
           </div>
         </div>
-        <div class="section-title" style="margin-top:6px">ID penyewa contoh presentasi</div>
-        <div class="section-sub" style="margin-bottom:10px">Ketuk ID untuk mengisi kolom:</div>
-        <div id="ck-samples" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+
+        <!-- Detail card -->
+        <div class="rd-detail-card">
+          <div class="rd-detail-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Informasi Rumah Dinas
+          </div>
+          <div class="rd-row">
+            <div class="rd-label">Alamat</div>
+            <div class="rd-value" id="rd-alamat">—</div>
+          </div>
+          <div class="rd-divider"></div>
+          <div class="rd-grid">
+            <div class="rd-row">
+              <div class="rd-label">Tipe / Golongan</div>
+              <div class="rd-value" id="rd-tipe">—</div>
+            </div>
+            <div class="rd-row">
+              <div class="rd-label">Luas Bangunan</div>
+              <div class="rd-value" id="rd-luas">—</div>
+            </div>
+          </div>
+          <div class="rd-divider"></div>
+          <div class="rd-grid">
+            <div class="rd-row">
+              <div class="rd-label">Status ASN</div>
+              <div class="rd-value" id="rd-status-asn">—</div>
+            </div>
+            <div class="rd-row">
+              <div class="rd-label">Status Bayar</div>
+              <div class="rd-value" id="rd-status-bayar">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Biaya card -->
+        <div class="rd-biaya-card">
+          <div>
+            <div class="rd-biaya-label">Tagihan Bulan Ini</div>
+            <div class="rd-biaya-amount" id="rd-biaya">Rp 0</div>
+            <div class="rd-biaya-unit" id="rd-periode">—</div>
+          </div>
+          <div class="rd-biaya-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+        </div>
+
       </div>
-      <div class="pad"></div>
+
+      <div style="height:16px"></div>
+    </div><!-- /scroll -->
+
+    <!-- FOOTER -->
+    <div class="footer-cta" id="ck-footer" style="display:none">
+      <button class="ck-pay-btn" id="ck-bayar-btn" onclick="bayarRumahDinas()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Bayar Sekarang
+      </button>
     </div>
-    <div class="footer-cta">
-      <button class="btn btn-blue" onclick="cekRetribusi()">Cek Tagihan</button>
-    </div>
+
   </section>
 
+  <script src="../js/data-lokal.js"></script>
   <script src="../js/data.js"></script>
   <script src="../js/shell.js"></script>
-  <script src="../js/retribusi.js"></script>
+  <script>
+    var _rdData = null;
+
+    function ru(n){ return 'Rp ' + Number(n||0).toLocaleString('id-ID'); }
+
+    function onSearchInput(){
+      if(!(document.getElementById('ck-idsewa').value||'').trim()) hideResult();
+    }
+
+    function hideResult(){
+      document.getElementById('rd-result').style.display   = 'none';
+      document.getElementById('rd-notfound').style.display = 'none';
+      document.getElementById('ck-footer').style.display   = 'none';
+      document.getElementById('rd-guide').style.display    = 'block';
+      _rdData = null;
+    }
+
+    function cekRetribusi(){
+      var v = (document.getElementById('ck-idsewa').value||'').trim();
+      if(!v) return;
+      hideResult();
+      _rdData = cariTagihanRD(v);
+      document.getElementById('rd-guide').style.display = 'none';
+      if(!_rdData){
+        document.getElementById('rd-notfound').style.display = 'block';
+        return;
+      }
+      showResult(_rdData);
+    }
+
+    function showResult(d){
+      document.getElementById('rd-id-pill').textContent   = d.id;
+      document.getElementById('rd-nama').textContent      = d.nama || '—';
+      document.getElementById('rd-jabatan').textContent   = d.jabatan || '—';
+      document.getElementById('rd-alamat').textContent    = d.alamat || '—';
+      document.getElementById('rd-tipe').textContent      = 'Tipe ' + (d.tipe||'—');
+      document.getElementById('rd-luas').textContent      = (d.luas||0) + ' m²';
+      document.getElementById('rd-status-asn').textContent = d.statusAsn || '—';
+      document.getElementById('rd-biaya').textContent     = ru(d.biaya);
+      var bln = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+      var now = new Date();
+      document.getElementById('rd-periode').textContent   = 'Periode ' + bln[now.getMonth()] + ' ' + now.getFullYear();
+
+      var lunas = sudahBayarRD(d.id);
+      document.getElementById('rd-status-bayar').innerHTML =
+        '<span class="rd-badge ' + (lunas?'lunas':'belum') + '">' +
+        (lunas ? 'Lunas' : 'Belum Bayar') + '</span>';
+
+      document.getElementById('rd-result').style.display = 'block';
+
+      var footer = document.getElementById('ck-footer');
+      var btn    = document.getElementById('ck-bayar-btn');
+      footer.style.display = 'block';
+
+      if(lunas){
+        btn.disabled = true;
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Sudah Lunas Bulan Ini';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Bayar Sekarang · ' + ru(d.biaya);
+      }
+    }
+
+    function bayarRumahDinas(){
+      if(!_rdData) return;
+      openSheet(
+        'Rumah Dinas – ' + _rdData.alamat,
+        ru(_rdData.biaya),
+        function(metode){
+          simpanBayarRD(_rdData, metode);
+          goSukses({
+            nama:   _rdData.nama,
+            item:   'Sewa Rumah Dinas',
+            alamat: _rdData.alamat,
+            total:  ru(_rdData.biaya),
+            metode: metode
+          });
+        }
+      );
+    }
+
+    /* pre-fill from URL ?id=RD-001 */
+    (function(){
+      var id = new URLSearchParams(location.search).get('id');
+      if(id){ document.getElementById('ck-idsewa').value = id; cekRetribusi(); }
+    })();
+  </script>
 </body>
 </html>

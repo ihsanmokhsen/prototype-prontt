@@ -24,13 +24,45 @@
     next.classList.add('active');
     var sc = next.querySelector('.scroll'); if(sc) sc.scrollTop = 0;
     var sb = document.getElementById('statusbar');
-    sb.classList.toggle('onblue', id==='splash');
+    if(sb) sb.classList.toggle('onblue', id==='splash');
   }
   function seg(which){
     document.getElementById('seg-samsat').classList.toggle('on', which==='samsat');
     document.getElementById('seg-retribusi').classList.toggle('on', which==='retribusi');
+    document.getElementById('seg-rumahdinas').classList.toggle('on', which==='rumahdinas');
     document.getElementById('riw-samsat').hidden = which!=='samsat';
     document.getElementById('riw-retribusi').hidden = which!=='retribusi';
+    document.getElementById('riw-rumahdinas').hidden = which!=='rumahdinas';
+    if(which==='rumahdinas') loadRwRumahDinas();
+  }
+
+  function loadRwRumahDinas(){
+    var el = document.getElementById('riw-rd-list');
+    if(!el) return;
+    var rows;
+    try{ rows = JSON.parse(localStorage.getItem('prontt.rdbayar.v1') || '[]'); }catch(e){ rows = []; }
+    if(!rows.length){
+      el.innerHTML = '<div class="empty"><div class="d">Belum ada pembayaran sewa rumah dinas.</div></div>';
+      return;
+    }
+    var MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    el.innerHTML = rows.map(function(d){
+      var t = new Date(d.tanggal);
+      var tgl = t.getDate() + ' ' + MONTHS[t.getMonth()] + ' ' + t.getFullYear()
+        + ' · ' + ('0'+t.getHours()).slice(-2) + ':' + ('0'+t.getMinutes()).slice(-2);
+      var p = (d.periode||'').split('-');
+      var periode = p.length === 2 ? MONTHS[+p[1]-1] + ' ' + p[0] : '';
+      return '<div class="trx">'
+        + '<div class="ic blue" style="width:44px;height:44px;border-radius:13px;flex:0 0 44px">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+        + '</div>'
+        + '<div class="m">'
+        + '<div class="tt">Sewa Rumah Dinas · ' + periode + '</div>'
+        + '<div class="ts">' + tgl + ' · ' + (d.metode||'—') + '</div>'
+        + '</div>'
+        + '<div class="r"><div class="amt">' + rupiah(d.nominal) + '</div><div class="st paid">Lunas</div></div>'
+        + '</div>';
+    }).join('');
   }
   function pseg(which){
     document.getElementById('pseg-samsat').classList.toggle('on', which==='samsat');

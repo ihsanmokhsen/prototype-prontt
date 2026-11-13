@@ -89,17 +89,13 @@ function initShell(){
   if(!page) return;
   var stage = document.createElement('div');
   stage.className = 'stage';
-  stage.innerHTML = '<div class="phone"><div class="notch"></div><div class="screen-wrap">'
-    + '<div class="statusbar" id="statusbar"><span id="clock">09:41</span><span class="dots">'+STATUS_DOTS+'</span></div>'
+  stage.innerHTML = '<div class="screen-wrap">'
     + '<div class="viewport"></div>'
     + SHEET_HTML
-    + '</div></div>'
-    + '<div class="stage-note">Prototipe tampilan <b>PRO NTT</b> — hanya untuk presentasi. Semua data contoh, tanpa login &amp; tanpa koneksi ke server.</div>';
+    + '</div>';
   document.body.appendChild(stage);
   stage.querySelector('.viewport').appendChild(page);
   buildTabs();
-  tick();
-  setInterval(tick, 10000);
 }
 
 document.addEventListener('DOMContentLoaded', initShell);

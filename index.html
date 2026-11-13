@@ -11,19 +11,7 @@
 </head>
 <body>
 <div class="stage">
-  <div class="phone">
-    <div class="notch"></div>
     <div class="screen-wrap">
-      <!-- status bar -->
-      <div class="statusbar onblue" id="statusbar">
-        <span id="clock">09:41</span>
-        <span class="dots">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20v-12M18 20V4" stroke-linecap="round"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 6c3.3 0 6.3 1.3 8.5 3.4l-1.4 1.4C17.3 9 14.8 8 12 8S6.7 9 4.9 10.8L3.5 9.4C5.7 7.3 8.7 6 12 6zm0 4c1.9 0 3.6.7 4.9 1.9l-1.5 1.5c-.9-.8-2.1-1.4-3.4-1.4s-2.5.6-3.4 1.4L7.1 11.9C8.4 10.7 10.1 10 12 10zm0 4c.8 0 1.5.3 2 .8L12 17l-2-2.2c.5-.5 1.2-.8 2-.8z"/></svg>
-          <svg viewBox="0 0 26 16" fill="none"><rect x="1" y="2" width="20" height="12" rx="3" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="4" width="15" height="8" rx="1.5" fill="currentColor"/><rect x="22.5" y="5.5" width="2" height="5" rx="1" fill="currentColor"/></svg>
-        </span>
-      </div>
-
       <div class="viewport">
 
         <!-- ============ SPLASH ============ -->
@@ -41,21 +29,31 @@
         <section class="screen" id="dashboard">
           <div class="app-header"></div>
           <div class="scroll">
-            <div class="greeting-banner">Halo, Muhammad Ihsanul</div>
+            <div class="welcome">
+              <div class="welcome-avatar">MI</div>
+              <div class="welcome-text">
+                <div class="welcome-k">Selamat datang,</div>
+                <div class="welcome-n">Muhammad Ihsanul</div>
+              </div>
+            </div>
+            <div class="dash-head">Layanan</div>
             <div class="dash-grid">
               <div class="dash-card" onclick="go('samsat')">
                 <img src="https://app.iwana.id/assets/prontt/icon/SAMSAT.png" alt="SAMSAT">
                 <div class="dc-label">SAMSAT</div>
+                <div class="dc-sub">Pajak kendaraan</div>
               </div>
               <div class="dash-card" onclick="location.href='pages/retribusi.html'">
                 <img src="https://app.iwana.id/assets/prontt/icon/RETRIBUSI.png" alt="RETRIBUSI">
                 <div class="dc-label">RETRIBUSI</div>
+                <div class="dc-sub">Sewa &amp; layanan daerah</div>
               </div>
-            </div>
-            <div class="dash-grid">
-              <div class="dash-card center" onclick="go('samsat')">
+              <div class="dash-card wide" onclick="go('samsat')">
                 <img src="https://app.iwana.id/assets/prontt/icon/PANDUAN.png" alt="PANDUAN">
-                <div class="dc-label">PANDUAN</div>
+                <div>
+                  <div class="dc-label">PANDUAN</div>
+                  <div class="dc-sub">Cara menggunakan aplikasi PRO NTT</div>
+                </div>
               </div>
             </div>
             <div class="pad"></div>
@@ -67,7 +65,7 @@
         <section class="screen" id="samsat">
           <div class="app-header"></div>
           <div class="scroll">
-            <div class="greeting-banner" style="text-align:center;font-size:16px">Samsat</div>
+            <div class="page-title">Samsat</div>
             <div class="dash-grid">
               <div class="dash-card" onclick="go('cekpajak')">
                 <img src="https://app.iwana.id/assets/prontt/icon/SAMSAT.png" alt="Cek Pajak">
@@ -163,7 +161,7 @@
         <section class="screen" id="retribusi">
           <div class="app-header"></div>
           <div class="scroll">
-            <div class="greeting-banner" style="text-align:center;font-size:16px">Retribusi</div>
+            <div class="page-title">Retribusi</div>
             <div class="section" style="padding-top:8px">
               <div class="cat">
                 <div class="ct"><span class="bar"></span>SEWA</div>
@@ -357,10 +355,11 @@
         <section class="screen" id="riwayat">
           <div class="app-header"></div>
           <div class="scroll">
-            <div class="greeting-banner" style="text-align:center;font-size:16px">Riwayat Transaksi</div>
+            <div class="page-title">Riwayat Transaksi</div>
             <div class="segment" style="margin:0">
                 <button class="on" id="seg-samsat" onclick="seg('samsat')">Samsat</button>
                 <button id="seg-retribusi" onclick="seg('retribusi')">Retribusi</button>
+                <button id="seg-rumahdinas" onclick="seg('rumahdinas')">Rumah Dinas</button>
               </div>
               <div class="section" style="padding-top:8px" id="riw-samsat">
                 <div class="trx">
@@ -384,6 +383,13 @@
                   <div class="d">Belum ada transaksi retribusi lainnya.</div>
                 </div>
               </div>
+
+              <!-- Rumah Dinas -->
+              <div class="section" style="padding-top:8px" id="riw-rumahdinas" hidden>
+                <div id="riw-rd-list">
+                  <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Memuat…</div>
+                </div>
+              </div>
             </div>
             <div class="pad"></div>
           <nav class="tabbar" data-tabbar></nav>
@@ -394,7 +400,7 @@
         <section class="screen" id="pesan">
           <div class="app-header"></div>
           <div class="scroll">
-            <div class="greeting-banner" style="text-align:center;font-size:16px">Status Orderan Anda</div>
+            <div class="page-title">Status Orderan Anda</div>
             <div class="segment" style="margin:0">
               <button class="on" id="pseg-samsat" onclick="pseg('samsat')">Samsat</button>
               <button id="pseg-retribusi" onclick="pseg('retribusi')">Retribusi</button>
@@ -418,8 +424,14 @@
         <section class="screen" id="akun">
           <div class="app-header"></div>
           <div class="scroll">
-            <div class="greeting-banner" style="text-align:left;font-size:14px">Akun</div>
-            <div class="akun-greeting">Halo, Muhammad Ihsanul</div>
+            <div class="page-title">Akun</div>
+            <div class="profile-card">
+              <div class="welcome-avatar">MI</div>
+              <div class="welcome-text">
+                <div class="welcome-n">Muhammad Ihsanul</div>
+                <div class="welcome-k">Wajib Pajak &amp; Retribusi · Prov. NTT</div>
+              </div>
+            </div>
 
             <div class="mon-card">
               <div class="mon-head">
@@ -454,12 +466,16 @@
               <div class="mon-note">Data contoh presentasi.</div>
             </div>
 
-            <div class="info-section-head">Info Aplikasi</div>
-            <div class="menucard" style="border-radius:0;border-top:none">
-              <div class="mitem" onclick="go('samsat')"><div class="mt">Panduan</div><div class="ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div></div>
+            <div class="dash-head">Info Aplikasi</div>
+            <div class="menucard akun-menu">
+              <div class="mitem" onclick="go('samsat')">
+                <div class="ic blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg></div>
+                <div class="mt">Panduan</div>
+                <div class="ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+              </div>
             </div>
-            <div class="section" style="padding-top:12px">
-              <button class="btn" style="background:#e5484d;color:#fff;border-radius:8px;font-weight:700" onclick="go('splash')">Logout</button>
+            <div class="akun-logout">
+              <button class="btn btn-logout" onclick="go('splash')">Keluar</button>
             </div>
             <div class="pad"></div>
           </div>
@@ -518,9 +534,6 @@
       </div>
 
     </div><!-- /screen-wrap -->
-  </div><!-- /phone -->
-
-  <div class="stage-note">Prototipe tampilan <b>PRO NTT</b> — hanya untuk presentasi. Semua data contoh, tanpa login &amp; tanpa koneksi ke server. Ketuk kartu &amp; tombol untuk menjelajah.</div>
 </div>
 <script src="js/script.js"></script>
 <script>
