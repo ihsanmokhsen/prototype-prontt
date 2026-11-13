@@ -76,13 +76,16 @@
           <div class="scroll">
             <div class="page-title">Samsat</div>
             <div class="section" style="padding-top:2px">
-              <div class="sec-head">
-                <div class="section-title">Kendaraan Saya</div>
-                <span class="sec-link" onclick="openTambahKendaraan()">+ Tambah</span>
+              <div class="entry-btn" onclick="go('kendaraansaya')">
+                <div class="ic blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l1.5-4.5A2 2 0 018.4 7h7.2a2 2 0 011.9 1.5L19 13"/><path d="M4 17h16v-3a2 2 0 00-2-2H6a2 2 0 00-2 2z"/><circle cx="7" cy="17" r="1.5"/><circle cx="17" cy="17" r="1.5"/></svg></div>
+                <div class="eb-txt">
+                  <div class="eb-t">Kendaraan Saya</div>
+                  <div class="eb-d" id="kd-summary">Masa berlaku &amp; jadwal pajak</div>
+                </div>
+                <div class="ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
               </div>
-              <div id="kendaraan-list"></div>
             </div>
-            <div class="section" style="padding-top:12px">
+            <div class="section" style="padding-top:14px">
               <div class="section-title" style="margin-bottom:12px">Layanan Lain</div>
               <div class="dash-grid" style="padding:0">
                 <div class="dash-card" onclick="go('cekpajak')">
@@ -100,11 +103,27 @@
           <nav class="tabbar" data-tabbar></nav>
         </section>
 
+        <!-- ============ KENDARAAN SAYA ============ -->
+        <section class="screen" id="kendaraansaya">
+          <div class="scroll">
+            <div class="appbar">
+              <button class="back" onclick="go('samsat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <div><h1>Kendaraan Saya</h1><div class="sub">Masa berlaku &amp; jadwal pajak</div></div>
+            </div>
+            <div class="section" style="padding-top:2px">
+              <div id="kendaraan-list"></div>
+              <button class="btn btn-outline" style="margin-top:4px;font-size:13px;padding:11px" onclick="openTambahKendaraan()">+ Tambah Kendaraan</button>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
         <!-- ============ TAMBAH KENDARAAN ============ -->
         <section class="screen" id="tambahkendaraan">
           <div class="scroll">
             <div class="appbar">
-              <button class="back" onclick="go('samsat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <button class="back" onclick="go('kendaraansaya')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
               <div><h1>Tambah Kendaraan</h1><div class="sub">Data kendaraan &amp; masa berlaku pajak</div></div>
             </div>
             <div class="section" style="padding-top:8px">
@@ -199,7 +218,7 @@
         <section class="screen" id="hasilpajak">
           <div class="scroll">
             <div class="appbar">
-              <button class="back" onclick="go('samsat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <button class="back" onclick="go('kendaraansaya')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
               <div><h1>Detail Tagihan</h1><div class="sub" id="hp-sub">Jatuh tempo pajak</div></div>
             </div>
             <div class="section" style="padding-top:4px">
@@ -223,6 +242,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
                 <span id="hp-hint">Simulasi UI/UX — denda 2% per bulan keterlambatan. Tidak terhubung ke server SAMSAT.</span>
               </div>
+              <button class="link-danger" onclick="hapusKendaraanAktif()">Hapus kendaraan dari daftar</button>
             </div>
             <div class="pad"></div>
           </div>

@@ -552,31 +552,51 @@
     if(d<=30) return {cls:'proses', text:d+' hari lagi'};
     return {cls:'tersedia', text:'Aktif · '+d+' hari lagi'};
   }
+  function statusShort(d){
+    if(d===null) return {cls:'tidak', text:'Belum diatur'};
+    if(d<0) return {cls:'tidak', text:'Lewat '+Math.abs(d)+' hr'};
+    if(d===0) return {cls:'proses', text:'Hari ini'};
+    if(d<=30) return {cls:'proses', text:d+' hari'};
+    return {cls:'tersedia', text:'Aktif'};
+  }
   function renderKendaraanList(){
-    var el=document.getElementById('kendaraan-list'); if(!el) return;
     var list=loadKendaraan();
+    var overdue = 0;
+    list.forEach(function(v){
+      var d=hariKeTempo(v.tempo);
+      if(d!==null && d<0) overdue++;
+    });
+    var sum=document.getElementById('kd-summary');
+    if(sum){
+      sum.textContent = list.length
+        ? list.length+' kendaraan'+(overdue ? ' · '+overdue+' lewat jatuh tempo' : '')
+        : 'Belum ada kendaraan';
+    }
+    var el=document.getElementById('kendaraan-list'); if(!el) return;
     if(!list.length){
       el.innerHTML = '<div class="empty"><div class="t">Belum ada kendaraan</div><div class="d">Tambahkan kendaraan untuk melihat masa berlaku dan jadwal bayar pajaknya.</div></div>';
       return;
     }
-    var overdue = 0;
     var cards = list.map(function(v){
-      var d=hariKeTempo(v.tempo); var st=statusTempo(d);
-      if(d!==null && d<0) overdue++;
-      return '<div class="vcard" onclick="bukaKendaraan(\''+v.id+'\')">'
-        + '<div class="vc-top"><span class="plate-badge sm">'+esc(v.nopol)+'</span>'
-        +   '<span class="chip '+st.cls+'">'+st.text+'</span></div>'
-        + '<div class="vc-name">'+esc(v.merk||'Kendaraan')+'</div>'
-        + '<div class="vc-sub">Tahun '+esc(v.tahun||'-')+' · '+esc(v.warna||'-')+' · Rangka ••••'+esc(v.rangka||'')+'</div>'
-        + '<div class="vc-due"><span class="k">Jatuh tempo pajak</span><span class="v">'+fmtTgl(v.tempo)+'</span></div>'
-        + '<div class="vc-actions"><button class="vc-del" onclick="event.stopPropagation();hapusKendaraan(\''+v.id+'\')">Hapus</button>'
-        +   '<button class="btn-sm gold" onclick="event.stopPropagation();bukaKendaraan(\''+v.id+'\')">Cek &amp; Bayar</button></div>'
+      var st=statusShort(hariKeTempo(v.tempo));
+      return '<div class="kcard" onclick="bukaKendaraan(\''+v.id+'\')">'
+        + '<div class="kplate">'+esc(v.nopol)+'</div>'
+        + '<div class="km"><div class="kt">'+esc(v.merk||'Kendaraan')+'</div>'
+        +   '<div class="ks">Jatuh tempo '+fmtTgl(v.tempo)+'</div></div>'
+        + '<span class="chip '+st.cls+'">'+st.text+'</span>'
         + '</div>';
     }).join('');
     var note = overdue
       ? '<div class="note-warn">'+overdue+' kendaraan melewati jatuh tempo pajak. Segera lakukan pembayaran.</div>'
       : '';
     el.innerHTML = note + cards;
+  }
+  function hapusKendaraanAktif(){
+    if(!kdAktif) return;
+    simpanKendaraan(loadKendaraan().filter(function(v){ return v.id!==kdAktif; }));
+    kdAktif=null;
+    renderKendaraanList();
+    go('kendaraansaya');
   }
   function hapusKendaraan(id){
     simpanKendaraan(loadKendaraan().filter(function(v){ return v.id!==id; }));
@@ -610,7 +630,7 @@
     });
     simpanKendaraan(list);
     renderKendaraanList();
-    go('samsat');
+    go('kendaraansaya');
   }
   function hitungPajak(v){
     var d=hariKeTempo(v.tempo);
