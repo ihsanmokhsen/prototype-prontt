@@ -622,6 +622,22 @@ function initCek(){
       return '<button class="btn-sm" onclick="cekFill(\''+s.sk+'\')">'+s.sk+'</button>';
     }).join('');
   }
+  var nbox = document.getElementById('ck-name-samples');
+  if(nbox){
+    nbox.innerHTML = SK_SEED.map(function(s){
+      var list = (s.penyewa && s.penyewa.length) ? s.penyewa : [s.pemohon];
+      var chips = list.filter(Boolean).map(function(n){
+        return '<button class="name-chip" onclick="cekFillContoh(\''+s.sk+'\',\''+n.replace(/'/g,"\\'")+'\')">'+n+'</button>';
+      }).join('');
+      return '<div class="name-group"><div class="ng-sk">'+s.sk+'</div><div class="ng-list">'+chips+'</div></div>';
+    }).join('');
+  }
+}
+function cekFillContoh(no, nama){
+  var el = document.getElementById('ck-nomor');
+  var nel = document.getElementById('ck-nama-input');
+  if(el) el.value = no;
+  if(nel){ nel.value = nama; nel.focus(); }
 }
 function cekFill(v){
   var el = document.getElementById('ck-nomor');
