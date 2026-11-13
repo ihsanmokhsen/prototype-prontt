@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Detail Retribusi — PRO NTT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <section class="screen active" id="bill">
+    <div class="scroll">
+      <div class="appbar">
+        <button class="back" onclick="backBill()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div><h1>Detail Retribusi</h1><div class="sub">Rincian pembayaran</div></div>
+      </div>
+      <div class="section" style="padding-top:10px">
+        <div class="billphoto" id="bl-photo" hidden>
+          <img id="bl-photo-img" alt="">
+          <span class="photo-credit" id="bl-photo-credit"></span>
+        </div>
+        <div class="billcard">
+          <div class="billrow"><span class="bk">Nomor Daftar</span><span class="bv"><span class="num" id="bl-nomor">3481562</span></span></div>
+          <div class="billrow"><span class="bk">Kode Booking</span><span class="bv"><span class="num" id="bl-booking">1231571794430970</span><button class="copybtn" onclick="copyTxt('bl-booking')" aria-label="Salin kode booking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button></span></div>
+          <div class="billrow big"><span class="bk">Total Bayar</span><span class="bv"><span class="num" id="bl-total">Rp 30.000</span><button class="copybtn" onclick="copyTxt('bl-total')" aria-label="Salin total bayar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button></span></div>
+          <div class="billrow"><span class="bk">Status Pesan</span><span class="bv"><span class="chip proses" id="bl-status">Kode Bayar Aktif</span></span></div>
+          <div class="billrow"><span class="bk">Tanggal Daftar</span><span class="bv"><span id="bl-tgl">12 November 2026</span></span></div>
+          <div class="billrow"><span class="bk">Batas Bayar</span><span class="bv"><span id="bl-batas">Nov 12 2026 2:00PM</span></span></div>
+          <div class="billrow"><span class="bk">Pesanan</span><span class="bv"><span id="bl-pesanan">Pemeriksaan Golongan darah</span></span></div>
+          <div class="billrow"><span class="bk">OPD Pengelola</span><span class="bv"><span id="bl-opd">—</span></span></div>
+        </div>
+        <div class="wajib">
+          <div class="wt">ANDA WAJIB:</div>
+          <ol>
+            <li>Segera lakukan pembayaran tunai menggunakan kode booking yang ada pada instansi terkait.</li>
+            <li>Ambil/claim transaksi ke instansi terkait.</li>
+            <li>Batas pembayaran sampai dengan batas waktu yang ditetapkan.</li>
+            <li>Apabila lewat masa waktu, request kode booking baru.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="pad"></div>
+    </div>
+    <div class="footer-cta">
+      <button class="btn btn-blue" id="bl-btn" onclick="payBill()">Bayar Sekarang</button>
+    </div>
+  </section>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/shell.js"></script>
+  <script src="../js/retribusi.js"></script>
+</body>
+</html>

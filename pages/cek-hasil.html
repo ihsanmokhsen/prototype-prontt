@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Tagihan Retribusi — PRO NTT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <section class="screen active" id="cekhasil">
+    <div class="scroll">
+      <div class="appbar">
+        <button class="back" onclick="backCek()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div><h1>Tagihan Retribusi</h1><div class="sub">Detail kontrak &amp; rincian pembayaran</div></div>
+      </div>
+      <div class="section" style="padding-top:4px">
+        <div id="cek-notfound" hidden>
+          <div class="empty">
+            <div class="t">Nomor tidak ditemukan</div>
+            <div class="d">Periksa kembali No. SK / No. Kerjasama yang Anda masukkan, lalu coba lagi.</div>
+          </div>
+          <button class="btn btn-blue" style="margin-top:14px" onclick="backCek()">Coba Lagi</button>
+        </div>
+        <div id="cek-found" hidden>
+          <div class="statusrow" id="ck-statusrow"></div>
+          <div class="vehcard">
+            <div class="top">
+              <span class="plate-badge" id="ck-sk">SK/000/PRO-NTT/2026</span>
+              <div class="vname" id="ck-nama">Objek retribusi</div>
+              <div class="vsub" id="ck-sub">Detail kontrak</div>
+            </div>
+            <div class="rows">
+              <div class="rowline"><span class="k">No. Kerjasama</span><span class="v" id="ck-kerjasama">—</span></div>
+              <div class="rowline"><span class="k">Kode Layanan</span><span class="v" id="ck-kode">—</span></div>
+              <div class="rowline"><span class="k">Pemohon</span><span class="v" id="ck-pemohon">—</span></div>
+              <div class="rowline"><span class="k">Instansi / OPD</span><span class="v" id="ck-instansi">—</span></div>
+              <div class="rowline"><span class="k">Keperluan</span><span class="v" id="ck-keperluan">—</span></div>
+              <div class="rowline"><span class="k">Masa Sewa</span><span class="v" id="ck-masa">—</span></div>
+              <div class="rowline"><span class="k">Tanggal SK</span><span class="v" id="ck-tglsk">—</span></div>
+            </div>
+          </div>
+          <div class="section-title">Rincian Tagihan</div>
+          <div class="section-sub" style="margin-bottom:10px">Nilai retribusi sesuai SK / Perjanjian Kerjasama</div>
+          <div class="vehcard">
+            <div class="rows">
+              <div class="rowline"><span class="k">Pokok retribusi</span><span class="v" id="ck-pokok">Rp 0</span></div>
+              <div class="rowline" id="ck-dendarow"><span class="k">Denda keterlambatan</span><span class="v" id="ck-denda">Rp 0</span></div>
+              <div class="rowline muted"><span class="k">Biaya admin</span><span class="v">Rp 0</span></div>
+            </div>
+            <div class="totalbar"><span class="k">Total Bayar</span><span class="v" id="ck-total">Rp 0</span></div>
+          </div>
+          <div class="hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+            Data bersifat contoh untuk keperluan presentasi — tidak terhubung ke server retribusi daerah.
+          </div>
+        </div>
+      </div>
+      <div class="pad"></div>
+    </div>
+    <div class="footer-cta" id="ck-footer" hidden>
+      <button class="btn btn-blue" id="ck-bayar" onclick="bayarCek()">Bayar Sekarang</button>
+    </div>
+  </section>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/shell.js"></script>
+  <script src="../js/retribusi.js"></script>
+</body>
+</html>

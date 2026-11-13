@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>PRO NTT Modern</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="stage">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen-wrap">
+      <!-- status bar -->
+      <div class="statusbar onblue" id="statusbar">
+        <span id="clock">09:41</span>
+        <span class="dots">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20v-12M18 20V4" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 6c3.3 0 6.3 1.3 8.5 3.4l-1.4 1.4C17.3 9 14.8 8 12 8S6.7 9 4.9 10.8L3.5 9.4C5.7 7.3 8.7 6 12 6zm0 4c1.9 0 3.6.7 4.9 1.9l-1.5 1.5c-.9-.8-2.1-1.4-3.4-1.4s-2.5.6-3.4 1.4L7.1 11.9C8.4 10.7 10.1 10 12 10zm0 4c.8 0 1.5.3 2 .8L12 17l-2-2.2c.5-.5 1.2-.8 2-.8z"/></svg>
+          <svg viewBox="0 0 26 16" fill="none"><rect x="1" y="2" width="20" height="12" rx="3" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="4" width="15" height="8" rx="1.5" fill="currentColor"/><rect x="22.5" y="5.5" width="2" height="5" rx="1" fill="currentColor"/></svg>
+        </span>
+      </div>
+
+      <div class="viewport">
+
+        <!-- ============ SPLASH ============ -->
+        <section class="screen active" id="splash">
+          <div class="scroll" style="display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:0 0 24px;background:#fff">
+            <img src="https://app.iwana.id/assets/prontt/splash.jpg" alt="PRO NTT" style="width:100%;max-height:460px;object-fit:cover;object-position:top">
+            <div class="splash-cta" style="padding:0 24px;width:100%;margin-top:16px">
+              <button class="btn" style="background:var(--blue-600);color:#fff;border-radius:8px;font-weight:700;margin-bottom:12px" onclick="go('dashboard')">Masuk</button>
+              <button class="btn" style="background:var(--teal);color:#fff;border-radius:8px;font-weight:700" onclick="go('dashboard')">Daftar</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ DASHBOARD ============ -->
+        <section class="screen" id="dashboard">
+          <div class="app-header"></div>
+          <div class="scroll">
+            <div class="greeting-banner">Halo, Muhammad Ihsanul</div>
+            <div class="dash-grid">
+              <div class="dash-card" onclick="go('samsat')">
+                <img src="https://app.iwana.id/assets/prontt/icon/SAMSAT.png" alt="SAMSAT">
+                <div class="dc-label">SAMSAT</div>
+              </div>
+              <div class="dash-card" onclick="location.href='pages/retribusi.html'">
+                <img src="https://app.iwana.id/assets/prontt/icon/RETRIBUSI.png" alt="RETRIBUSI">
+                <div class="dc-label">RETRIBUSI</div>
+              </div>
+            </div>
+            <div class="dash-grid">
+              <div class="dash-card center" onclick="go('samsat')">
+                <img src="https://app.iwana.id/assets/prontt/icon/PANDUAN.png" alt="PANDUAN">
+                <div class="dc-label">PANDUAN</div>
+              </div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============ SAMSAT ============ -->
+        <section class="screen" id="samsat">
+          <div class="app-header"></div>
+          <div class="scroll">
+            <div class="greeting-banner" style="text-align:center;font-size:16px">Samsat</div>
+            <div class="dash-grid">
+              <div class="dash-card" onclick="go('cekpajak')">
+                <img src="https://app.iwana.id/assets/prontt/icon/SAMSAT.png" alt="Cek Pajak">
+                <div class="dc-label">CEK &amp; BAYAR PAJAK</div>
+              </div>
+              <div class="dash-card" onclick="go('cekpajak')">
+                <img src="https://app.iwana.id/assets/prontt/icon/SAMSAT.png" alt="NJKB">
+                <div class="dc-label">CEK NJKB</div>
+              </div>
+            </div>
+            <div class="dash-grid">
+              <div class="dash-card center" onclick="go('cekpajak')">
+                <img src="https://app.iwana.id/assets/prontt/icon/SAMSAT.png" alt="Layanan SAMSAT">
+                <div class="dc-label">LAYANAN SAMSAT</div>
+              </div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============ CEK PAJAK FORM ============ -->
+        <section class="screen" id="cekpajak">
+          <div class="scroll">
+            <div class="appbar">
+              <button class="back" onclick="go('samsat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <div><h1>Cek &amp; Bayar Pajak</h1><div class="sub">Masukkan data kendaraan Anda</div></div>
+            </div>
+            <div class="section" style="padding-top:8px">
+              <div class="field">
+                <label class="label">Nopol Kendaraan</label>
+                <div class="plate">
+                  <input class="inp" id="p1" maxlength="2" placeholder="DH" value="DH" oninput="this.value=this.value.toUpperCase()">
+                  <input class="inp" id="p2" maxlength="4" placeholder="1234" value="1234" inputmode="numeric">
+                  <input class="inp" id="p3" maxlength="3" placeholder="ABC" value="ABC" oninput="this.value=this.value.toUpperCase()">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">5 Digit Terakhir Nomor Rangka</label>
+                <input class="inp text-left" id="rangka" maxlength="5" placeholder="Contoh: 84213" value="84213" inputmode="numeric">
+                <div class="hint">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+                  Nomor rangka tertera pada STNK dan BPKB kendaraan Anda.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="footer-cta">
+            <button class="btn btn-blue" onclick="go('hasilpajak')">Cek Pajak</button>
+          </div>
+        </section>
+
+        <!-- ============ HASIL PAJAK ============ -->
+        <section class="screen" id="hasilpajak">
+          <div class="scroll">
+            <div class="appbar">
+              <button class="back" onclick="go('cekpajak')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <div><h1>Detail Tagihan</h1><div class="sub">Tahun pajak 2026</div></div>
+            </div>
+            <div class="section" style="padding-top:4px">
+              <div class="statusrow">
+                <span class="tag warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 9v4M12 17h.01M10.3 3.9L2 18a2 2 0 001.7 3h16.6a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" stroke-linejoin="round"/></svg>Terlambat 2 bulan</span>
+                <span class="tag info">Progresif ke-1</span>
+              </div>
+              <div class="vehcard">
+                <div class="top">
+                  <span class="plate-badge">DH 1234 ABC</span>
+                  <div class="vname">Toyota Avanza 1.3 G</div>
+                  <div class="vsub">Tahun 2019 · Hitam · Rangka ••••84213</div>
+                </div>
+                <div class="rows">
+                  <div class="rowline"><span class="k">PKB (Pajak Kendaraan)</span><span class="v">Rp 1.045.000</span></div>
+                  <div class="rowline"><span class="k">SWDKLLJ (Jasa Raharja)</span><span class="v">Rp 143.000</span></div>
+                  <div class="rowline denda"><span class="k">Denda PKB</span><span class="v">Rp 52.250</span></div>
+                  <div class="rowline denda"><span class="k">Denda SWDKLLJ</span><span class="v">Rp 7.250</span></div>
+                  <div class="rowline muted"><span class="k">Biaya admin</span><span class="v">Rp 0</span></div>
+                </div>
+                <div class="totalbar"><span class="k">Total Bayar</span><span class="v">Rp 1.247.500</span></div>
+              </div>
+              <div class="hint" style="margin-bottom:4px">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+                Data bersifat contoh untuk keperluan presentasi — tidak terhubung ke server SAMSAT.
+              </div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <div class="footer-cta">
+            <button class="btn btn-blue" onclick="openSheet()">Bayar Sekarang · Rp 1.247.500</button>
+          </div>
+        </section>
+
+        <!-- ============ RETRIBUSI ============ -->
+        <section class="screen" id="retribusi">
+          <div class="app-header"></div>
+          <div class="scroll">
+            <div class="greeting-banner" style="text-align:center;font-size:16px">Retribusi</div>
+            <div class="section" style="padding-top:8px">
+              <div class="cat">
+                <div class="ct"><span class="bar"></span>SEWA</div>
+                <div class="cat-grid">
+                  <div class="citem" onclick="openList('gedung')"><img src="https://app.iwana.id/assets/prontt/icon/SEWA%20GEDUNG.png" style="width:70px;height:70px;object-fit:contain"><span>Gedung</span></div>
+                  <div class="citem" onclick="openList('tanah')"><img src="https://app.iwana.id/assets/prontt/icon/SEWA%20TANAH.png" style="width:70px;height:70px;object-fit:contain"><span>Tanah</span></div>
+                  <div class="citem" onclick="openList('labkesehatan')"><img src="https://app.iwana.id/assets/prontt/icon/SEWA%20PERALATAN%20LEB.png" style="width:70px;height:70px;object-fit:contain"><span>Peralatan Penelitian Kesehatan</span></div>
+                  <div class="citem" onclick="openList('it')"><img src="https://app.iwana.id/assets/prontt/icon/SEWA%20PERALATAN%20IT.png" style="width:70px;height:70px;object-fit:contain"><span>Peralatan IT</span></div>
+                </div>
+              </div>
+              <div class="cat">
+                <div class="ct"><span class="bar"></span>TERNAK</div>
+                <div class="cat-grid">
+                  <div class="citem" onclick="openList('ternak')"><img src="https://app.iwana.id/assets/prontt/icon/TERNAK.png" style="width:70px;height:70px;object-fit:contain"><span>Ternak</span></div>
+                  <div class="citem" onclick="openList('pakan')"><img src="https://app.iwana.id/assets/prontt/icon/PEMERIKSAAN%20HEWAN.png" style="width:70px;height:70px;object-fit:contain"><span>Pakan Ternak</span></div>
+                  <div class="citem" onclick="openList('labhewan')"><img src="https://app.iwana.id/assets/prontt/icon/PAKAN.png" style="width:70px;height:70px;object-fit:contain"><span>Pemeriksaan Laboratorium Hewan</span></div>
+                </div>
+              </div>
+              <div class="cat">
+                <div class="ct"><span class="bar"></span>JASA KESEHATAN</div>
+                <div class="cat-grid">
+                  <div class="citem" onclick="openList('kesehatan')"><img src="https://app.iwana.id/assets/prontt/icon/PEMERIKSAAN%20KESEHATAN.png" style="width:70px;height:70px;object-fit:contain"><span>Pemeriksaan Kesehatan</span></div>
+                  <div class="citem" onclick="openList('klinik')"><img src="https://app.iwana.id/assets/prontt/icon/PEMERIKSAAN%20KESEHATAN.png" style="width:70px;height:70px;object-fit:contain"><span>Jasa Laboratorium</span></div>
+                  <div class="citem" onclick="openList('kesehatan')"><img src="https://app.iwana.id/assets/prontt/icon/PEMERIKSAAN%20KESEHATAN.png" style="width:70px;height:70px;object-fit:contain"><span>Pelayanan Jasa Laboratorium</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============ DAFTAR ITEM RETRIBUSI ============ -->
+        <section class="screen" id="itemlist">
+          <div class="scroll">
+            <div class="appbar">
+              <button class="back" onclick="go('retribusi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <div><h1 id="il-title">Daftar Item</h1><div class="sub" id="il-sub">Retribusi Daerah</div></div>
+            </div>
+            <div class="section" style="padding-top:4px">
+              <div class="section-sub" style="margin-bottom:12px">Pilih item yang ingin disewa / dilayani:</div>
+              <div class="ilist" id="item-list"></div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============ RETRIBUSI DETAIL ============ -->
+        <section class="screen" id="retridetail">
+          <div class="scroll">
+            <div class="appbar">
+              <button class="back" onclick="backDetail()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <div><h1 id="rd-cat">Sewa Aset</h1><div class="sub" id="rd-sub">Detail layanan retribusi</div></div>
+            </div>
+            <div class="section" style="padding-top:4px">
+              <div class="statusrow" id="rd-statusrow" hidden></div>
+              <div class="vehcard">
+                <div class="top" style="display:flex;align-items:center;gap:14px">
+                  <div class="ic" id="rd-ic" style="width:52px;height:52px;background:rgba(255,255,255,.18);color:#fff;flex:0 0 52px"></div>
+                  <div><div class="vname" id="rd-name" style="margin-top:0">Item</div><div class="vsub" id="rd-cat2">Kategori</div></div>
+                </div>
+                <div class="rows">
+                  <div class="rowline"><span class="k">Kode Layanan</span><span class="v" id="rd-kode">RTB-000</span></div>
+                  <div class="rowline"><span class="k">Tarif per unit</span><span class="v" id="rd-unit">Rp 0</span></div>
+                  <div class="rowline" id="rd-stokrow" hidden><span class="k">Jumlah stok aset</span><span class="v" id="rd-stok">0 unit</span></div>
+                  <div class="rowline"><span class="k" id="rd-qtylabel">Masa / Jumlah</span>
+                    <span class="v" style="display:flex;align-items:center;gap:12px">
+                      <button class="rd-step" onclick="rdQty(-1)">−</button>
+                      <span id="rd-qty" style="min-width:20px;text-align:center">1</span>
+                      <button class="rd-step" onclick="rdQty(1)">+</button>
+                    </span>
+                  </div>
+                </div>
+                <div class="totalbar"><span class="k">Total Retribusi</span><span class="v" id="rd-total">Rp 0</span></div>
+              </div>
+              <div id="rd-docblock" hidden>
+                <div class="section-title" style="margin-top:2px">Lampiran SK / Perjanjian</div>
+                <div class="section-sub" style="margin-bottom:10px">Dokumen contoh pada detail aset</div>
+                <div id="rd-docs"></div>
+              </div>
+              <div class="section-title" style="margin-top:6px">Rincian Layanan</div>
+              <div class="section-sub" id="rd-desc" style="margin-bottom:0;line-height:1.5">Keterangan layanan.</div>
+              <div id="rd-histblock" hidden>
+                <div class="section-title" style="margin-top:18px">Riwayat Penyewaan</div>
+                <div class="section-sub" style="margin-bottom:10px">Pemohon, status, nomor SK, masa sewa &amp; nilai retribusi</div>
+                <div id="rd-hist"></div>
+              </div>
+              <div class="hint" style="margin-top:14px">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+                <span id="rd-hint">Tarif mengacu pada Perda Retribusi Daerah Prov. NTT (data contoh presentasi).</span>
+              </div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <div class="footer-cta">
+            <button class="btn btn-blue" onclick="rdCta()" id="rd-btn">Lanjut ke Pembayaran</button>
+          </div>
+        </section>
+
+        <!-- ============ FORM PERMOHONAN SEWA ============ -->
+        <section class="screen" id="permohonan">
+          <div class="scroll">
+            <div class="appbar">
+              <button class="back" onclick="backDetail()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <div><h1>Form Permohonan</h1><div class="sub">Permohonan sewa aset daerah</div></div>
+            </div>
+            <div class="section" style="padding-top:8px">
+              <div class="pf-asli">
+                <div class="an" id="pf-name">Aset</div>
+                <div class="ak" id="pf-kode">Kode aset</div>
+                <div class="at" id="pf-total">Rp 0</div>
+              </div>
+              <div class="field">
+                <label class="label">Nama Pemohon</label>
+                <input class="inp text-left" id="pf-nama" value="Muhammad Ihsanul">
+              </div>
+              <div class="field">
+                <label class="label">Instansi / OPD</label>
+                <input class="inp text-left" id="pf-opd" placeholder="Contoh: Dinas Pendidikan Prov. NTT">
+              </div>
+              <div class="field">
+                <label class="label">Keperluan</label>
+                <input class="inp text-left" id="pf-keperluan" placeholder="Contoh: Rapat koordinasi">
+              </div>
+              <div class="field">
+                <label class="label">Tanggal Mulai Sewa</label>
+                <input class="inp text-left" id="pf-mulai" type="date">
+              </div>
+              <div class="field">
+                <label class="label">Durasi (hari/bulan)</label>
+                <input class="inp text-left" id="pf-durasi" type="number" min="1" value="1" oninput="pfDurasi()">
+              </div>
+              <div class="hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+                Permohonan diverifikasi OPD. Sewa aktif setelah SK Kerjasama terbit dan retribusi dibayar.
+              </div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <div class="footer-cta">
+            <button class="btn btn-blue" onclick="submitPermohonan()">Kirim Permohonan</button>
+          </div>
+        </section>
+
+        <!-- ============ PERMOHONAN SAYA ============ -->
+        <section class="screen" id="permohonansaya">
+          <div class="scroll">
+            <div class="appbar">
+              <button class="back" onclick="go('akun')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <div><h1>Permohonan Saya</h1><div class="sub">Status permohonan sewa aset</div></div>
+            </div>
+            <div class="section" style="padding-top:4px">
+              <div id="apps-list"></div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============ DETAIL RETRIBUSI (NON-SEWA) ============ -->
+        <section class="screen" id="bill">
+          <div class="scroll">
+            <div class="appbar">
+              <button class="back" onclick="go('itemlist')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <div><h1>Detail Retribusi</h1><div class="sub">Rincian pembayaran</div></div>
+            </div>
+            <div class="section" style="padding-top:10px">
+              <div class="billcard">
+                <div class="billrow"><span class="bk">Nomor Daftar</span><span class="bv"><span class="num" id="bl-nomor">3481562</span></span></div>
+                <div class="billrow"><span class="bk">Kode Booking</span><span class="bv"><span class="num" id="bl-booking">1231571794430970</span><button class="copybtn" onclick="copyTxt('bl-booking')" aria-label="Salin kode booking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button></span></div>
+                <div class="billrow big"><span class="bk">Total Bayar</span><span class="bv"><span class="num" id="bl-total">Rp 30.000</span><button class="copybtn" onclick="copyTxt('bl-total')" aria-label="Salin total bayar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button></span></div>
+                <div class="billrow"><span class="bk">Status Pesan</span><span class="bv"><span class="chip proses" id="bl-status">Kode Bayar Aktif</span></span></div>
+                <div class="billrow"><span class="bk">Tanggal Daftar</span><span class="bv"><span id="bl-tgl">12 November 2026</span></span></div>
+                <div class="billrow"><span class="bk">Batas Bayar</span><span class="bv"><span id="bl-batas">Nov 12 2026 2:00PM</span></span></div>
+                <div class="billrow"><span class="bk">Pesanan</span><span class="bv"><span id="bl-pesanan">Pemeriksaan Golongan darah</span></span></div>
+              </div>
+              <div class="wajib">
+                <div class="wt">ANDA WAJIB:</div>
+                <ol>
+                  <li>Segera lakukan pembayaran tunai menggunakan kode booking yang ada pada instansi terkait.</li>
+                  <li>Ambil/claim transaksi ke instansi terkait.</li>
+                  <li>Batas pembayaran sampai dengan batas waktu yang ditetapkan.</li>
+                  <li>Apabila lewat masa waktu, request kode booking baru.</li>
+                </ol>
+              </div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <div class="footer-cta">
+            <button class="btn btn-blue" id="bl-btn" onclick="payBill()">Bayar Sekarang</button>
+          </div>
+        </section>
+
+        <!-- ============ RIWAYAT ============ -->
+        <section class="screen" id="riwayat">
+          <div class="app-header"></div>
+          <div class="scroll">
+            <div class="greeting-banner" style="text-align:center;font-size:16px">Riwayat Transaksi</div>
+            <div class="segment" style="margin:0">
+                <button class="on" id="seg-samsat" onclick="seg('samsat')">Samsat</button>
+                <button id="seg-retribusi" onclick="seg('retribusi')">Retribusi</button>
+              </div>
+              <div class="section" style="padding-top:8px" id="riw-samsat">
+                <div class="trx">
+                  <div class="ic green" style="width:44px;height:44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+                  <div class="m"><div class="tt">PKB · DH 1234 ABC</div><div class="ts">18 Jan 2026 · 10:24 · QRIS</div></div>
+                  <div class="r"><div class="amt">Rp 1.102.000</div><div class="st paid">Lunas</div></div>
+                </div>
+                <div class="trx">
+                  <div class="ic gold" style="width:44px;height:44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2M3 12a9 9 0 109-9 9 9 0 00-7 3.3M3 4v4h4"/></svg></div>
+                  <div class="m"><div class="tt">PKB · DH 1234 ABC</div><div class="ts">22 Jan 2025 · 09:10 · Virtual Account</div></div>
+                  <div class="r"><div class="amt">Rp 1.045.000</div><div class="st paid">Lunas</div></div>
+                </div>
+              </div>
+              <div class="section" style="padding-top:8px" id="riw-retribusi" hidden>
+                <div class="trx">
+                  <div class="ic blue" style="width:44px;height:44px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg></div>
+                  <div class="m"><div class="tt">Sewa Gedung Serbaguna</div><div class="ts">05 Feb 2026 · 14:02 · GoPay</div></div>
+                  <div class="r"><div class="amt">Rp 750.000</div><div class="st paid">Lunas</div></div>
+                </div>
+                <div class="empty" style="padding:30px 20px">
+                  <div class="d">Belum ada transaksi retribusi lainnya.</div>
+                </div>
+              </div>
+            </div>
+            <div class="pad"></div>
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============ PESAN ============ -->
+
+        <section class="screen" id="pesan">
+          <div class="app-header"></div>
+          <div class="scroll">
+            <div class="greeting-banner" style="text-align:center;font-size:16px">Status Orderan Anda</div>
+            <div class="segment" style="margin:0">
+              <button class="on" id="pseg-samsat" onclick="pseg('samsat')">Samsat</button>
+              <button id="pseg-retribusi" onclick="pseg('retribusi')">Retribusi</button>
+            </div>
+            <div class="section" style="padding-top:8px" id="pesan-samsat">
+              <div class="empty">
+                <div class="d">Tidak ada pesanan objek pajak terbaru.</div>
+              </div>
+            </div>
+            <div class="section" style="padding-top:8px" id="pesan-retribusi" hidden>
+              <div class="empty">
+                <div class="d">Tidak ada pesanan retribusi terbaru.</div>
+              </div>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============ AKUN ============ -->
+        <section class="screen" id="akun">
+          <div class="app-header"></div>
+          <div class="scroll">
+            <div class="greeting-banner" style="text-align:left;font-size:14px">Akun</div>
+            <div class="akun-greeting">Halo, Muhammad Ihsanul</div>
+            <div class="info-section-head">Info Aplikasi</div>
+            <div class="menucard" style="border-radius:0;border-top:none">
+              <div class="mitem" onclick="go('samsat')"><div class="mt">Panduan</div><div class="ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div></div>
+            </div>
+            <div class="section" style="padding-top:12px">
+              <button class="btn" style="background:#e5484d;color:#fff;border-radius:8px;font-weight:700" onclick="go('splash')">Logout</button>
+            </div>
+            <div class="pad"></div>
+          </div>
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============ SUKSES ============ -->
+        <section class="screen" id="sukses">
+          <div class="scroll">
+            <div class="check"><div class="inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+            <h2>Pembayaran Berhasil</h2>
+            <p id="sukses-sub">Pajak kendaraan DH 1234 ABC telah lunas.<br>E-TBPKP &amp; bukti bayar dikirim ke akun Anda.</p>
+            <div class="receipt">
+              <div class="rr"><span class="k">Jenis</span><span class="v" id="rc-jenis">Pajak Kendaraan (PKB)</span></div>
+              <div class="rr"><span class="k">Metode</span><span class="v" id="rc-metode">QRIS</span></div>
+              <div class="rr"><span class="k">No. Referensi</span><span class="v">PRONTT-2026021847</span></div>
+              <div class="rr" style="border-top:1px dashed var(--line);margin-top:4px;padding-top:12px"><span class="k">Total</span><span class="v" id="rc-total" style="color:var(--blue-700);font-size:16px">Rp 1.247.500</span></div>
+            </div>
+            <button class="btn btn-blue" onclick="go('dashboard')">Kembali ke Beranda</button>
+            <div style="height:10px"></div>
+            <button class="btn" style="background:var(--blue-50);color:var(--blue-600)" onclick="go('riwayat')">Lihat di Riwayat</button>
+          </div>
+        </section>
+
+      </div><!-- /viewport -->
+
+      <!-- ===== payment sheet ===== -->
+      <div class="sheet-mask" id="sheetMask" onclick="if(event.target===this)closeSheet()">
+        <div class="sheet">
+          <div class="grab"></div>
+          <h3>Pilih Metode Pembayaran</h3>
+          <div class="ssub" id="sheet-item">Pajak Kendaraan Bermotor</div>
+          <div class="paytotal"><span class="k">Total Pembayaran</span><span class="v" id="sheet-total">Rp 1.247.500</span></div>
+
+          <div class="paygroup">Scan QRIS</div>
+          <div class="pm sel" data-pay="QRIS" onclick="pick(this)">
+            <div class="logo" style="background:linear-gradient(135deg,#d2232a,#9a1b20)">QRIS</div>
+            <div style="flex:1"><div class="pmn">QRIS</div><div class="pmd">Semua bank &amp; e-wallet</div></div>
+            <div class="radio"></div>
+          </div>
+
+          <div class="paygroup">E-Wallet</div>
+          <div class="pm" data-pay="GoPay" onclick="pick(this)"><div class="logo" style="background:#00aed6">Go</div><div style="flex:1"><div class="pmn">GoPay</div><div class="pmd">Saldo Rp 320.000</div></div><div class="radio"></div></div>
+          <div class="pm" data-pay="DANA" onclick="pick(this)"><div class="logo" style="background:#118eea">DANA</div><div style="flex:1"><div class="pmn">DANA</div><div class="pmd">Terhubung</div></div><div class="radio"></div></div>
+          <div class="pm" data-pay="ShopeePay" onclick="pick(this)"><div class="logo" style="background:#ee4d2d">SPay</div><div style="flex:1"><div class="pmn">ShopeePay</div><div class="pmd">Terhubung</div></div><div class="radio"></div></div>
+
+          <div class="paygroup">Virtual Account</div>
+          <div class="pm" data-pay="VA Bank NTT" onclick="pick(this)"><div class="logo" style="background:#0f5fb0">NTT</div><div style="flex:1"><div class="pmn">Bank NTT</div><div class="pmd">Virtual Account</div></div><div class="radio"></div></div>
+          <div class="pm" data-pay="VA BRI" onclick="pick(this)"><div class="logo" style="background:#00529c">BRI</div><div style="flex:1"><div class="pmn">BRI</div><div class="pmd">Virtual Account</div></div><div class="radio"></div></div>
+
+          <div style="height:8px"></div>
+          <button class="btn btn-blue" onclick="payNow()">Bayar Sekarang</button>
+          <div style="height:10px"></div>
+          <button class="btn" style="background:#fff;color:var(--muted)" onclick="closeSheet()">Batal</button>
+        </div>
+      </div>
+
+    </div><!-- /screen-wrap -->
+  </div><!-- /phone -->
+
+  <div class="stage-note">Prototipe tampilan <b>PRO NTT</b> — hanya untuk presentasi. Semua data contoh, tanpa login &amp; tanpa koneksi ke server. Ketuk kartu &amp; tombol untuk menjelajah.</div>
+</div>
+<script src="js/script.js"></script>
+<script>
+  (function(){
+    var id = (location.hash||'').replace('#','');
+    var el = id && document.getElementById(id);
+    if(el && el.classList.contains('screen')) go(id);
+  })();
+</script>
+</body>
+</html>
