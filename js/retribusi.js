@@ -289,7 +289,7 @@ function submitPermohonan(){
   var seq = parseInt(localStorage.getItem(APP_SEQ)||'8',10);
   var id = 'PRM-'+('000'+seq).slice(-4);
   var app = {
-    id:id, nama:g.n, kode:g.k, unit:g.un,
+    id:id, idsewa:'PW-'+('000'+seq).slice(-4), nama:g.n, kode:g.k, unit:g.un,
     cat:rState.cat, opd:g.opd || LISTS[rState.cat].opd || '',
     pemohon:valOr('pf-nama','Muhammad Ihsanul'),
     instansi:valOr('pf-opd','Perorangan'),
@@ -395,7 +395,7 @@ function renderMyApps(){
         + '<a class="wbtn" href="https://wa.me/'+c.wa+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">Chat WA</a>'
         + '</div>';
     }
-    return '<div class="approw"><div class="ar1"><div><div class="aid">'+a.id+'</div><div class="anm">'+a.nama+'</div></div>'+chip+'</div>'
+    return '<div class="approw"><div class="ar1"><div><div class="aid">'+idSewaOfApp(a)+'</div><div class="anm">'+a.nama+'</div></div>'+chip+'</div>'
       + '<div class="ameta">Pemohon: '+a.pemohon+' ('+a.instansi+')<br>Masa sewa: '+a.masa
       + (a.sk?'<br>No. SK: '+a.sk:'') + '<br>Keperluan: '+a.keperluan+'</div>'
       + berkasBlock
@@ -430,7 +430,7 @@ function openSheetApp(id){
       jenis:'Retribusi Sewa · '+a.sk,
       total:rupiah(a.total),
       metode:metode,
-      sub:'Retribusi sewa berhasil dibayar.<br>No. SK: '+a.sk+'<br>Nama: '+a.pemohon+'<br>Sewa aktif hingga '+a.masa+'.',
+      sub:'Retribusi sewa berhasil dibayar.<br>ID Penyewa: '+idSewaOfApp(a)+'<br>No. SK: '+a.sk+'<br>Nama: '+a.pemohon+'<br>Sewa aktif hingga '+a.masa+'.',
       back:'permohonansaya.html'
     });
   });
@@ -538,44 +538,23 @@ function copyTxt(id){
 var CEK_PAID = 'prontt.skpaid.v1';
 var cekState = null;
 
-function normNo(s){ return String(s||'').toUpperCase().replace(/\s+/g,'').replace(/^#/,''); }
-function normNama(s){
-  return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
-}
-function namesOfBill(c){
-  var out = [], i;
-  var list = (c && c.penyewa) || [];
-  for(i=0;i<list.length;i++){ if(list[i]) out.push(list[i]); }
-  if(c && c.pemohon){
-    var pn = normNama(c.pemohon), dup = false;
-    for(i=0;i<out.length;i++){ if(normNama(out[i])===pn){ dup = true; break; } }
-    if(!dup) out.push(c.pemohon);
-  }
-  return out;
-}
-function matchNama(c, input){
-  var q = normNama(input);
-  if(!q) return '';
-  var names = namesOfBill(c), i, n;
-  for(i=0;i<names.length;i++){ if(normNama(names[i])===q) return names[i]; }
-  if(q.length >= 3){
-    for(i=0;i<names.length;i++){
-      n = normNama(names[i]);
-      if(n.indexOf(q) >= 0 || q.indexOf(n) >= 0) return names[i];
-    }
-  }
-  return '';
-}
+function normId(s){ return String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,''); }
 function loadPaid(){
   try{ return JSON.parse(localStorage.getItem(CEK_PAID)||'{}'); }catch(e){ return {}; }
 }
 function savePaid(m){
   try{ localStorage.setItem(CEK_PAID, JSON.stringify(m)); }catch(e){}
 }
+function idSewaOfApp(a){
+  if(!a) return '';
+  if(a.idsewa) return a.idsewa;
+  var n = String(a.id||'').replace(/\D/g,'').slice(-4);
+  return n ? 'PW-'+n : '';
+}
 function appToBill(a){
   var paid = a.status === 'aktif';
   return {
-    source:'app', appId:a.id, sk:a.sk,
+    source:'app', appId:a.id, sk:a.sk, idsewa:idSewaOfApp(a),
     kerjasama:'PKS/'+a.sk.replace(/^SK\//,''),
     nama:a.nama, kode:a.kode, pemohon:a.pemohon, instansi:a.instansi,
     penyewa:[a.pemohon],
@@ -587,7 +566,7 @@ function appToBill(a){
 function seedToBill(s, paidMap){
   var paid = !!paidMap[s.sk] || s.status === 'lunas';
   return {
-    source:'seed', sk:s.sk, kerjasama:s.kerjasama,
+    source:'seed', sk:s.sk, idsewa:s.idsewa, kerjasama:s.kerjasama,
     nama:s.nama, kode:s.kode, pemohon:s.pemohon, instansi:s.instansi,
     penyewa:s.penyewa || [],
     keperluan:s.keperluan, masa:s.masa, tglSk:s.tglSk, opd:s.opd,
@@ -595,94 +574,60 @@ function seedToBill(s, paidMap){
     status: paid ? 'lunas' : 'belum'
   };
 }
-function findSk(query){
-  var q = normNo(query);
-  if(!q) return null;
+function allBills(){
   var paidMap = loadPaid();
   var cands = [];
   loadApps().forEach(function(a){ if(a.sk) cands.push(appToBill(a)); });
   SK_SEED.forEach(function(s){ cands.push(seedToBill(s, paidMap)); });
-  var exact = cands.filter(function(c){ return normNo(c.sk)===q || normNo(c.kerjasama)===q; });
+  return cands;
+}
+function findSewa(query){
+  var q = normId(query);
+  if(!q) return null;
+  var cands = allBills();
+  var exact = cands.filter(function(c){ return normId(c.idsewa)===q; });
   if(exact.length) return exact[0];
-  var part = cands.filter(function(c){
-    return normNo(c.sk).indexOf(q)>=0 || normNo(c.kerjasama).indexOf(q)>=0;
-  });
+  var part = cands.filter(function(c){ return normId(c.idsewa).indexOf(q)>=0; });
   return part.length===1 ? part[0] : null;
 }
 function initCek(){
-  var pre = qs('no');
-  var el = document.getElementById('ck-nomor');
+  var pre = qs('id');
+  var el = document.getElementById('ck-idsewa');
   if(pre && el) el.value = pre;
-  var preNama = qs('nama');
-  var nel = document.getElementById('ck-nama-input');
-  if(preNama && nel) nel.value = preNama;
   var box = document.getElementById('ck-samples');
   if(box){
-    box.innerHTML = SK_SEED.slice(0,3).map(function(s){
-      return '<button class="btn-sm" onclick="cekFill(\''+s.sk+'\')">'+s.sk+'</button>';
+    box.innerHTML = SK_SEED.map(function(s){
+      return '<button class="btn-sm" onclick="cekFill(\''+s.idsewa+'\')">'+s.idsewa+'</button>';
     }).join('');
   }
-  var nbox = document.getElementById('ck-name-samples');
-  if(nbox){
-    nbox.innerHTML = SK_SEED.map(function(s){
-      var list = (s.penyewa && s.penyewa.length) ? s.penyewa : [s.pemohon];
-      var chips = list.filter(Boolean).map(function(n){
-        return '<button class="name-chip" onclick="cekFillContoh(\''+s.sk+'\',\''+n.replace(/'/g,"\\'")+'\')">'+n+'</button>';
-      }).join('');
-      return '<div class="name-group"><div class="ng-sk">'+s.sk+'</div><div class="ng-list">'+chips+'</div></div>';
-    }).join('');
-  }
-}
-function cekFillContoh(no, nama){
-  var el = document.getElementById('ck-nomor');
-  var nel = document.getElementById('ck-nama-input');
-  if(el) el.value = no;
-  if(nel){ nel.value = nama; nel.focus(); }
 }
 function cekFill(v){
-  var el = document.getElementById('ck-nomor');
+  var el = document.getElementById('ck-idsewa');
   if(!el) return;
   el.value = v;
-  var nel = document.getElementById('ck-nama-input');
-  if(nel){ nel.value = ''; nel.focus(); }
-  else el.focus();
+  el.focus();
 }
 function cekRetribusi(){
-  var el = document.getElementById('ck-nomor');
-  var nel = document.getElementById('ck-nama-input');
+  var el = document.getElementById('ck-idsewa');
   var v = el ? (el.value||'').trim() : '';
-  var nama = nel ? (nel.value||'').trim() : '';
   if(!v){ if(el) el.focus(); return; }
-  if(!nama){ if(nel) nel.focus(); return; }
-  location.href = 'cek-hasil.html?no='+encodeURIComponent(v)+'&nama='+encodeURIComponent(nama);
+  location.href = 'cek-hasil.html?id='+encodeURIComponent(v);
 }
 function initCekHasil(){
-  var bill = findSk(qs('no'));
-  var matched = bill ? matchNama(bill, qs('nama')) : '';
-  cekState = (bill && matched) ? bill : null;
+  var bill = findSewa(qs('id'));
+  cekState = bill || null;
   var notfound = document.getElementById('cek-notfound');
-  var namefail = document.getElementById('cek-namefail');
   var found = document.getElementById('cek-found');
   var footer = document.getElementById('ck-footer');
   if(!bill){
     notfound.hidden = false;
-    if(namefail) namefail.hidden = true;
-    found.hidden = true;
-    footer.hidden = true;
-    return;
-  }
-  if(!matched){
-    notfound.hidden = true;
-    if(namefail) namefail.hidden = false;
     found.hidden = true;
     footer.hidden = true;
     return;
   }
   notfound.hidden = true;
-  if(namefail) namefail.hidden = true;
   found.hidden = false;
   footer.hidden = false;
-  cekState.pembayar = matched;
 
   var c = cekState, lunas = c.status === 'lunas';
   document.getElementById('ck-sk').textContent = c.sk;
@@ -690,7 +635,8 @@ function initCekHasil(){
   document.getElementById('ck-sub').textContent = c.instansi+' · '+c.kode;
   document.getElementById('ck-kerjasama').textContent = c.kerjasama;
   document.getElementById('ck-kode').textContent = c.kode;
-  document.getElementById('ck-pemohon').textContent = c.pembayar;
+  document.getElementById('ck-idsewa').textContent = c.idsewa || '—';
+  document.getElementById('ck-pemohon').textContent = c.pemohon || '—';
   document.getElementById('ck-instansi').textContent = c.instansi;
   document.getElementById('ck-keperluan').textContent = c.keperluan;
   document.getElementById('ck-masa').textContent = c.masa;
@@ -708,12 +654,8 @@ function initCekHasil(){
   btn.textContent = lunas ? 'Sudah Dibayar' : 'Bayar Sekarang · '+rupiah(c.total);
 }
 function backCek(){
-  var no = (cekState && cekState.sk) || qs('no') || '';
-  var nama = (cekState && cekState.pembayar) || qs('nama') || '';
-  var q = [];
-  if(no) q.push('no='+encodeURIComponent(no));
-  if(nama) q.push('nama='+encodeURIComponent(nama));
-  location.href = 'cek-retribusi.html'+(q.length ? '?'+q.join('&') : '');
+  var id = (cekState && cekState.idsewa) || qs('id') || '';
+  location.href = 'cek-retribusi.html'+(id ? '?id='+encodeURIComponent(id) : '');
 }
 function bayarCek(){
   var c = cekState;
@@ -736,8 +678,8 @@ function bayarCek(){
       jenis:'Retribusi · '+c.sk,
       total:rupiah(c.total),
       metode:metode,
-      sub:'Retribusi <b>'+c.nama+'</b> telah dibayar.<br>No. SK: '+c.sk+'.',
-      back:'cek-hasil.html?no='+encodeURIComponent(c.sk)+'&nama='+encodeURIComponent(c.pembayar||''),
+      sub:'Retribusi <b>'+c.nama+'</b> telah dibayar.<br>ID Penyewa: '+c.idsewa+'<br>No. SK: '+c.sk+'.',
+      back:'cek-hasil.html?id='+encodeURIComponent(c.idsewa||''),
       backLabel:'Kembali ke Tagihan'
     });
   });

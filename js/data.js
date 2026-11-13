@@ -163,7 +163,7 @@ function contactOf(opd){
    Nomor SK juga bisa berasal dari permohonan yang dibuat di aplikasi (localStorage). */
 var SK_SEED = [
   {
-    sk:'SK/042/PRO-NTT/2026', kerjasama:'PKS/042/PRO-NTT/2026',
+    sk:'SK/042/PRO-NTT/2026', idsewa:'PW-001', kerjasama:'PKS/042/PRO-NTT/2026',
     nama:'Sewa Gedung Serbaguna', kode:'RTB-SWA-101',
     pemohon:'Panitia Festival Daerah', instansi:'Biro Umum Setda NTT',
     keperluan:'Festival Daerah NTT', mulai:'2026-02-10',
@@ -171,7 +171,7 @@ var SK_SEED = [
     opd:'Biro Umum Setda Prov. NTT', pokok:2250000, denda:0, status:'belum'
   },
   {
-    sk:'SK/118/PRO-NTT/2025', kerjasama:'PKS/118/PRO-NTT/2025',
+    sk:'SK/118/PRO-NTT/2025', idsewa:'PW-002', kerjasama:'PKS/118/PRO-NTT/2025',
     nama:'Sewa Rumah Dinas Type E', kode:'RTB-SWA-214',
     pemohon:'Yohanes Bria, S.Pd', instansi:'Dinas Pendidikan Prov. NTT',
     penyewa:['Yohanes Bria, S.Pd','Maria Goreti Bria, S.Pd','Fransiska D. Leki, S.Pd'],
@@ -180,7 +180,7 @@ var SK_SEED = [
     opd:'Biro Umum Setda Prov. NTT', pokok:400000, denda:20000, status:'belum'
   },
   {
-    sk:'SK/097/PRO-NTT/2025', kerjasama:'PKS/097/PRO-NTT/2025',
+    sk:'SK/097/PRO-NTT/2025', idsewa:'PW-003', kerjasama:'PKS/097/PRO-NTT/2025',
     nama:'Sewa Ruko Friendship Blok Besar', kode:'RTB-SWA-001',
     pemohon:'Koperasi Serba Usaha NTT', instansi:'Koperasi Serba Usaha NTT',
     keperluan:'Usaha perdagangan', mulai:'2025-11-14',
@@ -188,7 +188,7 @@ var SK_SEED = [
     opd:'Biro Umum Setda Prov. NTT', pokok:30000000, denda:0, status:'lunas'
   },
   {
-    sk:'SK/066/PRO-NTT/2025', kerjasama:'PKS/066/PRO-NTT/2025',
+    sk:'SK/066/PRO-NTT/2025', idsewa:'PW-004', kerjasama:'PKS/066/PRO-NTT/2025',
     nama:'Sewa Aula Kantor Wilayah Kemenag', kode:'RTB-SWA-088',
     pemohon:'Kantor Wilayah Kemenag', instansi:'Kantor Wilayah Kemenag NTT',
     keperluan:'Kegiatan pembinaan', mulai:'2025-10-05',
