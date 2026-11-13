@@ -301,7 +301,7 @@
           </div>
           <div class="ck-hint">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
-            ID Pegawai tercantum pada SK Penghuni Rumah Dinas.
+            Cukup ID Pegawai saja — atau gunakan kode bayar.
           </div>
         </div>
         <div class="ck-field">
@@ -321,7 +321,7 @@
           </div>
           <div class="ck-hint">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
-            Minta kode bayar ke PIC OPD melalui WhatsApp.
+            Cukup kode bayar saja — atau gunakan ID Pegawai.
           </div>
         </div>
       </div>
@@ -333,7 +333,7 @@
         <h3>Cek tagihan sewa rumah dinas</h3>
         <ol>
           <li>Minta kode bayar ke PIC OPD lewat WhatsApp.</li>
-          <li>Masukkan ID Pegawai dan kode bayar.</li>
+          <li>Masukkan ID Pegawai atau kode bayar (salah satu saja).</li>
           <li>Periksa tagihan bulan ini, lalu bayar lewat QRIS, e-wallet, atau virtual account.</li>
         </ol>
       </div>
@@ -481,25 +481,32 @@
       document.getElementById('rd-notfound').style.display = 'block';
     }
 
+    function cariTagihanByKode(kode){
+      for(var i=0;i<DATA_TAGIHAN_RD.length;i++){
+        if(String(DATA_TAGIHAN_RD[i].kodeBayar) === kode) return DATA_TAGIHAN_RD[i];
+      }
+      return null;
+    }
+
     function cekRetribusi(){
       var id = (document.getElementById('ck-idsewa').value||'').trim().toUpperCase();
       var kode = (document.getElementById('ck-kode').value||'').replace(/\s+/g,'');
       hideResult();
-      if(!id){
-        showNotFound('ID Pegawai Belum Diisi','Masukkan ID Pegawai sesuai SK Penghuni Rumah Dinas.');
+      if(!id && !kode){
+        showNotFound('Data Belum Diisi','Masukkan ID Pegawai atau kode bayar untuk mengecek tagihan.');
         return;
       }
-      if(!kode){
-        showNotFound('Kode Bayar Belum Diisi','Minta kode bayar ke PIC OPD melalui WhatsApp, lalu masukkan pada kolom Kode Bayar.');
-        return;
-      }
-      _rdData = cariTagihanRD(id);
       document.getElementById('rd-guide').style.display = 'none';
+      _rdData = id ? cariTagihanRD(id) : cariTagihanByKode(kode);
       if(!_rdData){
-        showNotFound('Data Tidak Ditemukan','ID Pegawai tidak terdaftar pada SK Penghuni Rumah Dinas.<br>Periksa kembali atau hubungi BPAD Provinsi NTT.');
+        if(id){
+          showNotFound('Data Tidak Ditemukan','ID Pegawai tidak terdaftar pada SK Penghuni Rumah Dinas.<br>Periksa kembali atau hubungi BPAD Provinsi NTT.');
+        } else {
+          showNotFound('Kode Bayar Tidak Dikenali','Kode bayar tidak ditemukan. Periksa kembali atau minta kode terbaru ke PIC OPD melalui WhatsApp.');
+        }
         return;
       }
-      if(String(_rdData.kodeBayar) !== kode){
+      if(id && kode && String(_rdData.kodeBayar) !== kode){
         _rdData = null;
         showNotFound('Kode Bayar Salah','Kode bayar tidak sesuai dengan ID Pegawai tersebut.<br>Minta kode terbaru ke PIC OPD melalui WhatsApp.');
         return;
@@ -566,7 +573,7 @@
       if(id) document.getElementById('ck-idsewa').value = id;
       if(kode) document.getElementById('ck-kode').value = kode;
       updateWaLink();
-      if(id) cekRetribusi();
+      if(id || kode) cekRetribusi();
     })();
   </script>
 </body>
