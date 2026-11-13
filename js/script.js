@@ -36,17 +36,39 @@
     if(which==='rumahdinas') loadRwRumahDinas();
   }
 
+  function isRdApp(a){ return /rumah dinas/i.test(a && a.nama || ''); }
+  function rdAppRow(a){
+    var pending = a.status === 'menunggu';
+    var ic = pending
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>';
+    var tgl = a.dibuat ? fmtTgl(a.dibuat) + ' · ' : '';
+    return '<div class="trx">'
+      + '<div class="ic ' + (pending ? 'gold' : 'blue') + '" style="width:44px;height:44px;border-radius:13px;flex:0 0 44px">' + ic + '</div>'
+      + '<div class="m">'
+      + '<div class="tt">' + a.nama + '</div>'
+      + '<div class="ts">' + tgl + 'Permohonan ' + a.id + '<br>'
+      + (pending ? 'Menunggu verifikasi OPD' : 'SK terbit · menunggu pembayaran') + '</div>'
+      + '</div>'
+      + '<div class="r"><div class="amt">' + rupiah(a.total) + '</div><div class="st pending">Belum Dibayar</div></div>'
+      + '</div>';
+  }
   function loadRwRumahDinas(){
     var el = document.getElementById('riw-rd-list');
     if(!el) return;
     var rows;
     try{ rows = JSON.parse(localStorage.getItem('prontt.rdbayar.v1') || '[]'); }catch(e){ rows = []; }
-    if(!rows.length){
-      el.innerHTML = '<div class="empty"><div class="d">Belum ada pembayaran sewa rumah dinas.</div></div>';
+    var running = apps.filter(function(a){ return isRdApp(a) && (a.status === 'menunggu' || a.status === 'sk'); });
+    var runningHtml = running.length
+      ? '<div class="section-title" style="margin:2px 0 8px">Permohonan Berjalan</div>' + running.map(rdAppRow).join('')
+        + '<div class="section-title" style="margin:14px 0 8px">Pembayaran</div>'
+      : '';
+    if(!rows.length && !running.length){
+      el.innerHTML = '<div class="empty"><div class="d">Belum ada permohonan atau pembayaran sewa rumah dinas.</div></div>';
       return;
     }
     var MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-    el.innerHTML = rows.map(function(d){
+    el.innerHTML = runningHtml + rows.map(function(d){
       var t = new Date(d.tanggal);
       var tgl = t.getDate() + ' ' + MONTHS[t.getMonth()] + ' ' + t.getFullYear()
         + ' · ' + ('0'+t.getHours()).slice(-2) + ':' + ('0'+t.getMinutes()).slice(-2);
@@ -145,7 +167,17 @@
     }
     if(payCtx.appId){
       var a = findApp(payCtx.appId);
-      if(a){ a.status='aktif'; a.bayar=metode; }
+      if(a){
+        a.status='aktif'; a.bayar=metode;
+        saveApps();
+        try{
+          var rows = JSON.parse(localStorage.getItem('prontt.rdbayar.v1') || '[]');
+          var now = new Date();
+          rows.unshift({ref:'RD-'+now.getTime(), id:a.id, nama:a.nama, nominal:a.total, metode:metode,
+            periode: now.getFullYear()+'-'+('0'+(now.getMonth()+1)).slice(-2), tanggal: now.toISOString()});
+          localStorage.setItem('prontt.rdbayar.v1', JSON.stringify(rows));
+        }catch(e){}
+      }
       document.getElementById('rc-jenis').textContent = payCtx.item;
       document.getElementById('rc-metode').textContent = metode;
       document.getElementById('rc-total').textContent = payCtx.total;
@@ -449,7 +481,14 @@
   }
 
   // ===== permohonan sewa =====
-  var apps = [], appSeq = 8, skSeq = 57, justSubmitted = false;
+  var APP_KEY = 'prontt.apps.v1', APP_SEQ_KEY = 'prontt.appseq.v1';
+  function loadApps(){
+    try{ var r = JSON.parse(localStorage.getItem(APP_KEY) || '[]'); return Array.isArray(r) ? r : []; }catch(e){ return []; }
+  }
+  function saveApps(){
+    try{ localStorage.setItem(APP_KEY, JSON.stringify(apps)); }catch(e){}
+  }
+  var apps = loadApps(), appSeq = parseInt(localStorage.getItem(APP_SEQ_KEY) || '8', 10), skSeq = 57, justSubmitted = false;
 
   function findApp(id){
     for(var i=0;i<apps.length;i++){ if(apps[i].id===id) return apps[i]; }
@@ -483,8 +522,11 @@
       instansi:valOr('pf-opd','Perorangan'),
       keperluan:valOr('pf-keperluan','Kegiatan'),
       mulai:mulai, masa:fmtMasaBulan(mulai,durasi), total:g.p*durasi,
+      dibuat:isoDate(new Date()),
       status:'menunggu', sk:'', bayar:''
     });
+    localStorage.setItem(APP_SEQ_KEY, String(appSeq));
+    saveApps();
     justSubmitted = true;
     renderMyApps();
     go('permohonansaya');
@@ -493,6 +535,7 @@
     var a = findApp(id); if(!a) return;
     a.status = 'sk';
     a.sk = 'SK/'+('00'+skSeq++).slice(-3)+'/PRO-NTT/2026';
+    saveApps();
     renderMyApps();
   }
   function renderMyApps(){
