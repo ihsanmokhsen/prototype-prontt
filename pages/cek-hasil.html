@@ -24,6 +24,13 @@
           </div>
           <button class="btn btn-blue" style="margin-top:14px" onclick="backCek()">Coba Lagi</button>
         </div>
+        <div id="cek-namefail" hidden>
+          <div class="empty">
+            <div class="t">Data tidak cocok</div>
+            <div class="d">Periksa kembali No. SK / No. Kerjasama dan nama pemohon yang Anda masukkan, lalu coba lagi.</div>
+          </div>
+          <button class="btn btn-blue" style="margin-top:14px" onclick="backCek()">Coba Lagi</button>
+        </div>
         <div id="cek-found" hidden>
           <div class="statusrow" id="ck-statusrow"></div>
           <div class="vehcard">
@@ -40,10 +47,6 @@
               <div class="rowline"><span class="k">Keperluan</span><span class="v" id="ck-keperluan">—</span></div>
               <div class="rowline"><span class="k">Masa Sewa</span><span class="v" id="ck-masa">—</span></div>
               <div class="rowline"><span class="k">Tanggal SK</span><span class="v" id="ck-tglsk">—</span></div>
-            </div>
-            <div class="penyewa-box" id="ck-penyewabox" hidden>
-              <div class="pt">Nama dalam SK</div>
-              <div class="penyewa-list" id="ck-penyewa-list"></div>
             </div>
           </div>
           <div class="section-title">Rincian Tagihan</div>

@@ -539,10 +539,32 @@ var CEK_PAID = 'prontt.skpaid.v1';
 var cekState = null;
 
 function normNo(s){ return String(s||'').toUpperCase().replace(/\s+/g,'').replace(/^#/,''); }
-function labelPembayar(c){
-  var n = (c && c.penyewa) || [];
-  if(n.length > 1) return n[0]+' dkk ('+n.length+' nama)';
-  return (c && c.pemohon) || '';
+function normNama(s){
+  return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+}
+function namesOfBill(c){
+  var out = [], i;
+  var list = (c && c.penyewa) || [];
+  for(i=0;i<list.length;i++){ if(list[i]) out.push(list[i]); }
+  if(c && c.pemohon){
+    var pn = normNama(c.pemohon), dup = false;
+    for(i=0;i<out.length;i++){ if(normNama(out[i])===pn){ dup = true; break; } }
+    if(!dup) out.push(c.pemohon);
+  }
+  return out;
+}
+function matchNama(c, input){
+  var q = normNama(input);
+  if(!q) return '';
+  var names = namesOfBill(c), i, n;
+  for(i=0;i<names.length;i++){ if(normNama(names[i])===q) return names[i]; }
+  if(q.length >= 3){
+    for(i=0;i<names.length;i++){
+      n = normNama(names[i]);
+      if(n.indexOf(q) >= 0 || q.indexOf(n) >= 0) return names[i];
+    }
+  }
+  return '';
 }
 function loadPaid(){
   try{ return JSON.parse(localStorage.getItem(CEK_PAID)||'{}'); }catch(e){ return {}; }
@@ -591,6 +613,9 @@ function initCek(){
   var pre = qs('no');
   var el = document.getElementById('ck-nomor');
   if(pre && el) el.value = pre;
+  var preNama = qs('nama');
+  var nel = document.getElementById('ck-nama-input');
+  if(preNama && nel) nel.value = preNama;
   var box = document.getElementById('ck-samples');
   if(box){
     box.innerHTML = SK_SEED.slice(0,3).map(function(s){
@@ -602,28 +627,46 @@ function cekFill(v){
   var el = document.getElementById('ck-nomor');
   if(!el) return;
   el.value = v;
-  el.focus();
+  var nel = document.getElementById('ck-nama-input');
+  if(nel){ nel.value = ''; nel.focus(); }
+  else el.focus();
 }
 function cekRetribusi(){
   var el = document.getElementById('ck-nomor');
+  var nel = document.getElementById('ck-nama-input');
   var v = el ? (el.value||'').trim() : '';
+  var nama = nel ? (nel.value||'').trim() : '';
   if(!v){ if(el) el.focus(); return; }
-  location.href = 'cek-hasil.html?no='+encodeURIComponent(v);
+  if(!nama){ if(nel) nel.focus(); return; }
+  location.href = 'cek-hasil.html?no='+encodeURIComponent(v)+'&nama='+encodeURIComponent(nama);
 }
 function initCekHasil(){
-  cekState = findSk(qs('no'));
+  var bill = findSk(qs('no'));
+  var matched = bill ? matchNama(bill, qs('nama')) : '';
+  cekState = (bill && matched) ? bill : null;
   var notfound = document.getElementById('cek-notfound');
+  var namefail = document.getElementById('cek-namefail');
   var found = document.getElementById('cek-found');
   var footer = document.getElementById('ck-footer');
-  if(!cekState){
+  if(!bill){
     notfound.hidden = false;
+    if(namefail) namefail.hidden = true;
+    found.hidden = true;
+    footer.hidden = true;
+    return;
+  }
+  if(!matched){
+    notfound.hidden = true;
+    if(namefail) namefail.hidden = false;
     found.hidden = true;
     footer.hidden = true;
     return;
   }
   notfound.hidden = true;
+  if(namefail) namefail.hidden = true;
   found.hidden = false;
   footer.hidden = false;
+  cekState.pembayar = matched;
 
   var c = cekState, lunas = c.status === 'lunas';
   document.getElementById('ck-sk').textContent = c.sk;
@@ -631,21 +674,11 @@ function initCekHasil(){
   document.getElementById('ck-sub').textContent = c.instansi+' · '+c.kode;
   document.getElementById('ck-kerjasama').textContent = c.kerjasama;
   document.getElementById('ck-kode').textContent = c.kode;
-  document.getElementById('ck-pemohon').textContent = c.pemohon;
+  document.getElementById('ck-pemohon').textContent = c.pembayar;
   document.getElementById('ck-instansi').textContent = c.instansi;
   document.getElementById('ck-keperluan').textContent = c.keperluan;
   document.getElementById('ck-masa').textContent = c.masa;
   document.getElementById('ck-tglsk').textContent = c.tglSk;
-  var pbox = document.getElementById('ck-penyewabox');
-  if(pbox){
-    var names = c.penyewa || [];
-    pbox.hidden = names.length < 2;
-    if(names.length > 1){
-      document.getElementById('ck-penyewa-list').innerHTML = names.map(function(n,i){
-        return '<div class="penyewa-item"><span class="n">'+(i+1)+'</span><span>'+n+'</span></div>';
-      }).join('');
-    }
-  }
   document.getElementById('ck-pokok').textContent = rupiah(c.pokok);
   document.getElementById('ck-denda').textContent = rupiah(c.denda);
   document.getElementById('ck-dendarow').hidden = !c.denda;
@@ -659,13 +692,17 @@ function initCekHasil(){
   btn.textContent = lunas ? 'Sudah Dibayar' : 'Bayar Sekarang · '+rupiah(c.total);
 }
 function backCek(){
-  var no = cekState ? cekState.sk : (qs('no')||'');
-  location.href = 'cek-retribusi.html'+(no ? '?no='+encodeURIComponent(no) : '');
+  var no = (cekState && cekState.sk) || qs('no') || '';
+  var nama = (cekState && cekState.pembayar) || qs('nama') || '';
+  var q = [];
+  if(no) q.push('no='+encodeURIComponent(no));
+  if(nama) q.push('nama='+encodeURIComponent(nama));
+  location.href = 'cek-retribusi.html'+(q.length ? '?'+q.join('&') : '');
 }
 function bayarCek(){
   var c = cekState;
   if(!c || c.status === 'lunas') return;
-  openSheet('Retribusi · '+c.sk+' · '+labelPembayar(c), rupiah(c.total), function(metode){
+  openSheet('Retribusi · '+c.sk, rupiah(c.total), function(metode){
     if(c.source === 'app'){
       var apps = loadApps();
       for(var i=0;i<apps.length;i++){
@@ -684,7 +721,7 @@ function bayarCek(){
       total:rupiah(c.total),
       metode:metode,
       sub:'Retribusi <b>'+c.nama+'</b> telah dibayar.<br>No. SK: '+c.sk+'.',
-      back:'cek-hasil.html?no='+encodeURIComponent(c.sk),
+      back:'cek-hasil.html?no='+encodeURIComponent(c.sk)+'&nama='+encodeURIComponent(c.pembayar||''),
       backLabel:'Kembali ke Tagihan'
     });
   });
