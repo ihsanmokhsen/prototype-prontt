@@ -279,7 +279,6 @@
     document.getElementById('rd-statusrow').hidden = true;
     document.getElementById('rd-stokrow').hidden = true;
     document.getElementById('rd-docblock').hidden = true;
-    document.getElementById('rd-histblock').hidden = true;
     document.getElementById('rd-qtylabel').textContent = 'Masa / Jumlah';
     document.getElementById('rd-hint').textContent = 'Tarif mengacu pada Perda Retribusi Daerah Prov. NTT (data contoh presentasi).';
     var btn = document.getElementById('rd-btn');
@@ -309,8 +308,7 @@
     document.getElementById('rd-stok').textContent = g.stok+' unit';
     document.getElementById('rd-qtylabel').textContent = 'Durasi ('+unitShort(g.un)+')';
     document.getElementById('rd-docblock').hidden = false;
-    document.getElementById('rd-histblock').hidden = false;
-    renderDocs(); renderHist(g);
+    renderDocs();
     var avail = g.st === 'Tersedia';
     var btn = document.getElementById('rd-btn');
     btn.disabled = !avail;
@@ -329,14 +327,6 @@
     document.getElementById('rd-docs').innerHTML = docs.map(function(d){
       return '<div class="docrow"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div>'
         + '<div class="dn">'+d[0]+'<small>'+d[1]+'</small></div><span class="pdf">'+d[2]+'</span></div>';
-    }).join('');
-  }
-  function renderHist(g){
-    var el = document.getElementById('rd-hist');
-    var list = riwayatOf(g);
-    el.innerHTML = list.map(function(h){
-      return '<div class="hist"><div class="h1"><span>'+h.pemohon+'</span><span class="hstat">'+h.status+'</span></div>'
-        + '<div class="h2">No. SK: <b>'+(h.sk||'—')+'</b> · Masa: <b>'+h.masa+'</b><br>Nilai retribusi: <b>'+h.nilai+'</b></div></div>';
     }).join('');
   }
 

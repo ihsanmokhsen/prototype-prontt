@@ -121,10 +121,18 @@ function renderDetail(){
   var stokrow = document.getElementById('rd-stokrow');
   var flowblock = document.getElementById('rd-flowblock');
   var formblock = document.getElementById('rd-formblock');
-  var histblock = document.getElementById('rd-histblock');
   var btn = document.getElementById('rd-btn');
   var rumahDinas = sewa && isRumahDinas(rState.cat,g);
   if(formblock) formblock.hidden = !rumahDinas;
+  var locrow = document.getElementById('rd-locrow');
+  if(locrow){
+    locrow.hidden = !rumahDinas;
+    if(rumahDinas){
+      document.getElementById('rd-loc').textContent = g.loc || '—';
+      var mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((g.loc || '') + ', Kupang, NTT');
+      document.getElementById('rd-map').href = mapUrl;
+    }
+  }
 
   if(sewa){
     sr.hidden = false;
@@ -140,8 +148,6 @@ function renderDetail(){
     }
     document.getElementById('rd-qtylabel').textContent = 'Durasi ('+unitShort(g.un)+')';
     if(flowblock) flowblock.hidden = !rumahDinas;
-    histblock.hidden = !rumahDinas;
-    if(rumahDinas) renderHist(g);
     var avail = g.st === 'Tersedia';
     btn.disabled = rumahDinas ? !avail : false;
     btn.textContent = rumahDinas
@@ -154,7 +160,6 @@ function renderDetail(){
     sr.hidden = true;
     stokrow.hidden = true;
     if(flowblock) flowblock.hidden = true;
-    histblock.hidden = true;
     document.getElementById('rd-qtylabel').textContent = 'Masa / Jumlah';
     btn.disabled = false;
     btn.textContent = 'Lanjut ke Pembayaran';
@@ -168,12 +173,6 @@ function initDetail(){
   rState.cat = key; rState.idx = i;
   rState.qty = Math.max(1, parseInt(qs('qty'),10)||1);
   renderDetail();
-}
-function renderHist(g){
-  document.getElementById('rd-hist').innerHTML = riwayatOf(g).map(function(h){
-    return '<div class="hist"><div class="h1"><span>'+h.pemohon+'</span><span class="hstat">'+h.status+'</span></div>'
-      + '<div class="h2">No. SK: <b>'+(h.sk||'—')+'</b> · Masa: <b>'+h.masa+'</b><br>Nilai retribusi: <b>'+h.nilai+'</b></div></div>';
-  }).join('');
 }
 function rdQty(d){
   rState.qty = Math.max(1, Math.min(999, rState.qty + d));
