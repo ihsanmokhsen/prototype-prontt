@@ -85,6 +85,12 @@ function openItem(i){
 }
 
 // ================= detail aset / layanan =================
+function isRumahDinas(key,g){
+  return key==='gedung' && !!g && /rumah dinas/i.test(g.n||'');
+}
+function isRumahDinasApp(a){
+  return !!a && a.cat==='gedung' && /rumah dinas/i.test(a.nama||'');
+}
 function renderDetail(){
   var L = LISTS[rState.cat], g = L.items[rState.idx];
   var sewa = L.sewa;
@@ -117,22 +123,33 @@ function renderDetail(){
   var formblock = document.getElementById('rd-formblock');
   var histblock = document.getElementById('rd-histblock');
   var btn = document.getElementById('rd-btn');
-  if(formblock) formblock.hidden = !(sewa && rState.cat==='gedung' && /rumah dinas/i.test(g.n));
+  var rumahDinas = sewa && isRumahDinas(rState.cat,g);
+  if(formblock) formblock.hidden = !rumahDinas;
 
   if(sewa){
     sr.hidden = false;
-    sr.innerHTML = '<span class="chip '+chipCls(g.st)+'">'+g.st+'</span>'
-      + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Stok aset: '+g.stok+' unit</span>';
-    stokrow.hidden = false;
-    document.getElementById('rd-stok').textContent = g.stok+' unit';
+    if(rumahDinas){
+      sr.innerHTML = '<span class="chip '+chipCls(g.st)+'">'+g.st+'</span>'
+        + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Stok aset: '+g.stok+' unit</span>';
+      stokrow.hidden = false;
+      document.getElementById('rd-stok').textContent = g.stok+' unit';
+    } else {
+      sr.innerHTML = '<span class="chip tersedia">Bayar Langsung</span>'
+        + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Tanpa permohonan &amp; SK</span>';
+      stokrow.hidden = true;
+    }
     document.getElementById('rd-qtylabel').textContent = 'Durasi ('+unitShort(g.un)+')';
-    if(flowblock) flowblock.hidden = false;
-    histblock.hidden = false;
-    renderHist(g);
+    if(flowblock) flowblock.hidden = !rumahDinas;
+    histblock.hidden = !rumahDinas;
+    if(rumahDinas) renderHist(g);
     var avail = g.st === 'Tersedia';
-    btn.disabled = !avail;
-    btn.textContent = avail ? 'Ajukan Permohonan Sewa' : 'Tidak Dapat Diajukan';
-    document.getElementById('rd-hint').textContent = 'Sewa aktif setelah SK Kerjasama terbit dan retribusi dibayar. Aset berstatus selain Tersedia tidak dapat diajukan.';
+    btn.disabled = rumahDinas ? !avail : false;
+    btn.textContent = rumahDinas
+      ? (avail ? 'Ajukan Permohonan Sewa' : 'Tidak Dapat Diajukan')
+      : 'Lanjut ke Pembayaran';
+    document.getElementById('rd-hint').textContent = rumahDinas
+      ? 'Sewa aktif setelah SK Kerjasama terbit dan retribusi dibayar. Aset berstatus selain Tersedia tidak dapat diajukan.'
+      : 'Retribusi sewa dibayar langsung tanpa permohonan dan SK. Tarif mengacu pada Perda Retribusi Daerah Prov. NTT.';
   } else {
     sr.hidden = true;
     stokrow.hidden = true;
@@ -173,10 +190,11 @@ function rdRender(){
 }
 function rdCta(){
   var L = LISTS[rState.cat];
-  if(L && L.sewa){
+  var g = L && L.items[rState.idx];
+  if(L && L.sewa && isRumahDinas(rState.cat,g)){
     location.href = 'permohonan.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
   } else {
-    location.href = 'bill.html?cat='+rState.cat+'&item='+rState.idx;
+    location.href = 'bill.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
   }
 }
 function backDetail(){
@@ -200,6 +218,10 @@ function initForm(){
   rState.cat = key; rState.idx = i;
   rState.qty = Math.max(1, parseInt(qs('qty'),10)||1);
   var g = LISTS[key].items[i];
+  if(!isRumahDinas(key,g)){
+    location.replace('bill.html?cat='+key+'&item='+i+'&qty='+rState.qty);
+    return;
+  }
   document.getElementById('pf-name').textContent = g.n;
   document.getElementById('pf-kode').textContent = g.k+' · '+rupiah(g.p)+' / '+unitShort(g.un);
   document.getElementById('pf-nama').value = 'Muhammad Ihsanul';
@@ -209,10 +231,10 @@ function initForm(){
   document.getElementById('pf-durasi').value = rState.qty;
   pfDurasi();
 
-  var isRumahDinas = key==='gedung' && /rumah dinas/i.test(g.n);
+  var rumahDinas = isRumahDinas(key,g);
   var docblock = document.getElementById('pf-docblock');
-  if(docblock) docblock.hidden = !isRumahDinas;
-  if(isRumahDinas){
+  if(docblock) docblock.hidden = !rumahDinas;
+  if(rumahDinas){
     var c = contactOf(g.opd || LISTS[key].opd || '');
     var msg = 'Halo '+c.nama+', saya ingin mengajukan permohonan sewa '+g.n+' ('+g.k+'). Mohon informasi kelengkapan berkas. Terima kasih.';
     document.getElementById('pf-wa').innerHTML = '<div class="wi">'+WA_ICON+'</div>'
@@ -258,6 +280,10 @@ function pfDurasi(){
 }
 function submitPermohonan(){
   var g = LISTS[rState.cat].items[rState.idx];
+  if(!isRumahDinas(rState.cat,g)){
+    location.replace('bill.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty);
+    return;
+  }
   var durasi = Math.max(1, parseInt(document.getElementById('pf-durasi').value,10)||1);
   var mulai = document.getElementById('pf-mulai').value || isoDate(new Date());
   var apps = loadApps();
@@ -333,7 +359,7 @@ function fmtWa(n){
 }
 function renderMyApps(){
   var el = document.getElementById('apps-list'); if(!el) return;
-  var apps = loadApps();
+  var apps = loadApps().filter(isRumahDinasApp);
   var head = '';
   if(qs('submitted')){
     var latest = apps[0];
@@ -343,7 +369,7 @@ function renderMyApps(){
     if(history.replaceState) history.replaceState(null, '', 'permohonansaya.html');
   }
   if(!apps.length){
-    el.innerHTML = head + '<div class="empty"><div class="t">Belum ada permohonan</div><div class="d">Ajukan sewa aset dari menu Retribusi.</div></div>';
+    el.innerHTML = head + '<div class="empty"><div class="t">Belum ada permohonan</div><div class="d">Ajukan sewa rumah dinas dari menu Retribusi.</div></div>';
     return;
   }
   el.innerHTML = head + apps.map(function(a){
@@ -419,7 +445,7 @@ function fmtBatas(d){
   h=h%12; if(h===0) h=12;
   return BULAN[d.getMonth()]+' '+d.getDate()+' '+d.getFullYear()+' '+h+':'+m+ap;
 }
-function billStoreKey(){ return 'prontt.bill.'+billState.key+'.'+billState.idx; }
+function billStoreKey(){ return 'prontt.bill.'+billState.key+'.'+billState.idx+'.'+(billState.qty||1); }
 function saveBill(){
   try{ sessionStorage.setItem(billStoreKey(), JSON.stringify(billState)); }catch(e){}
 }
@@ -427,14 +453,15 @@ function initBill(){
   var key = qs('cat'), i = parseInt(qs('item'),10);
   if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi.html'); return; }
   var g = LISTS[key].items[i], now = new Date();
+  var qty = Math.max(1, parseInt(qs('qty'),10)||1);
   var raw = null;
-  try{ raw = sessionStorage.getItem('prontt.bill.'+key+'.'+i); }catch(e){}
+  try{ raw = sessionStorage.getItem('prontt.bill.'+key+'.'+i+'.'+qty); }catch(e){}
   if(raw){
     try{ billState = JSON.parse(raw); }catch(e){ billState = null; }
   }
   if(!billState){
     billState = {
-      key:key, idx:i, nama:g.n, total:g.p, paid:false,
+      key:key, idx:i, qty:qty, nama:g.n, total:g.p*qty, paid:false,
       nomor:'34'+rnd(5),
       booking:'1231571794'+rnd(6),
       tgl:now.getDate()+' '+BULAN_LONG[now.getMonth()]+' '+now.getFullYear(),
@@ -487,7 +514,7 @@ function payBill(){
       total:rupiah(billState.total),
       metode:metode,
       sub:'Retribusi '+billState.nama+' telah dibayar.<br>Kode booking: '+billState.booking+'. Tunjukkan bukti ini ke instansi terkait.',
-      back:'bill.html?cat='+billState.key+'&item='+billState.idx
+      back:'bill.html?cat='+billState.key+'&item='+billState.idx+'&qty='+(billState.qty||1)
     });
   });
 }
