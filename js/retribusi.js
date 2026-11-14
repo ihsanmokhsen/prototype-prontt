@@ -25,16 +25,20 @@ function itemCard(key, g, i){
 function priceBand(p){ return p < 100000 ? 'low' : (p <= 1000000 ? 'mid' : 'high'); }
 function renderFilters(){
   var L = LISTS[listState.key], opts;
-  if(listState.key === 'rumahdinas'){
-    opts = [['all','Semua tipe ('+L.items.length+')']];
-    listState.tags = [];
-    L.items.forEach(function(g){ if(listState.tags.indexOf(g.tag) < 0) listState.tags.push(g.tag); });
-    listState.tags.forEach(function(t, i){
-      var n = L.items.filter(function(g){ return g.tag === t && g.st === 'Tersedia'; }).length;
-      opts.push(['t:'+i, t.split(' · ')[0]+' · '+n+' kosong']);
-    });
-  } else if(L.sewa){
+  if(L.sewa){
     opts = [['all','Semua ('+L.items.length+')']];
+    var rumah = L.items.filter(function(g){ return g.tipe; });
+    if(rumah.length){
+      // rumah dinas: satu chip untuk semua, lalu per tipe
+      opts.push(['rd','Rumah Dinas ('+rumah.length+')']);
+      listState.tags = [];
+      rumah.forEach(function(g){ if(listState.tags.indexOf(g.tag) < 0) listState.tags.push(g.tag); });
+      listState.tags.forEach(function(t, i){
+        var n = rumah.filter(function(g){ return g.tag === t && g.st === 'Tersedia'; }).length;
+        opts.push(['t:'+i, t.split(' · ')[0]+' · '+n+' kosong']);
+      });
+      opts.push(['lain','Gedung lain ('+(L.items.length-rumah.length)+')']);
+    }
     ['Tersedia','Disewa','Tidak Tersedia'].forEach(function(st){
       var n = L.items.filter(function(g){ return g.st === st; }).length;
       if(n) opts.push([st, st+' ('+n+')']);
@@ -77,7 +81,8 @@ function applyFilter(){
     var hay = (g.n+' '+g.loc+' '+g.cap+' '+g.tag+' '+g.k).toLowerCase();
     var okQ = !q || hay.indexOf(q) >= 0;
     var okF = f === 'all'
-      || (f.indexOf('t:') === 0 ? g.tag === listState.tags[+f.slice(2)]
+      || (f === 'rd' ? !!g.tipe : f === 'lain' ? !g.tipe
+        : f.indexOf('t:') === 0 ? g.tag === listState.tags[+f.slice(2)]
         : f.indexOf('p:') === 0 ? priceBand(g.p) === f.slice(2) : g.st === f);
     if(okQ && okF) rows.push({g:g, i:i});
   });
@@ -90,7 +95,7 @@ function initList(){
   if(!LISTS[key]){ location.replace('retribusi.html'); return; }
   rState.cat = key;
   listState.key = key;
-  listState.f = 'all';
+  listState.f = qs('f') || 'all';
   var L = LISTS[key];
   document.getElementById('il-title').textContent = L.title;
   document.getElementById('il-sub').textContent = L.sub;
@@ -106,7 +111,7 @@ function openItem(i){
 
 // ================= detail aset / layanan =================
 function isRumahDinas(key,g){
-  return key==='rumahdinas' || (key==='gedung' && PRONTT.isRumahDinas(g));
+  return key==='gedung' && !!g && (!!g.tipe || PRONTT.isRumahDinas(g));
 }
 function isRumahDinasApp(a){
   return PRONTT.isRumahDinasApp(a);

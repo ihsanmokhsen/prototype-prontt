@@ -43,7 +43,7 @@ var DESCT = {
 };
 function descOf(key,g){
   var n = String(g.n||'');
-  var t = DESCT[key];
+  var t = (key === 'gedung' && g.tipe) ? DESCT.rumahdinas : DESCT[key];
   if(/^sewa\s/i.test(n)) t = t.replace(/^Sewa /,'');
   return t.replace('{}', n);
 }
