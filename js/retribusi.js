@@ -283,12 +283,35 @@ function pfDrive(){
   pfDriveLink = v;
   pfDriveHint('ok', 'Link Drive siap dikirim. Pastikan aksesnya sudah <b>open access</b>.');
 }
+function pfValid(){
+  var bad = [];
+  [['pf-nama','Nama pemohon'],['pf-opd','Instansi / OPD'],['pf-keperluan','Keperluan']].forEach(function(f){
+    var el = document.getElementById(f[0]);
+    var kosong = !el.value.trim();
+    el.classList.toggle('inp-err', kosong);
+    if(kosong) bad.push(f[1]);
+  });
+  if(document.getElementById('pf-drive') && !pfDriveLink){
+    bad.push('Link Google Drive surat permohonan');
+    pfDriveHint('err', 'Wajib diisi: link Google Drive surat permohonan yang sudah <b>open access</b>.');
+  }
+  var box = document.getElementById('pf-err');
+  if(box){
+    box.hidden = !bad.length;
+    box.innerHTML = bad.length ? 'Lengkapi dulu: <b>'+bad.join(', ')+'</b>.' : '';
+  }
+  if(bad.length){
+    var first = document.querySelector('.inp-err') || document.getElementById('pf-drive');
+    if(first) first.scrollIntoView({block:'center', behavior:'smooth'});
+  }
+  return !bad.length;
+}
 function pfDurasi(){
   var g = LISTS[rState.cat].items[rState.idx];
   var el = document.getElementById('pf-durasi');
   var d = PRONTT.clampBulan(el.value);
   if(el.value !== String(d)) el.value = String(d);
-  document.getElementById('pf-total').textContent = rupiah(g.p*d);
+  document.getElementById('pf-total').innerHTML = rupiah(g.p)+' <small style="font-weight:600;color:var(--muted)">/ bulan · dibayar tiap bulan selama '+d+' bulan</small>';
 }
 function submitPermohonan(){
   var g = LISTS[rState.cat].items[rState.idx];
@@ -296,6 +319,7 @@ function submitPermohonan(){
     location.replace('bill.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty);
     return;
   }
+  if(!pfValid()) return;
   var durasi = PRONTT.clampBulan(document.getElementById('pf-durasi').value);
   var mulai = document.getElementById('pf-mulai').value || isoDate(new Date());
   var apps = loadApps();

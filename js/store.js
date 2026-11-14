@@ -166,3 +166,8 @@ window.PRONTT = (function(){
     clampBulan: clampBulan, bulanRange: bulanRange, isDriveLink: isDriveLink
   };
 })();
+
+/* tanda kolom wajib hilang begitu pengguna mulai mengetik */
+document.addEventListener('input', function(e){
+  if(e.target && e.target.classList) e.target.classList.remove('inp-err');
+});

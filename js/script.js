@@ -479,10 +479,15 @@
     var el = document.getElementById('pf-durasi');
     var d = PRONTT.clampBulan(el.value);
     if(el.value !== String(d)) el.value = String(d);
-    document.getElementById('pf-total').textContent = rupiah(rd.unit*d);
+    document.getElementById('pf-total').innerHTML = rupiah(rd.unit)+' <small style="font-weight:600;color:var(--muted)">/ bulan · dibayar tiap bulan selama '+d+' bulan</small>';
   }
   function submitPermohonan(){
     var g = LISTS[rd.key].items[rd.idx];
+    var kosong = ['pf-nama','pf-opd','pf-keperluan'].filter(function(id){
+      var el = document.getElementById(id), k = !el.value.trim();
+      el.classList.toggle('inp-err', k); return k;
+    });
+    if(kosong.length){ alert('Lengkapi dulu Nama, Instansi / OPD, dan Keperluan.'); return; }
     var durasi = PRONTT.clampBulan(document.getElementById('pf-durasi').value);
     var mulai = document.getElementById('pf-mulai').value || isoDate(new Date());
     apps.unshift({
