@@ -378,7 +378,7 @@
         </div>
         <div class="ck-wa-txt">
           <div class="ck-wa-t">Belum menghuni? Ajukan permohonan baru</div>
-          <div class="ck-wa-d">Isi formulir, unggah surat permohonan, lalu tunggu SK terbit.</div>
+          <div class="ck-wa-d">Pilih tipe rumah (A–E), isi formulir dan surat permohonan, lalu tunggu SK terbit.</div>
         </div>
         <svg class="ck-new-ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
       </a>
@@ -630,16 +630,8 @@
       );
     }
 
-    /* tautan permohonan baru: unit rumah dinas pertama yang tersedia */
-    (function(){
-      var items = (DATA_LISTS.gedung && DATA_LISTS.gedung.items) || [];
-      for(var i=0;i<items.length;i++){
-        if(PRONTT.isRumahDinas(items[i]) && items[i].st === 'Tersedia'){
-          document.getElementById('ck-new').href = 'retridetail.html?cat=gedung&item=' + i;
-          return;
-        }
-      }
-    })();
+    /* permohonan baru: pilih dulu tipe rumah dinas */
+    document.getElementById('ck-new').href = 'itemlist.html?cat=rumahdinas';
 
     /* pre-fill from URL ?id=RD-001&kode=... */
     (function(){

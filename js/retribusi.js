@@ -25,7 +25,15 @@ function itemCard(key, g, i){
 function priceBand(p){ return p < 100000 ? 'low' : (p <= 1000000 ? 'mid' : 'high'); }
 function renderFilters(){
   var L = LISTS[listState.key], opts;
-  if(L.sewa){
+  if(listState.key === 'rumahdinas'){
+    opts = [['all','Semua tipe ('+L.items.length+')']];
+    listState.tags = [];
+    L.items.forEach(function(g){ if(listState.tags.indexOf(g.tag) < 0) listState.tags.push(g.tag); });
+    listState.tags.forEach(function(t, i){
+      var n = L.items.filter(function(g){ return g.tag === t && g.st === 'Tersedia'; }).length;
+      opts.push(['t:'+i, t.split(' · ')[0]+' · '+n+' kosong']);
+    });
+  } else if(L.sewa){
     opts = [['all','Semua ('+L.items.length+')']];
     ['Tersedia','Disewa','Tidak Tersedia'].forEach(function(st){
       var n = L.items.filter(function(g){ return g.st === st; }).length;
@@ -98,7 +106,7 @@ function openItem(i){
 
 // ================= detail aset / layanan =================
 function isRumahDinas(key,g){
-  return key==='gedung' && PRONTT.isRumahDinas(g);
+  return key==='rumahdinas' || (key==='gedung' && PRONTT.isRumahDinas(g));
 }
 function isRumahDinasApp(a){
   return PRONTT.isRumahDinasApp(a);
@@ -137,6 +145,15 @@ function renderDetail(){
   var rumahDinas = sewa && isRumahDinas(rState.cat,g);
   if(formblock) formblock.hidden = !rumahDinas;
   var locrow = document.getElementById('rd-locrow');
+  var tiperow = document.getElementById('rd-tiperow');
+  if(tiperow){
+    tiperow.hidden = !g.tipe;
+    if(g.tipe){
+      document.getElementById('rd-tipe').textContent = 'Tipe '+g.tipe+' · '+g.peruntukan;
+      document.getElementById('rd-luasrow').hidden = false;
+      document.getElementById('rd-luas').textContent = g.cap;
+    }
+  }
   if(locrow){
     locrow.hidden = !rumahDinas;
     if(rumahDinas){
@@ -199,7 +216,13 @@ function rdQty(d){
 function rdRender(){
   var g = LISTS[rState.cat].items[rState.idx];
   document.getElementById('rd-qty').textContent = rState.qty;
-  document.getElementById('rd-total').textContent = rupiah(g.p * rState.qty);
+  if(isRumahDinas(rState.cat,g)){
+    // rumah dinas dibayar tiap bulan, bukan sekaligus
+    document.getElementById('rd-totallabel').textContent = 'Dibayar tiap bulan';
+    document.getElementById('rd-total').textContent = rupiah(g.p)+' × '+rState.qty+' bln';
+  } else {
+    document.getElementById('rd-total').textContent = rupiah(g.p * rState.qty);
+  }
 }
 function rdCta(){
   var L = LISTS[rState.cat];

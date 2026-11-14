@@ -95,11 +95,15 @@ window.PRONTT = (function(){
   function tarifBulananApp(a){ return Math.round((a.total || 0) / durasiApp(a)); }
   // permohonan rumah dinas yang SK-nya sudah terbit -> tagihan bulanan di Cek & Bayar
   function tagihanApp(a){
+    // ambil tipe, luas, dan alamat dari unit rumah dinas yang diajukan
+    var u = null;
+    var L = (typeof DATA_LISTS !== 'undefined' && a.cat) ? DATA_LISTS[a.cat] : null;
+    if(L) for(var i=0;i<L.items.length;i++){ if(L.items[i].k === a.kode){ u = L.items[i]; break; } }
     return {
       id: idSewaApp(a), appId: a.id, sk: a.sk,
       nama: a.pemohon, jabatan: a.instansi,
-      alamat: a.nama + (a.kode ? ' · ' + a.kode : ''),
-      luas: null, tipe: null, statusAsn: null, kodeBayar: null,
+      alamat: u && u.loc ? u.loc + ' · ' + a.kode : a.nama + (a.kode ? ' · ' + a.kode : ''),
+      luas: u && u.luas || null, tipe: u && u.tipe || null, statusAsn: null, kodeBayar: null,
       biaya: tarifBulananApp(a)
     };
   }

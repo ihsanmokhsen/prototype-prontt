@@ -18,6 +18,7 @@ function chipCls(s){
 }
 
 var ICP = {
+  rumahdinas:'<path d="M3 10l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22v-7h6v7"/>',
   gedung:'<path d="M4 22V4a1 1 0 011-1h10a1 1 0 011 1v18M16 8h3a1 1 0 011 1v13M8 7h0M12 7h0M8 11h0M12 11h0M9 22v-4h3v4"/>',
   tanah:'<path d="M9 20l-5.4 1.8a1 1 0 01-1.3-1V6.4a1 1 0 01.7-1L9 3m0 17l6-2m-6 2V3m6 15l5.4 1.8a1 1 0 001.3-1V4.6a1 1 0 00-.7-1L15 1.8M15 18V1.8"/>',
   labkesehatan:'<path d="M9 2v7.5L5 17a2 2 0 001.8 3h10.4A2 2 0 0019 17l-4-7.5V2M8 2h8M8 14h8"/>',
@@ -29,6 +30,7 @@ var ICP = {
   klinik:'<path d="M10 2v6L5.5 16A2 2 0 007.3 19h9.4a2 2 0 001.8-3L14 8V2M9 2h6"/>'
 };
 var DESCT = {
+  rumahdinas:'{} milik Pemprov NTT, dikelola BPAD. Sewa dibayar tiap bulan setelah SK penghuni terbit.',
   gedung:'Sewa {} milik Pemprov NTT untuk kegiatan sesuai peruntukan. Data contoh presentasi.',
   tanah:'Sewa pemanfaatan {} milik daerah untuk usaha atau kegiatan sesuai peruntukan.',
   labkesehatan:'Sewa {} untuk kegiatan penelitian dan pelayanan laboratorium kesehatan.',

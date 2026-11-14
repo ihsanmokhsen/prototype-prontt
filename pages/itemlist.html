@@ -13,7 +13,7 @@
   <section class="screen active" id="itemlist">
     <div class="scroll">
       <div class="appbar">
-        <button class="back" onclick="location.href='retribusi.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="back" onclick="location.href=(new URLSearchParams(location.search).get('cat')==='rumahdinas'?'cek-retribusi.html':'retribusi.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
         <div><h1 id="il-title">Daftar Item</h1><div class="sub" id="il-sub">Retribusi Daerah</div></div>
       </div>
       <div class="section" style="padding-top:4px">
