@@ -17,7 +17,7 @@ var DATA_LISTS = {
       {
         "id": 1,
         "n": "Rumah Dinas Tipe A",
-        "tag": "Tipe A · Eselon I / pejabat setara",
+        "tag": "Tipe A · Pejabat Setara",
         "loc": "Jl. El Tari No. 12, Kupang",
         "cap": "Luas 120 m² · 4 kamar tidur",
         "p": 1500000,
@@ -29,13 +29,15 @@ var DATA_LISTS = {
         "img": "../img/rumah-dinas-1.jpg",
         "imgCredit": "Foto: Ozymandros Caelum / CC BY-SA 4.0",
         "tipe": "A",
-        "peruntukan": "Eselon I / pejabat setara",
-        "luas": 120
+        "peruntukan": "Pejabat Setara",
+        "luas": 120,
+        "luas_lahan": 400,
+        "kondisi": "Baik"
       },
       {
         "id": 2,
         "n": "Rumah Dinas Tipe B",
-        "tag": "Tipe B · Eselon II",
+        "tag": "Tipe B · Gol. IV ke atas",
         "loc": "Jl. Polisi Militer No. 5, Kupang",
         "cap": "Luas 90 m² · 3 kamar tidur",
         "p": 1000000,
@@ -47,13 +49,15 @@ var DATA_LISTS = {
         "img": "../img/rumah-dinas-2.jpg",
         "imgCredit": "Foto: Pijri Paijar / CC BY-SA 4.0",
         "tipe": "B",
-        "peruntukan": "Eselon II",
-        "luas": 90
+        "peruntukan": "Gol. IV ke atas",
+        "luas": 90,
+        "luas_lahan": 300,
+        "kondisi": "Sedang"
       },
       {
         "id": 3,
         "n": "Rumah Dinas Tipe B",
-        "tag": "Tipe B · Eselon II",
+        "tag": "Tipe B · Gol. IV ke atas",
         "loc": "Jl. Frans Seda No. 21, Kupang",
         "cap": "Luas 90 m² · 3 kamar tidur",
         "p": 1000000,
@@ -65,13 +69,15 @@ var DATA_LISTS = {
         "img": "../img/rumah-dinas-3.jpg",
         "imgCredit": "Foto: Wong Langsep / CC BY-SA 4.0",
         "tipe": "B",
-        "peruntukan": "Eselon II",
-        "luas": 90
+        "peruntukan": "Gol. IV ke atas",
+        "luas": 90,
+        "luas_lahan": 300,
+        "kondisi": "Baik"
       },
       {
         "id": 4,
         "n": "Rumah Dinas Tipe C",
-        "tag": "Tipe C · Eselon III / Gol. IV",
+        "tag": "Tipe C · Gol. III–IV",
         "loc": "Perumahan Oepoi Blok C.2",
         "cap": "Luas 54 m² · 3 kamar tidur",
         "p": 750000,
@@ -83,13 +89,15 @@ var DATA_LISTS = {
         "img": "../img/rumah-dinas-1.jpg",
         "imgCredit": "Foto: Ozymandros Caelum / CC BY-SA 4.0",
         "tipe": "C",
-        "peruntukan": "Eselon III / Gol. IV",
-        "luas": 54
+        "peruntukan": "Gol. III–IV",
+        "luas": 54,
+        "luas_lahan": 180,
+        "kondisi": "Baik"
       },
       {
         "id": 5,
         "n": "Rumah Dinas Tipe C",
-        "tag": "Tipe C · Eselon III / Gol. IV",
+        "tag": "Tipe C · Gol. III–IV",
         "loc": "Perumahan Oepoi Blok C.5",
         "cap": "Luas 54 m² · 3 kamar tidur",
         "p": 750000,
@@ -101,8 +109,10 @@ var DATA_LISTS = {
         "img": "../img/rumah-dinas-2.jpg",
         "imgCredit": "Foto: Pijri Paijar / CC BY-SA 4.0",
         "tipe": "C",
-        "peruntukan": "Eselon III / Gol. IV",
-        "luas": 54
+        "peruntukan": "Gol. III–IV",
+        "luas": 54,
+        "luas_lahan": 180,
+        "kondisi": "Sedang"
       },
       {
         "id": 6,
@@ -120,7 +130,9 @@ var DATA_LISTS = {
         "imgCredit": "Foto: Wong Langsep / CC BY-SA 4.0",
         "tipe": "D",
         "peruntukan": "Gol. III",
-        "luas": 36
+        "luas": 36,
+        "luas_lahan": 120,
+        "kondisi": "Baik"
       },
       {
         "id": 7,
@@ -138,7 +150,9 @@ var DATA_LISTS = {
         "imgCredit": "Foto: Ozymandros Caelum / CC BY-SA 4.0",
         "tipe": "D",
         "peruntukan": "Gol. III",
-        "luas": 36
+        "luas": 36,
+        "luas_lahan": 120,
+        "kondisi": "Sedang"
       },
       {
         "id": 8,
@@ -156,7 +170,9 @@ var DATA_LISTS = {
         "imgCredit": "Foto: Pijri Paijar / CC BY-SA 4.0",
         "tipe": "D",
         "peruntukan": "Gol. III",
-        "luas": 36
+        "luas": 36,
+        "luas_lahan": 120,
+        "kondisi": "Baik"
       },
       {
         "id": 9,
@@ -174,7 +190,9 @@ var DATA_LISTS = {
         "imgCredit": "Foto: Wong Langsep / CC BY-SA 4.0",
         "tipe": "E",
         "peruntukan": "Gol. I–II",
-        "luas": 30
+        "luas": 30,
+        "luas_lahan": 90,
+        "kondisi": "Baik"
       },
       {
         "id": 10,
@@ -192,7 +210,9 @@ var DATA_LISTS = {
         "imgCredit": "Foto: Ozymandros Caelum / CC BY-SA 4.0",
         "tipe": "E",
         "peruntukan": "Gol. I–II",
-        "luas": 30
+        "luas": 30,
+        "luas_lahan": 90,
+        "kondisi": "Sedang"
       },
       {
         "id": 11,

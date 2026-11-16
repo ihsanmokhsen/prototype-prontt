@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css?v=202611140814">
+  <link rel="stylesheet" href="../css/style.css?v=202611161200">
   <style>
     /* ---- hero header ---- */
     .ck-hero{
@@ -421,7 +421,13 @@
           <div class="rd-divider"></div>
           <div class="rd-row" id="rd-kode-row">
             <div class="rd-label">Kode Bayar</div>
-            <div class="rd-value" id="rd-kode">—</div>
+            <div class="rd-value" style="display:flex;align-items:center;gap:8px">
+              <span id="rd-kode">—</span>
+              <button onclick="copyKodeBayar()" id="rd-kode-copy" title="Salin kode bayar" style="border:none;background:var(--blue-50);color:var(--blue-600);border-radius:8px;padding:4px 7px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Salin
+              </button>
+            </div>
           </div>
           <div class="rd-divider" id="rd-kode-divider"></div>
           <div class="rd-grid">
@@ -487,10 +493,10 @@
 
   </section>
 
-  <script src="../js/data-lokal.js?v=202611140814"></script>
-  <script src="../js/store.js?v=202611140814"></script>
-  <script src="../js/data.js?v=202611140814"></script>
-  <script src="../js/shell.js?v=202611140814"></script>
+  <script src="../js/data-lokal.js?v=202611161200"></script>
+  <script src="../js/store.js?v=202611161200"></script>
+  <script src="../js/data.js?v=202611161200"></script>
+  <script src="../js/shell.js?v=202611161200"></script>
   <script>
     var _rdData = null;
     var PIC_WA = '6280000000003';
@@ -646,6 +652,22 @@
           });
         }
       );
+    }
+
+    function copyKodeBayar(){
+      var el = document.getElementById('rd-kode');
+      var btn = document.getElementById('rd-kode-copy');
+      if(!el || el.textContent === '—') return;
+      var t = el.textContent.trim();
+      function done(){ if(btn){ btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Disalin!'; setTimeout(function(){ btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Salin'; }, 1500); } }
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(done, function(){ fallbackCopy(t, done); }); }
+      else { fallbackCopy(t, done); }
+    }
+    function fallbackCopy(t, cb){
+      var ta = document.createElement('textarea'); ta.value = t; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); }catch(e){}
+      document.body.removeChild(ta); if(cb) cb();
     }
 
     /* permohonan baru: pilih dulu tipe rumah dinas */

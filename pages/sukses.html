@@ -7,7 +7,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css?v=202611140814">
+  <link rel="stylesheet" href="../css/style.css?v=202611161200">
+  <style>
+    @media print{
+      body{background:#fff !important; display:block}
+      .screen{position:static !important; opacity:1 !important; visibility:visible !important; transform:none !important}
+      .scroll{overflow:visible !important}
+      .btn{display:none !important}
+      .rc-actions{display:none !important}
+      .receipt{border:1px solid #ccc; border-radius:12px; page-break-inside:avoid}
+    }
+  </style>
 </head>
 <body>
   <section class="screen active" id="sukses">
@@ -21,16 +31,24 @@
         <div class="rr"><span class="k">No. Referensi</span><span class="v" id="rc-ref">PRONTT-2026021847</span></div>
         <div class="rr" style="border-top:1px dashed var(--line);margin-top:4px;padding-top:12px"><span class="k">Total</span><span class="v" id="rc-total" style="color:var(--blue-700);font-size:16px">Rp 0</span></div>
       </div>
+      <div class="rc-actions" style="display:flex;gap:10px;margin-bottom:10px">
+        <button class="btn" id="rc-share" style="flex:1;background:var(--blue-50);color:var(--blue-600);font-size:14px;padding:13px 10px" onclick="shareReceipt()">
+          <svg style="width:16px;height:16px;vertical-align:middle;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Bagikan
+        </button>
+        <button class="btn" style="flex:1;background:var(--blue-50);color:var(--blue-600);font-size:14px;padding:13px 10px" onclick="captureReceipt()">
+          <svg style="width:16px;height:16px;vertical-align:middle;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Capture
+        </button>
+      </div>
       <button class="btn btn-blue" id="rc-back" onclick="location.href='../index.html#dashboard'">Kembali ke Beranda</button>
       <div style="height:10px"></div>
       <button class="btn" style="background:var(--blue-50);color:var(--blue-600)" onclick="location.href='../index.html#riwayat'">Lihat di Riwayat</button>
     </div>
   </section>
 
-  <script src="../js/data-lokal.js?v=202611140814"></script>
-  <script src="../js/store.js?v=202611140814"></script>
-  <script src="../js/data.js?v=202611140814"></script>
-  <script src="../js/shell.js?v=202611140814"></script>
-  <script src="../js/retribusi.js?v=202611140814"></script>
+  <script src="../js/data-lokal.js?v=202611161200"></script>
+  <script src="../js/store.js?v=202611161200"></script>
+  <script src="../js/data.js?v=202611161200"></script>
+  <script src="../js/shell.js?v=202611161200"></script>
+  <script src="../js/retribusi.js?v=202611161200"></script>
 </body>
 </html>

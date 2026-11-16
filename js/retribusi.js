@@ -192,7 +192,17 @@ function renderDetail(){
     if(g.tipe){
       document.getElementById('rd-tipe').textContent = 'Tipe '+g.tipe+' · '+g.peruntukan;
       document.getElementById('rd-luasrow').hidden = false;
-      document.getElementById('rd-luas').textContent = g.cap;
+      document.getElementById('rd-luas').textContent = g.luas ? g.luas+' m²' : g.cap;
+      var luasLahanRow = document.getElementById('rd-luaslahanrow');
+      if(luasLahanRow){
+        luasLahanRow.hidden = !g.luas_lahan;
+        if(g.luas_lahan) document.getElementById('rd-luaslahan').textContent = g.luas_lahan+' m²';
+      }
+      var kondisiRow = document.getElementById('rd-kondisirow');
+      if(kondisiRow){
+        kondisiRow.hidden = !g.kondisi;
+        if(g.kondisi) document.getElementById('rd-kondisi').textContent = g.kondisi;
+      }
     }
   }
   if(locrow){
@@ -223,8 +233,8 @@ function renderDetail(){
       ? (avail ? 'Ajukan Permohonan Sewa' : 'Tidak Dapat Diajukan')
       : 'Lanjut ke Pembayaran';
     document.getElementById('rd-hint').textContent = butuhPermohonan
-      ? 'Sewa aktif setelah SK/Perjanjian terbit dan retribusi dibayar. Aset berstatus selain Tersedia tidak dapat diajukan.'
-      : 'Retribusi sewa dibayar langsung tanpa permohonan dan SK. Tarif mengacu pada Perda Retribusi Daerah Prov. NTT.';
+      ? 'Sewa aktif setelah SK/Perjanjian terbit dan retribusi dibayar. Aset berstatus selain Tersedia tidak dapat diajukan. Tarif berdasarkan Perda Retribusi No. 1 Tahun 2026.'
+      : 'Retribusi sewa dibayar langsung tanpa permohonan dan SK. Tarif berdasarkan Perda Retribusi No. 1 Tahun 2026.';
   } else {
     sr.hidden = true;
     stokrow.hidden = true;
@@ -232,7 +242,7 @@ function renderDetail(){
     document.getElementById('rd-qtylabel').textContent = 'Masa / Jumlah';
     btn.disabled = false;
     btn.textContent = 'Lanjut ke Pembayaran';
-    document.getElementById('rd-hint').textContent = 'Tarif mengacu pada Perda Retribusi Daerah Prov. NTT (data contoh presentasi).';
+    document.getElementById('rd-hint').textContent = 'Tarif berdasarkan Perda Retribusi No. 1 Tahun 2026.';
   }
   rdRender();
 }
@@ -404,8 +414,8 @@ function initForm(){
     ? 'Surat Permohonan Sewa Lahan<small id="pf-docsub">Template DOCX · isi lalu simpan di Drive</small>'
     : 'Surat Permohonan Rumah Dinas<small id="pf-docsub">Template DOCX · isi lalu simpan di Drive</small>';
   if(docdesc) docdesc.innerHTML = sewaTanah
-    ? 'Unduh template, cantumkan luas lahan, peruntukan dan lokasi, tanda tangani, simpan di Google Drive dan tempelkan link-nya di sini. Atur akses menjadi <b>"Siapa saja yang memiliki link"</b> (open access).'
-    : 'Unduh template, isi dan tanda tangani, lalu simpan di Google Drive dan tempelkan link-nya di sini. Jangan lupa atur akses menjadi <b>"Siapa saja yang memiliki link"</b> (open access) agar OPD dapat membukanya.';
+    ? 'Unduh template, cantumkan luas lahan, peruntukan dan lokasi, tanda tangani. Siapkan juga <b>scan/foto KTP</b> yang masih berlaku. Gabungkan surat permohonan dan KTP dalam satu <b>folder Google Drive</b>, lalu tempelkan link folder-nya di sini. Atur akses menjadi <b>"Siapa saja yang memiliki link"</b> (open access).'
+    : 'Unduh template, isi dan tanda tangani. Siapkan juga <b>scan/foto KTP</b> yang masih berlaku. Gabungkan surat permohonan dan KTP dalam satu <b>folder Google Drive</b>, lalu tempelkan link folder-nya di sini. Atur akses menjadi <b>"Siapa saja yang memiliki link"</b> (open access) agar OPD dapat membukanya.';
 
   // tombol WA admin (rumah dinas saja; BPAD punya kontak sendiri)
   var waEl = document.getElementById('pf-wa');
@@ -429,7 +439,7 @@ function pfDriveHint(state, msg){
   var icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>';
   if(state === 'ok') icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
   if(state === 'err') icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>';
-  var text = msg || 'Tempelkan link file/folder Drive yang sudah diatur <b>open access</b> (siapa saja yang memiliki link).';
+  var text = msg || 'Tempelkan link <b>folder Google Drive</b> yang berisi surat permohonan dan <b>scan/foto KTP</b>, sudah diatur <b>open access</b>.';
   h.innerHTML = icon + '<span>' + text + '</span>';
   h.style.color = state === 'ok' ? '#0f7a4d' : state === 'err' ? '#b3261e' : '';
 }
@@ -914,7 +924,33 @@ function bayarCek(){
   });
 }
 
-// ================= sukses =================
+// ================= sukses (share & capture) =================
+function shareReceipt(){
+  var jenis = (document.getElementById('rc-jenis')||{}).textContent || '';
+  var metode = (document.getElementById('rc-metode')||{}).textContent || '';
+  var total = (document.getElementById('rc-total')||{}).textContent || '';
+  var ref = (document.getElementById('rc-ref')||{}).textContent || '';
+  var text = 'Bukti Pembayaran PRO NTT\n'
+    + 'Jenis: ' + jenis + '\n'
+    + 'Metode: ' + metode + '\n'
+    + 'Total: ' + total + '\n'
+    + 'No. Referensi: ' + ref;
+  if(navigator.share){
+    navigator.share({title:'Bukti Bayar PRO NTT', text:text}).catch(function(){});
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    var btn = document.getElementById('rc-share');
+    if(btn){ btn.textContent = 'Disalin!'; setTimeout(function(){ btn.textContent = 'Bagikan Bukti Bayar'; }, 1800); }
+  }
+}
+function captureReceipt(){
+  window.print();
+}
+
 function initSukses(){
   var jenis = qs('jenis'), metode = qs('metode'), total = qs('total'), sub = qs('sub');
   if(jenis) document.getElementById('rc-jenis').textContent = jenis;
