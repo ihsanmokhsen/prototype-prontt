@@ -412,31 +412,35 @@
         <div class="rd-detail-card">
           <div class="rd-detail-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            Informasi Rumah Dinas
+            <span id="rd-info-title">Informasi Rumah Dinas</span>
           </div>
           <div class="rd-row">
-            <div class="rd-label">Alamat</div>
+            <div class="rd-label" id="rd-alamat-label">Alamat</div>
             <div class="rd-value" id="rd-alamat">—</div>
           </div>
           <div class="rd-divider"></div>
-          <div class="rd-row">
+          <div class="rd-row" id="rd-kode-row">
             <div class="rd-label">Kode Bayar</div>
             <div class="rd-value" id="rd-kode">—</div>
           </div>
-          <div class="rd-divider"></div>
+          <div class="rd-divider" id="rd-kode-divider"></div>
           <div class="rd-grid">
-            <div class="rd-row">
-              <div class="rd-label">Tipe / Golongan</div>
+            <div class="rd-row" id="rd-tipe-row">
+              <div class="rd-label" id="rd-tipe-label">Tipe / Golongan</div>
               <div class="rd-value" id="rd-tipe">—</div>
             </div>
             <div class="rd-row">
-              <div class="rd-label">Luas Bangunan</div>
+              <div class="rd-label" id="rd-luas-label">Luas Bangunan</div>
               <div class="rd-value" id="rd-luas">—</div>
             </div>
           </div>
           <div class="rd-divider"></div>
           <div class="rd-grid">
-            <div class="rd-row">
+            <div class="rd-row" id="rd-masa-row" style="display:none">
+              <div class="rd-label">Masa Sewa</div>
+              <div class="rd-value" id="rd-masa">—</div>
+            </div>
+            <div class="rd-row" id="rd-asn-row">
               <div class="rd-label">Status ASN</div>
               <div class="rd-value" id="rd-status-asn">—</div>
             </div>
@@ -450,7 +454,7 @@
         <!-- Biaya card -->
         <div class="rd-biaya-card">
           <div>
-            <div class="rd-biaya-label">Tagihan Bulan Ini</div>
+            <div class="rd-biaya-label" id="rd-tagihan-label">Tagihan Bulan Ini</div>
             <div class="rd-biaya-amount" id="rd-biaya">Rp 0</div>
             <div class="rd-biaya-unit" id="rd-periode">—</div>
           </div>
@@ -558,6 +562,7 @@
 
     function showResult(d){
       var belumSk = d.skTerbit === false;
+      var isTanah = !!d.isTanah;
       document.getElementById('rd-id-pill').textContent   = belumSk ? 'SK belum terbit · bayar dengan kode' : (d.sk ? d.id + ' · ' + d.sk : d.id);
       document.getElementById('ck-new').style.display     = 'none';
       document.getElementById('rd-kode').textContent      = d.kodeBayar || '—';
@@ -565,12 +570,25 @@
       document.getElementById('rd-jabatan').textContent   = d.jabatan || '—';
       document.getElementById('rd-alamat').textContent    = d.alamat || '—';
       document.getElementById('rd-tipe').textContent      = d.tipe ? 'Tipe ' + d.tipe : '—';
-      document.getElementById('rd-luas').textContent      = d.luas ? d.luas + ' m²' : '—';
+      document.getElementById('rd-luas').textContent      = d.luas || '—';
       document.getElementById('rd-status-asn').textContent = d.statusAsn || '—';
       document.getElementById('rd-biaya').textContent     = ru(d.biaya);
       var bln = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
       var now = new Date();
-      document.getElementById('rd-periode').textContent   = 'Periode ' + bln[now.getMonth()] + ' ' + now.getFullYear();
+      document.getElementById('rd-periode').textContent   = isTanah
+        ? 'Tahun ' + now.getFullYear()
+        : 'Periode ' + bln[now.getMonth()] + ' ' + now.getFullYear();
+
+      // tanah-specific labels
+      document.getElementById('rd-info-title').textContent = isTanah ? 'Informasi Lahan Daerah' : 'Informasi Rumah Dinas';
+      document.getElementById('rd-alamat-label').textContent = isTanah ? 'Lokasi Lahan' : 'Alamat';
+      document.getElementById('rd-luas-label').textContent = isTanah ? 'Luas Lahan' : 'Luas Bangunan';
+      document.getElementById('rd-tipe-label').textContent = isTanah ? 'Peruntukan' : 'Tipe / Golongan';
+      if(isTanah) document.getElementById('rd-tipe').textContent = d.keperluan || '—';
+      document.getElementById('rd-tagihan-label').textContent = isTanah ? 'Tagihan Tahun Ini' : 'Tagihan Bulan Ini';
+      document.getElementById('rd-masa-row').style.display = isTanah ? '' : 'none';
+      document.getElementById('rd-asn-row').style.display  = isTanah ? 'none' : '';
+      if(isTanah) document.getElementById('rd-masa').textContent = d.masa || '—';
 
       var lunas = sudahBayarRD(d.id);
       document.getElementById('rd-status-bayar').innerHTML =
@@ -586,7 +604,7 @@
 
       if(lunas){
         btn.disabled = true;
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Sudah Lunas Bulan Ini';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Sudah Lunas ' + (isTanah ? 'Tahun' : 'Bulan') + ' Ini';
       } else {
         btn.disabled = false;
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Bayar Sekarang · ' + ru(d.biaya);

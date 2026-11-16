@@ -96,17 +96,24 @@ window.PRONTT = (function(){
     return clampBulan((a && a.durasi) || (m && m[1]) || 1);
   }
   function tarifBulananApp(a){ return Math.round((a.total || 0) / durasiApp(a)); }
-  // permohonan rumah dinas yang SK-nya sudah terbit -> tagihan bulanan di Cek & Bayar
+  // permohonan yang SK-nya sudah terbit -> tagihan di Cek & Bayar
   function tagihanApp(a){
-    // ambil tipe, luas, dan alamat dari unit rumah dinas yang diajukan
     var u = null;
     var L = (typeof DATA_LISTS !== 'undefined' && a.cat) ? DATA_LISTS[a.cat] : null;
     if(L) for(var i=0;i<L.items.length;i++){ if(L.items[i].k === a.kode){ u = L.items[i]; break; } }
+    var tanah = isTanahApp(a);
     return {
       id: idSewaApp(a), appId: a.id, sk: a.sk,
       nama: a.pemohon, jabatan: a.instansi,
-      alamat: u && u.loc ? u.loc + ' · ' + a.kode : a.nama + (a.kode ? ' · ' + a.kode : ''),
-      luas: u && u.luas || null, tipe: u && u.tipe || null, statusAsn: null, kodeBayar: null,
+      alamat: tanah
+        ? (a.lokasi || a.nama) + (a.kode ? ' · ' + a.kode : '')
+        : (u && u.loc ? u.loc + ' · ' + a.kode : a.nama + (a.kode ? ' · ' + a.kode : '')),
+      luas: tanah ? (a.luas || null) : (u && u.luas || null),
+      tipe: tanah ? null : (u && u.tipe || null),
+      isTanah: tanah,
+      masa: a.masa || null,
+      keperluan: a.keperluan || null,
+      statusAsn: null, kodeBayar: null,
       biaya: tarifBulananApp(a)
     };
   }
@@ -117,7 +124,7 @@ window.PRONTT = (function(){
     var list = apps();
     for(var i=0;i<list.length;i++){
       var a = list[i];
-      if(!isRumahDinasApp(a) || !a.sk) continue;
+      if(!isPermohonanApp(a) || !a.sk) continue;
       var n = idSewaApp(a).replace(/\D/g, '').replace(/^0+/, '');
       if(n === m[1]) return tagihanApp(a);
     }
