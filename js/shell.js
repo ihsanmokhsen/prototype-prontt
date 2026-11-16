@@ -81,7 +81,7 @@ function payNow(){
   if(cb) cb(metode);
 }
 function goSukses(data){
-  location.href = 'sukses.html?' + new URLSearchParams(data).toString();
+  location.href = 'sukses?' + new URLSearchParams(data).toString();
 }
 
 function initShell(){

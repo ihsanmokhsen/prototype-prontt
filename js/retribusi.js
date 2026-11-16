@@ -300,8 +300,8 @@ function backDetail(){
     location.href = 'retridetail?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
     return;
   }
-  if(rState.cat) location.href = 'itemlist.html?cat='+rState.cat;
-  else location.href = 'retribusi.html';
+  if(rState.cat) location.href = 'itemlist?cat='+rState.cat;
+  else location.href = 'retribusi';
 }
 
 // ================= form permohonan =================
@@ -729,8 +729,8 @@ function renderBill(){
   }
 }
 function backBill(){
-  if(billState && billState.key) location.href = 'itemlist.html?cat='+billState.key;
-  else location.href = 'retribusi.html';
+  if(billState && billState.key) location.href = 'itemlist?cat='+billState.key;
+  else location.href = 'retribusi';
 }
 function payBill(){
   if(!billState || billState.paid) return;
@@ -840,7 +840,7 @@ function cekRetribusi(){
   var el = document.getElementById('ck-idsewa');
   var v = el ? (el.value||'').trim() : '';
   if(!v){ if(el) el.focus(); return; }
-  location.href = 'cek-hasil.html?id='+encodeURIComponent(v);
+  location.href = 'cek-hasil?id='+encodeURIComponent(v);
 }
 function initCekHasil(){
   var bill = findSewa(qs('id'));
@@ -884,7 +884,7 @@ function initCekHasil(){
 }
 function backCek(){
   var id = (cekState && cekState.idsewa) || qs('id') || '';
-  location.href = 'cek-retribusi.html'+(id ? '?id='+encodeURIComponent(id) : '');
+  location.href = 'cek-retribusi'+(id ? '?id='+encodeURIComponent(id) : '');
 }
 function bayarCek(){
   var c = cekState;
