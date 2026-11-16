@@ -558,6 +558,10 @@
                   </tfoot>
                 </table>
               </div>
+              <div class="mon-export">
+                <button class="btn-sm" onclick="exportMonExcel()"><svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13l2 2-2 2M12 13h4"/></svg>Excel</button>
+                <button class="btn-sm" onclick="exportMonPDF()"><svg style="width:13px;height:13px;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h1a2 2 0 010 4H9v-4zm7 0h1a2 2 0 010 4h-1M18 17h-1"/></svg>PDF</button>
+              </div>
               <div class="mon-note">Data contoh presentasi.</div>
             </div>
 
@@ -659,12 +663,70 @@
 </div>
 <script src="js/store.js?v=202611140814"></script>
 <script src="js/script.js?v=202611140814"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
 <script>
   (function(){
     var id = (location.hash||'').replace('#','');
     var el = id && document.getElementById(id);
     if(el && el.classList.contains('screen')) go(id);
   })();
+
+  var MON_DATA = {
+    title: 'Monitoring Retribusi',
+    sub: 'Realisasi per OPD · Tahun 2026',
+    summary: { target: 'Rp 10.000.000', realisasi: 'Rp 7.780.000', capaian: '77,8%' },
+    head: ['No', 'Nama Dinas', 'UPT', 'Target', 'Realisasi', '%'],
+    rows: [
+      ['1', 'Dinas Peternakan', 'UPTD Veteriner', 'Rp 9.000.000', 'Rp 7.140.000', '79,3%'],
+      ['2', 'Badan Pendapatan dan Aset Daerah', 'Kantor Pusat', 'Rp 700.000', 'Rp 500.000', '71,4%'],
+      ['3', 'Dinas Kesehatan', 'UPTD Laboratorium Kesehatan', 'Rp 300.000', 'Rp 140.000', '46,7%']
+    ],
+    foot: ['', 'GRAND TOTAL', '', 'Rp 10.000.000', 'Rp 7.780.000', '77,8%']
+  };
+
+  function exportMonExcel() {
+    var d = MON_DATA;
+    var ws_data = [
+      [d.title],
+      [d.sub],
+      [],
+      ['Target', d.summary.target, 'Realisasi', d.summary.realisasi, 'Capaian', d.summary.capaian],
+      [],
+      d.head
+    ].concat(d.rows).concat([d.foot]);
+    var ws = XLSX.utils.aoa_to_sheet(ws_data);
+    ws['!cols'] = [{wch:4},{wch:36},{wch:32},{wch:16},{wch:16},{wch:8}];
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Monitoring');
+    XLSX.writeFile(wb, 'Monitoring_Retribusi_2026.xlsx');
+  }
+
+  function exportMonPDF() {
+    var d = MON_DATA;
+    var doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text(d.title, 14, 18);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text(d.sub, 14, 24);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.text('Target: ' + d.summary.target + '   Realisasi: ' + d.summary.realisasi + '   Capaian: ' + d.summary.capaian, 14, 30);
+    doc.autoTable({
+      startY: 35,
+      head: [d.head],
+      body: d.rows,
+      foot: [d.foot],
+      styles: { fontSize: 8, cellPadding: 3 },
+      headStyles: { fillColor: [21, 101, 192], textColor: 255, fontStyle: 'bold' },
+      footStyles: { fillColor: [240, 245, 255], textColor: [21, 61, 100], fontStyle: 'bold' },
+      columnStyles: { 0:{halign:'center',cellWidth:10}, 3:{halign:'right'}, 4:{halign:'right'}, 5:{halign:'right',cellWidth:14} }
+    });
+    doc.save('Monitoring_Retribusi_2026.pdf');
+  }
 </script>
 </body>
 </html>

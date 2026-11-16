@@ -312,6 +312,9 @@
   .mon-table tfoot td:nth-last-child(3){color:var(--ink)}
   .mon-table tfoot td:nth-last-child(2){color:var(--blue-700)}
   .mon-table tfoot td:last-child{color:var(--green)}
+  .mon-export{display:flex;gap:8px;padding:0 16px 10px}
+  .mon-export .btn-sm{flex:1;text-align:center}
+  .mon-export .btn-sm:last-child{background:#fff3cd;color:#7c5a00;border:1px solid #f0d070}
   .mon-note{font-size:10px;color:var(--muted);padding:0 16px 14px}
 
   /* grafik realisasi (akun) */
