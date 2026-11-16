@@ -391,8 +391,24 @@
 
   function rdQty(d){ var max = rd.months ? 12 : 999; rd.qty = Math.max(1, Math.min(max, rd.qty + d)); rdRender(); }
   function rdRender(){
-    document.getElementById('rd-qty').textContent = rd.qty;
-    document.getElementById('rd-total').textContent = rupiah(rd.unit * rd.qty);
+    var isRD = rd && (rd.months || /rumah dinas/i.test(rd.name || ''));
+    var qtyWrap = document.getElementById('rd-qtywrap');
+    var flatInfo = document.getElementById('rd-flatinfo');
+    if(isRD){
+      if(qtyWrap) qtyWrap.style.display = 'none';
+      if(flatInfo){
+        flatInfo.hidden = false;
+        flatInfo.innerHTML = 'Tarif Flat: <b>' + rupiah(rd.unit) + '</b> / bulan<br><span style="font-size:10.5px;font-weight:400;color:var(--muted)">(Durasi ditentukan pada formulir permohonan)</span>';
+      }
+      var ql = document.getElementById('rd-qtylabel');
+      if(ql) ql.textContent = 'Skema Tarif';
+      document.getElementById('rd-total').textContent = rupiah(rd.unit) + ' / bulan';
+    } else {
+      if(qtyWrap) qtyWrap.style.display = 'flex';
+      if(flatInfo) flatInfo.hidden = true;
+      document.getElementById('rd-qty').textContent = rd.qty;
+      document.getElementById('rd-total').textContent = rupiah(rd.unit * rd.qty);
+    }
   }
   function payRetri(){ openSheet(rd.name, rupiah(rd.unit * rd.qty)); }
   function rdCta(){ if(rd.sewa){ openForm(); } else { payRetri(); } }

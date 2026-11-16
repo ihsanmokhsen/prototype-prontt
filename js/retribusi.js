@@ -5,7 +5,7 @@ var BULAN_LONG = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agus
 var APP_KEY = PRONTT.KEYS.apps;
 var APP_SEQ = PRONTT.KEYS.appSeq;
 
-function goList(cat){ location.href = 'itemlist.html?cat=' + encodeURIComponent(cat); }
+function goList(cat){ location.href = 'itemlist?cat=' + encodeURIComponent(cat); }
 
 // ================= daftar item =================
 var listState = {key:null, f:'all'};
@@ -92,7 +92,7 @@ function applyFilter(){
 }
 function initList(){
   var key = qs('cat');
-  if(!LISTS[key]){ location.replace('retribusi.html'); return; }
+  if(!LISTS[key]){ location.replace('retribusi'); return; }
   rState.cat = key;
   listState.key = key;
   listState.f = qs('f') || 'all';
@@ -105,13 +105,22 @@ function initList(){
 function openItem(i){
   var L = LISTS[rState.cat];
   if(!L || !L.items[i]) return;
-  if(L.sewa){ location.href = 'retridetail.html?cat='+rState.cat+'&item='+i; }
-  else { location.href = 'bill.html?cat='+rState.cat+'&item='+i; }
+  if(L.sewa){ location.href = 'retridetail?cat='+rState.cat+'&item='+i; }
+  else { location.href = 'bill?cat='+rState.cat+'&item='+i; }
 }
 
 // ================= detail aset / layanan =================
 function isRumahDinas(key,g){
   return key==='gedung' && !!g && (!!g.tipe || PRONTT.isRumahDinas(g));
+}
+function isSewaTanah(key,g){
+  return key==='tanah' || (!!g && /tanah|lahan/i.test(g.n || ''));
+}
+function needsPermohonan(key,g){
+  return isRumahDinas(key,g) || isSewaTanah(key,g);
+}
+function isPermohonanApp(a){
+  return PRONTT.isPermohonanApp(a);
 }
 function isRumahDinasApp(a){
   return PRONTT.isRumahDinasApp(a);
@@ -148,7 +157,34 @@ function renderDetail(){
   var formblock = document.getElementById('rd-formblock');
   var btn = document.getElementById('rd-btn');
   var rumahDinas = sewa && isRumahDinas(rState.cat,g);
-  if(formblock) formblock.hidden = !rumahDinas;
+  var sewaTanah = sewa && isSewaTanah(rState.cat,g);
+  var butuhPermohonan = rumahDinas || sewaTanah;
+
+  if(formblock) formblock.hidden = !butuhPermohonan;
+  var doclink = document.getElementById('rd-doclink');
+  var doctitle = document.getElementById('rd-doctitle');
+  if(doclink && doctitle){
+    if(sewaTanah){
+      doclink.href = '../docs/Surat_Permohonan_Sewa_Tanah.docx';
+      doclink.download = 'Surat_Permohonan_Sewa_Tanah.docx';
+      doctitle.innerHTML = 'Surat Permohonan Sewa Tanah<small>Template DOCX · isi lalu simpan di Drive</small>';
+    } else {
+      doclink.href = '../docs/Surat_Permohonan_Sewa_Rumah_Dinas.docx?v=2';
+      doclink.download = 'Surat_Permohonan_Rumah_Dinas.docx';
+      doctitle.innerHTML = 'Surat Permohonan Rumah Dinas<small>Template DOCX · isi lalu simpan di Drive</small>';
+    }
+  }
+  var flowdesc = document.getElementById('rd-flowdesc');
+  var flowstep3 = document.getElementById('rd-flowstep3');
+  if(flowdesc){
+    flowdesc.textContent = sewaTanah
+      ? 'Unduh surat permohonan sewa tanah, cantumkan luas, peruntukan & lokasi, simpan di Drive open access, lalu ajukan ke BPAD.'
+      : 'Unduh surat permohonan, simpan di Google Drive dengan akses open, ajukan link-nya ke OPD, lalu hubungi admin OPD untuk verifikasi.';
+  }
+  if(flowstep3){
+    flowstep3.textContent = sewaTanah ? 'SK / Perjanjian' : 'Penerbitan SK';
+  }
+
   var locrow = document.getElementById('rd-locrow');
   var tiperow = document.getElementById('rd-tiperow');
   if(tiperow){
@@ -160,8 +196,8 @@ function renderDetail(){
     }
   }
   if(locrow){
-    locrow.hidden = !rumahDinas;
-    if(rumahDinas){
+    locrow.hidden = !(rumahDinas || sewaTanah || !!g.loc);
+    if(g.loc){
       document.getElementById('rd-loc').textContent = g.loc || '—';
       var mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((g.loc || '') + ', Kupang, NTT');
       document.getElementById('rd-map').href = mapUrl;
@@ -170,25 +206,24 @@ function renderDetail(){
 
   if(sewa){
     sr.hidden = false;
-    if(rumahDinas){
+    if(butuhPermohonan){
       sr.innerHTML = '<span class="chip '+chipCls(g.st)+'">'+g.st+'</span>'
-        + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Stok aset: '+g.stok+' unit</span>';
+        + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Stok aset: '+(g.stok||1)+' unit</span>';
       stokrow.hidden = false;
-      document.getElementById('rd-stok').textContent = g.stok+' unit';
+      document.getElementById('rd-stok').textContent = (g.stok||1)+' unit';
     } else {
       sr.innerHTML = '<span class="chip tersedia">Bayar Langsung</span>'
         + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Tanpa permohonan &amp; SK</span>';
       stokrow.hidden = true;
     }
-    document.getElementById('rd-qtylabel').textContent = rumahDinas ? 'Durasi (bulan)' : 'Durasi ('+unitShort(g.un)+')';
-    if(flowblock) flowblock.hidden = !rumahDinas;
+    if(flowblock) flowblock.hidden = !butuhPermohonan;
     var avail = g.st === 'Tersedia';
-    btn.disabled = rumahDinas ? !avail : false;
-    btn.textContent = rumahDinas
+    btn.disabled = butuhPermohonan ? !avail : false;
+    btn.textContent = butuhPermohonan
       ? (avail ? 'Ajukan Permohonan Sewa' : 'Tidak Dapat Diajukan')
       : 'Lanjut ke Pembayaran';
-    document.getElementById('rd-hint').textContent = rumahDinas
-      ? 'Sewa aktif setelah SK Kerjasama terbit dan retribusi dibayar. Aset berstatus selain Tersedia tidak dapat diajukan.'
+    document.getElementById('rd-hint').textContent = butuhPermohonan
+      ? 'Sewa aktif setelah SK/Perjanjian terbit dan retribusi dibayar. Aset berstatus selain Tersedia tidak dapat diajukan.'
       : 'Retribusi sewa dibayar langsung tanpa permohonan dan SK. Tarif mengacu pada Perda Retribusi Daerah Prov. NTT.';
   } else {
     sr.hidden = true;
@@ -203,7 +238,7 @@ function renderDetail(){
 }
 function initDetail(){
   var key = qs('cat'), i = parseInt(qs('item'),10);
-  if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi.html'); return; }
+  if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi'); return; }
   rState.cat = key; rState.idx = i;
   rState.qty = PRONTT.clampBulan(qs('qty'));
   renderDetail();
@@ -213,34 +248,56 @@ function rdQty(d){
   var max = isRumahDinas(rState.cat,g) ? 12 : 999;
   rState.qty = Math.max(1, Math.min(max, rState.qty + d));
   if(history.replaceState){
-    var url = 'retridetail.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
+    var url = 'retridetail?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
     history.replaceState(null, '', url);
   }
   rdRender();
 }
 function rdRender(){
   var g = LISTS[rState.cat].items[rState.idx];
-  document.getElementById('rd-qty').textContent = rState.qty;
-  if(isRumahDinas(rState.cat,g)){
-    // rumah dinas dibayar tiap bulan, bukan sekaligus
-    document.getElementById('rd-totallabel').textContent = 'Dibayar tiap bulan';
-    document.getElementById('rd-total').textContent = rupiah(g.p)+' × '+rState.qty+' bln';
+  var rumahDinas = isRumahDinas(rState.cat, g);
+  var sewaTanah = isSewaTanah(rState.cat, g);
+  var qtyWrap = document.getElementById('rd-qtywrap');
+  var flatInfo = document.getElementById('rd-flatinfo');
+
+  if(rumahDinas){
+    if(qtyWrap) qtyWrap.style.display = 'none';
+    if(flatInfo){
+      flatInfo.hidden = false;
+      flatInfo.innerHTML = 'Tarif Flat: <b>' + rupiah(g.p) + '</b> / bulan<br><span style="font-size:11px;font-weight:400;color:var(--muted)">(Durasi ditentukan pada formulir permohonan)</span>';
+    }
+    document.getElementById('rd-qtylabel').textContent = 'Skema Tarif';
+    document.getElementById('rd-totallabel').textContent = 'Kewajiban Bulanan';
+    document.getElementById('rd-total').textContent = rupiah(g.p) + ' / bulan';
+  } else if(sewaTanah){
+    if(qtyWrap) qtyWrap.style.display = 'none';
+    if(flatInfo){
+      flatInfo.hidden = false;
+      flatInfo.innerHTML = 'Tarif: <b>' + rupiah(g.p) + '</b> / tahun<br><span style="font-size:11px;font-weight:400;color:var(--muted)">(Luas, peruntukan & durasi diajukan di form)</span>';
+    }
+    document.getElementById('rd-qtylabel').textContent = 'Skema Tarif';
+    document.getElementById('rd-totallabel').textContent = 'Estimasi Tarif';
+    document.getElementById('rd-total').textContent = rupiah(g.p) + ' / tahun';
   } else {
+    if(qtyWrap) qtyWrap.style.display = 'flex';
+    if(flatInfo) flatInfo.hidden = true;
+    document.getElementById('rd-qty').textContent = rState.qty;
+    document.getElementById('rd-totallabel').textContent = 'Total Retribusi';
     document.getElementById('rd-total').textContent = rupiah(g.p * rState.qty);
   }
 }
 function rdCta(){
   var L = LISTS[rState.cat];
   var g = L && L.items[rState.idx];
-  if(L && L.sewa && isRumahDinas(rState.cat,g)){
-    location.href = 'permohonan.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
+  if(L && L.sewa && needsPermohonan(rState.cat,g)){
+    location.href = 'permohonan?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
   } else {
-    location.href = 'bill.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
+    location.href = 'bill?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
   }
 }
 function backDetail(){
   if(document.getElementById('permohonan')){
-    location.href = 'retridetail.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
+    location.href = 'retridetail?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty;
     return;
   }
   if(rState.cat) location.href = 'itemlist.html?cat='+rState.cat;
@@ -255,37 +312,114 @@ function valOr(id, fb){
 }
 function initForm(){
   var key = qs('cat'), i = parseInt(qs('item'),10);
-  if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi.html'); return; }
+  if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi'); return; }
   rState.cat = key; rState.idx = i;
-  rState.qty = PRONTT.clampBulan(qs('qty'));
   var g = LISTS[key].items[i];
-  if(!isRumahDinas(key,g)){
-    location.replace('bill.html?cat='+key+'&item='+i+'&qty='+rState.qty);
+  var rumahDinas = isRumahDinas(key,g);
+  var sewaTanah = isSewaTanah(key,g);
+  if(!rumahDinas && !sewaTanah){
+    rState.qty = PRONTT.clampBulan(qs('qty'));
+    location.replace('bill?cat='+key+'&item='+i+'&qty='+rState.qty);
     return;
   }
+  rState.qty = sewaTanah
+    ? Math.min(5, Math.max(1, parseInt(qs('qty'),10)||1))
+    : PRONTT.clampBulan(qs('qty'));
+
+  // isi data aset
   document.getElementById('pf-name').textContent = g.n;
   document.getElementById('pf-kode').textContent = g.k+' · '+rupiah(g.p)+' / '+unitShort(g.un);
+
+  // reset field isian
   document.getElementById('pf-nama').value = 'Muhammad Ihsanul';
   document.getElementById('pf-opd').value = '';
   document.getElementById('pf-keperluan').value = '';
   document.getElementById('pf-mulai').value = isoDate(new Date());
-  document.getElementById('pf-durasi').value = String(rState.qty);
-  pfDurasi();
-  var drv = document.getElementById('pf-drive');
-  if(drv) drv.value = '';
-  pfDriveLink = '';
-  pfDriveHint('');
+  var luasEl = document.getElementById('pf-luas'); if(luasEl) luasEl.value = '';
+  var lokasiEl = document.getElementById('pf-lokasi'); if(lokasiEl) lokasiEl.value = '';
 
-  var rumahDinas = isRumahDinas(key,g);
+  // opsi durasi — bulan untuk rumah dinas, tahun untuk lahan
+  var duEl = document.getElementById('pf-durasi');
+  if(sewaTanah){
+    var optsT = '';
+    for(var y=1;y<=5;y++) optsT += '<option value="'+y+'">'+y+' tahun</option>';
+    duEl.innerHTML = optsT;
+    duEl.value = String(rState.qty);
+  } else {
+    var optsB = '';
+    for(var m=1;m<=12;m++) optsB += '<option value="'+m+'">'+m+' bulan</option>';
+    duEl.innerHTML = optsB;
+    duEl.value = String(rState.qty);
+  }
+  pfDurasi();
+
+  // drive link
+  var drv = document.getElementById('pf-drive'); if(drv) drv.value = '';
+  pfDriveLink = ''; pfDriveHint('');
+
+  // judul & subjudul form
+  var pfTitle = document.getElementById('pf-title');
+  var pfSub   = document.getElementById('pf-sub');
+  if(pfTitle) pfTitle.textContent = sewaTanah ? 'Form Permohonan Sewa Lahan' : 'Form Permohonan Sewa Rumah Dinas';
+  if(pfSub)   pfSub.textContent   = sewaTanah ? 'Permohonan sewa tanah/lahan daerah' : 'Permohonan sewa rumah dinas Pemprov NTT';
+
+  // label keperluan & durasi
+  var kepLabel = document.getElementById('pf-keperluanlabel');
+  if(kepLabel) kepLabel.innerHTML = sewaTanah
+    ? 'Peruntukan <span class="req">*</span>'
+    : 'Peruntukan / Keperluan <span class="req">*</span>';
+  var durLabel = document.getElementById('pf-durasilabel');
+  if(durLabel) durLabel.textContent = sewaTanah ? 'Durasi Sewa (Tahun)' : 'Durasi Sewa';
+
+  // field luas & lokasi (khusus lahan)
+  var luasRow   = document.getElementById('pf-luasrow');
+  var lokasiRow = document.getElementById('pf-lokasirow');
+  if(luasRow)   luasRow.hidden   = !sewaTanah;
+  if(lokasiRow) lokasiRow.hidden = !sewaTanah;
+
+  // hint bawah form
+  var hintTxt = document.getElementById('pf-hint-txt');
+  if(hintTxt) hintTxt.textContent = sewaTanah
+    ? 'Permohonan diverifikasi BPAD. Setelah perjanjian sewa terbit, Anda mendapat ID Penyewa untuk membayar retribusi tahunan.'
+    : 'Permohonan diverifikasi OPD. Setelah SK terbit, Anda mendapat ID Penyewa untuk membayar sewa bulanan.';
+
+  // docblock: selalu tampil (kedua tipe pakai surat permohonan)
   var docblock = document.getElementById('pf-docblock');
-  if(docblock) docblock.hidden = !rumahDinas;
-  if(rumahDinas){
-    var c = contactOf(g.opd || LISTS[key].opd || '');
-    var msg = 'Halo '+c.nama+', saya ingin mengajukan permohonan sewa '+g.n+' ('+g.k+'). Mohon informasi kelengkapan berkas. Terima kasih.';
-    document.getElementById('pf-wa').innerHTML = '<div class="wi">'+WA_ICON+'</div>'
-      + '<div class="wb"><div class="wt">Hubungi Admin OPD</div>'
-      + '<div class="wd">'+c.nama+' · '+(g.opd || LISTS[key].opd || 'OPD terkait')+'<br><span class="wn">'+fmtWa(c.wa)+'</span></div></div>'
-      + '<a class="wbtn" href="https://wa.me/'+c.wa+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">Chat WA</a>';
+  if(docblock) docblock.hidden = false;
+
+  // link & judul template surat
+  var doclink  = document.getElementById('pf-doclink');
+  var doctitle = document.getElementById('pf-doctitle');
+  var docdesc  = document.getElementById('pf-docdesc');
+  if(doclink){
+    if(sewaTanah){
+      doclink.href = '../docs/Surat_Permohonan_Sewa_Tanah.docx';
+      doclink.setAttribute('download','Surat_Permohonan_Sewa_Tanah.docx');
+    } else {
+      doclink.href = '../docs/Surat_Permohonan_Sewa_Rumah_Dinas.docx?v=2';
+      doclink.setAttribute('download','Surat_Permohonan_Rumah_Dinas.docx');
+    }
+  }
+  if(doctitle) doctitle.innerHTML = sewaTanah
+    ? 'Surat Permohonan Sewa Lahan<small id="pf-docsub">Template DOCX · isi lalu simpan di Drive</small>'
+    : 'Surat Permohonan Rumah Dinas<small id="pf-docsub">Template DOCX · isi lalu simpan di Drive</small>';
+  if(docdesc) docdesc.innerHTML = sewaTanah
+    ? 'Unduh template, cantumkan luas lahan, peruntukan dan lokasi, tanda tangani, simpan di Google Drive dan tempelkan link-nya di sini. Atur akses menjadi <b>"Siapa saja yang memiliki link"</b> (open access).'
+    : 'Unduh template, isi dan tanda tangani, lalu simpan di Google Drive dan tempelkan link-nya di sini. Jangan lupa atur akses menjadi <b>"Siapa saja yang memiliki link"</b> (open access) agar OPD dapat membukanya.';
+
+  // tombol WA admin (rumah dinas saja; BPAD punya kontak sendiri)
+  var waEl = document.getElementById('pf-wa');
+  if(waEl){
+    if(rumahDinas){
+      var c = contactOf(g.opd || LISTS[key].opd || '');
+      var msg = 'Halo '+c.nama+', saya ingin mengajukan permohonan sewa '+g.n+' ('+g.k+'). Mohon informasi kelengkapan berkas. Terima kasih.';
+      waEl.innerHTML = '<div class="wi">'+WA_ICON+'</div>'
+        + '<div class="wb"><div class="wt">Hubungi Admin OPD</div>'
+        + '<div class="wd">'+c.nama+' · '+(g.opd || LISTS[key].opd || 'OPD terkait')+'<br><span class="wn">'+fmtWa(c.wa)+'</span></div></div>'
+        + '<a class="wbtn" href="https://wa.me/'+c.wa+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">Chat WA</a>';
+    } else {
+      waEl.innerHTML = '';
+    }
   }
 }
 var pfDriveLink = '';
@@ -312,9 +446,17 @@ function pfDrive(){
   pfDriveHint('ok', 'Link Drive siap dikirim. Pastikan aksesnya sudah <b>open access</b>.');
 }
 function pfValid(){
+  var g = LISTS[rState.cat].items[rState.idx];
+  var sewaTanah = isSewaTanah(rState.cat,g);
+  var fields = [['pf-nama','Nama pemohon'],['pf-opd','Instansi / OPD'],['pf-keperluan','Peruntukan']];
+  if(sewaTanah){
+    fields.push(['pf-luas','Luas lahan']);
+    fields.push(['pf-lokasi','Lokasi lahan']);
+  }
   var bad = [];
-  [['pf-nama','Nama pemohon'],['pf-opd','Instansi / OPD'],['pf-keperluan','Keperluan']].forEach(function(f){
+  fields.forEach(function(f){
     var el = document.getElementById(f[0]);
+    if(!el) return;
     var kosong = !el.value.trim();
     el.classList.toggle('inp-err', kosong);
     if(kosong) bad.push(f[1]);
@@ -336,39 +478,56 @@ function pfValid(){
 }
 function pfDurasi(){
   var g = LISTS[rState.cat].items[rState.idx];
+  var sewaTanah = isSewaTanah(rState.cat,g);
   var el = document.getElementById('pf-durasi');
-  var d = PRONTT.clampBulan(el.value);
-  if(el.value !== String(d)) el.value = String(d);
-  document.getElementById('pf-total').innerHTML = rupiah(g.p)+' <small style="font-weight:600;color:var(--muted)">/ bulan · dibayar tiap bulan selama '+d+' bulan</small>';
+  var d = parseInt(el.value,10) || 1;
+  if(sewaTanah){
+    document.getElementById('pf-total').innerHTML = rupiah(g.p)
+      +' <small style="font-weight:600;color:var(--muted)">/ tahun · estimasi '+d+' tahun</small>';
+  } else {
+    var dc = PRONTT.clampBulan(el.value);
+    if(el.value !== String(dc)) el.value = String(dc);
+    document.getElementById('pf-total').innerHTML = rupiah(g.p)
+      +' <small style="font-weight:600;color:var(--muted)">/ bulan · dibayar tiap bulan selama '+dc+' bulan</small>';
+  }
 }
 function submitPermohonan(){
   var g = LISTS[rState.cat].items[rState.idx];
-  if(!isRumahDinas(rState.cat,g)){
-    location.replace('bill.html?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty);
+  var rumahDinas = isRumahDinas(rState.cat,g);
+  var sewaTanah  = isSewaTanah(rState.cat,g);
+  if(!rumahDinas && !sewaTanah){
+    location.replace('bill?cat='+rState.cat+'&item='+rState.idx+'&qty='+rState.qty);
     return;
   }
   if(!pfValid()) return;
-  var durasi = PRONTT.clampBulan(document.getElementById('pf-durasi').value);
-  var mulai = document.getElementById('pf-mulai').value || isoDate(new Date());
+  var durasi = parseInt(document.getElementById('pf-durasi').value,10) || 1;
+  var mulai  = document.getElementById('pf-mulai').value || isoDate(new Date());
   var apps = loadApps();
-  var seq = parseInt(localStorage.getItem(APP_SEQ)||'8',10);
-  var id = 'PRM-'+('000'+seq).slice(-4);
+  var seq  = parseInt(localStorage.getItem(APP_SEQ)||'8',10);
+  var id   = 'PRM-'+('000'+seq).slice(-4);
   var app = {
     id:id, idsewa:'PW-'+('000'+seq).slice(-4), nama:g.n, kode:g.k, unit:g.un,
     cat:rState.cat, opd:g.opd || LISTS[rState.cat].opd || '',
-    pemohon:valOr('pf-nama','Muhammad Ihsanul'),
-    instansi:valOr('pf-opd','Perorangan'),
-    keperluan:valOr('pf-keperluan','Kegiatan'),
-    mulai:mulai, masa:PRONTT.bulanRange(mulai,durasi), total:g.p*durasi,
+    pemohon: valOr('pf-nama','Muhammad Ihsanul'),
+    instansi: valOr('pf-opd','Perorangan'),
+    keperluan: valOr('pf-keperluan','Kegiatan'),
+    mulai: mulai,
+    masa: sewaTanah
+      ? durasi+' tahun (mulai '+mulai+')'
+      : PRONTT.bulanRange(mulai, durasi),
+    total: g.p * durasi,
+    durasi: durasi,
     status:'menunggu', sk:'', bayar:''
   };
-  if(pfDriveLink){
-    app.driveLink = pfDriveLink;
+  if(sewaTanah){
+    app.luas   = valOr('pf-luas','');
+    app.lokasi = valOr('pf-lokasi','');
   }
+  if(pfDriveLink) app.driveLink = pfDriveLink;
   apps.unshift(app);
   localStorage.setItem(APP_SEQ, String(seq+1));
   saveApps(apps);
-  location.href = 'permohonansaya.html?submitted=1';
+  location.href = 'permohonansaya?submitted=1';
 }
 
 // ================= permohonan saya =================
@@ -414,33 +573,34 @@ function fmtWa(n){
 }
 function renderMyApps(){
   var el = document.getElementById('apps-list'); if(!el) return;
-  var apps = loadApps().filter(isRumahDinasApp);
+  var apps = loadApps().filter(isPermohonanApp);
   var head = '';
   if(qs('submitted')){
     var latest = apps[0];
     head = '<div class="note-ok">Permohonan berhasil dikirim'
       + (latest && (latest.driveLink || latest.berkas) ? ' beserta surat permohonan' : '')
       + '. Menunggu verifikasi OPD.</div>';
-    if(history.replaceState) history.replaceState(null, '', 'permohonansaya.html');
+    if(history.replaceState) history.replaceState(null, '', 'permohonansaya');
   }
   if(!apps.length){
-    el.innerHTML = head + '<div class="empty"><div class="t">Belum ada permohonan</div><div class="d">Ajukan sewa rumah dinas dari menu Retribusi.</div></div>';
+    el.innerHTML = head + '<div class="empty"><div class="t">Belum ada permohonan</div><div class="d">Ajukan sewa aset daerah dari menu Retribusi.</div></div>';
     return;
   }
   el.innerHTML = head + apps.map(function(a){
+    var isTanahApp = PRONTT.isTanahApp(a);
     var chip = a.status==='menunggu' ? '<span class="chip proses">Menunggu Verifikasi OPD</span>'
-      : a.status==='sk' ? '<span class="chip disewa">SK Terbit · Bayar Bulanan</span>'
+      : a.status==='sk' ? '<span class="chip disewa">SK Terbit · '+(isTanahApp?'Bayar Tahunan':'Bayar Bulanan')+'</span>'
       : '<span class="chip tersedia">Aktif</span>';
     var act = '';
     if(a.status==='menunggu') act = '<button class="btn-sm" onclick="verifyApp(\''+a.id+'\')">Simulasi Verifikasi OPD</button>';
-    if(a.status==='sk' || a.status==='aktif') act = '<button class="btn-sm gold" onclick="location.href=\'cek-retribusi.html?id='+encodeURIComponent(idSewaOfApp(a))+'\'">Bayar Bulan Ini</button>';
+    if(a.status==='sk' || a.status==='aktif') act = '<button class="btn-sm gold" onclick="location.href=\'cek-retribusi?id='+encodeURIComponent(idSewaOfApp(a))+'\'">Bayar '+(isTanahApp?'Tahun':'Bulan')+' Ini</button>';
     var berkasBlock = a.driveLink
       ? '<div class="berkas">'+FILE_ICON+'<span>Surat Permohonan (Google Drive)</span><a href="'+a.driveLink+'" target="_blank" rel="noopener">Buka</a></div>'
       : (a.berkas
         ? '<div class="berkas">'+FILE_ICON+'<span>'+a.berkas+'</span><button onclick="viewBerkas(\''+a.id+'\')">Lihat</button></div>'
         : '');
     var waBlock = '';
-    if(a.status==='menunggu'){
+    if(a.status==='menunggu' && !isTanahApp){
       var opdName = a.opd || (a.cat && LISTS[a.cat] ? LISTS[a.cat].opd : '');
       var c = contactOf(opdName);
       var msg = 'Halo '+c.nama+', saya ingin menindaklanjuti permohonan sewa aset PRO NTT '+a.id+' ('+a.nama+').'
@@ -453,13 +613,22 @@ function renderMyApps(){
         + '<a class="wbtn" href="https://wa.me/'+c.wa+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">Chat WA</a>'
         + '</div>';
     }
+    var metaExtra = '';
+    if(isTanahApp){
+      if(a.luas)   metaExtra += '<br>Luas: '+a.luas;
+      if(a.lokasi) metaExtra += '<br>Lokasi: '+a.lokasi;
+    }
+    var tarifLabel = isTanahApp ? '/ tahun' : '/ bulan';
+    var bayarHint  = isTanahApp
+      ? 'Bayar tiap tahun di Cek &amp; Bayar dengan ID <b>'+idSewaOfApp(a)+'</b>.'
+      : 'Bayar tiap bulan di Cek &amp; Bayar dengan ID <b>'+idSewaOfApp(a)+'</b>.';
     return '<div class="approw"><div class="ar1"><div><div class="aid">'+idSewaOfApp(a)+'</div><div class="anm">'+a.nama+'</div></div>'+chip+'</div>'
       + '<div class="ameta">Pemohon: '+a.pemohon+' ('+a.instansi+')<br>Masa sewa: '+a.masa
-      + (a.sk?'<br>No. SK: '+a.sk:'') + '<br>Keperluan: '+a.keperluan+'</div>'
+      + (a.sk?'<br>No. SK: '+a.sk:'') + '<br>Peruntukan: '+a.keperluan+metaExtra+'</div>'
       + berkasBlock
       + waBlock
-      + (a.sk ? '<div class="hint" style="margin:8px 0 0">Bayar tiap bulan di Cek &amp; Bayar dengan ID <b>'+idSewaOfApp(a)+'</b>.</div>' : '')
-      + '<div class="afoot"><span class="anilai">'+rupiah(PRONTT.tarifBulananApp(a))+' <small style="font-weight:600;color:var(--muted)">/ bulan</small></span>'+act+'</div></div>';
+      + (a.sk ? '<div class="hint" style="margin:8px 0 0">'+bayarHint+'</div>' : '')
+      + '<div class="afoot"><span class="anilai">'+rupiah(PRONTT.tarifBulananApp(a))+' <small style="font-weight:600;color:var(--muted)">'+tarifLabel+'</small></span>'+act+'</div></div>';
   }).join('');
 }
 function verifyApp(id){
@@ -491,7 +660,7 @@ function openSheetApp(id){
       total:rupiah(a.total),
       metode:metode,
       sub:'Retribusi sewa berhasil dibayar.<br>ID Penyewa: '+idSewaOfApp(a)+'<br>No. SK: '+a.sk+'<br>Nama: '+a.pemohon+'<br>Sewa aktif hingga '+a.masa+'.',
-      back:'permohonansaya.html'
+      back:'permohonansaya'
     });
   });
 }
@@ -510,7 +679,7 @@ function saveBill(){
 }
 function initBill(){
   var key = qs('cat'), i = parseInt(qs('item'),10);
-  if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi.html'); return; }
+  if(!LISTS[key] || isNaN(i) || !LISTS[key].items[i]){ location.replace('retribusi'); return; }
   var g = LISTS[key].items[i], now = new Date();
   var qty = Math.max(1, parseInt(qs('qty'),10)||1);
   var raw = null;
@@ -573,7 +742,7 @@ function payBill(){
       total:rupiah(billState.total),
       metode:metode,
       sub:'Retribusi '+billState.nama+' telah dibayar.<br>Kode booking: '+billState.booking+'. Tunjukkan bukti ini ke instansi terkait.',
-      back:'bill.html?cat='+billState.key+'&item='+billState.idx+'&qty='+(billState.qty||1)
+      back:'bill?cat='+billState.key+'&item='+billState.idx+'&qty='+(billState.qty||1)
     });
   });
 }
@@ -739,7 +908,7 @@ function bayarCek(){
       total:rupiah(c.total),
       metode:metode,
       sub:'Retribusi <b>'+c.nama+'</b> telah dibayar.<br>ID Penyewa: '+c.idsewa+'<br>No. SK: '+c.sk+'.',
-      back:'cek-hasil.html?id='+encodeURIComponent(c.idsewa||''),
+      back:'cek-hasil?id='+encodeURIComponent(c.idsewa||''),
       backLabel:'Kembali ke Tagihan'
     });
   });

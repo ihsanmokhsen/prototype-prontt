@@ -323,11 +323,12 @@
                   <div class="rowline"><span class="k">Tarif per unit</span><span class="v" id="rd-unit">Rp 0</span></div>
                   <div class="rowline" id="rd-stokrow" hidden><span class="k">Jumlah stok aset</span><span class="v" id="rd-stok">0 unit</span></div>
                   <div class="rowline"><span class="k" id="rd-qtylabel">Masa / Jumlah</span>
-                    <span class="v" style="display:flex;align-items:center;gap:12px">
+                    <span class="v" id="rd-qtywrap" style="display:flex;align-items:center;gap:12px">
                       <button class="rd-step" onclick="rdQty(-1)">−</button>
                       <span id="rd-qty" style="min-width:20px;text-align:center">1</span>
                       <button class="rd-step" onclick="rdQty(1)">+</button>
                     </span>
+                    <span class="v" id="rd-flatinfo" style="font-size:12px;color:var(--ink);font-weight:600;text-align:right;line-height:1.4" hidden></span>
                   </div>
                 </div>
                 <div class="totalbar"><span class="k">Total Retribusi</span><span class="v" id="rd-total">Rp 0</span></div>

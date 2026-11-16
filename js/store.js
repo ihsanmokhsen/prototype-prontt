@@ -71,9 +71,12 @@ window.PRONTT = (function(){
 
   function isRumahDinas(item){ return !!item && /rumah dinas/i.test(item.n || item.nama || ''); }
   function isRumahDinasApp(app){ return !!app && /rumah dinas/i.test(app.nama || ''); }
+  function isTanah(item){ return !!item && (/tanah|lahan/i.test(item.n || item.nama || '') || item.cat === 'tanah'); }
+  function isTanahApp(app){ return !!app && (app.cat === 'tanah' || /tanah|lahan/i.test(app.nama || '')); }
+  function isPermohonanApp(app){ return isRumahDinasApp(app) || isTanahApp(app); }
   function runningApps(list){
     return (list || apps()).filter(function(a){
-      return isRumahDinasApp(a) && (a.status === 'menunggu' || a.status === 'sk');
+      return isPermohonanApp(a) && (a.status === 'menunggu' || a.status === 'sk');
     });
   }
   function statusOf(status){
@@ -165,6 +168,7 @@ window.PRONTT = (function(){
     apps: apps, saveApps: saveApps, addApp: addApp, findApp: findApp,
     payments: payments, addPayment: addPayment, recordPayment: recordPayment,
     isRumahDinas: isRumahDinas, isRumahDinasApp: isRumahDinasApp,
+    isTanah: isTanah, isTanahApp: isTanahApp, isPermohonanApp: isPermohonanApp,
     runningApps: runningApps, statusOf: statusOf,
     idSewaApp: idSewaApp, tarifBulananApp: tarifBulananApp, cariTagihanApp: cariTagihanApp, aktifkanApp: aktifkanApp,
     clampBulan: clampBulan, bulanRange: bulanRange, isDriveLink: isDriveLink
