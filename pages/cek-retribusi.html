@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css?v=202611161200">
+  <link rel="stylesheet" href="../css/style.css?v=202611171000">
   <style>
     /* ---- hero header ---- */
     .ck-hero{
@@ -267,6 +267,21 @@
     }
     .rd-biaya-icon svg{width:24px;height:24px}
 
+    /* periode bayar */
+    .pb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .pb-year{display:flex;align-items:center;gap:6px}
+    .pb-year b{font-size:14px;min-width:42px;text-align:center}
+    .pb-nav{width:28px;height:28px;border:none;border-radius:8px;background:var(--blue-50);color:var(--blue-600);font-size:16px;font-weight:700;cursor:pointer}
+    .pb-nav:disabled{opacity:.35;cursor:default}
+    .pb-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .pb-m{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:9px 0 7px;font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer;line-height:1.15}
+    .pb-m small{display:block;font-size:9.5px;font-weight:600;color:var(--muted);margin-top:2px}
+    .pb-m.sel{border-color:var(--blue-600);background:var(--blue-50);color:var(--blue-700)}
+    .pb-m.sel small{color:var(--blue-600)}
+    .pb-m.paid{background:#f0fdf4;border-color:#bbf7d0;color:#15803d;cursor:default}
+    .pb-m.paid small{color:#15803d}
+    .pb-note{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.4}
+
     /* footer */
     .footer-cta{
       padding:12px 16px 16px;
@@ -457,6 +472,23 @@
           </div>
         </div>
 
+        <!-- Periode bayar -->
+        <div class="rd-detail-card" id="pb-card" style="display:none">
+          <div class="pb-head">
+            <div class="rd-detail-title" style="margin-bottom:0">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              Periode Bayar
+            </div>
+            <div class="pb-year">
+              <button class="pb-nav" id="pb-prev" onclick="pbYear(-1)" aria-label="Tahun sebelumnya">‹</button>
+              <b id="pb-yr">—</b>
+              <button class="pb-nav" id="pb-next" onclick="pbYear(1)" aria-label="Tahun berikutnya">›</button>
+            </div>
+          </div>
+          <div class="pb-grid" id="pb-grid"></div>
+          <div class="pb-note">Pilih satu atau beberapa bulan yang ingin dibayar. Bulan berwarna hijau sudah lunas.</div>
+        </div>
+
         <!-- Biaya card -->
         <div class="rd-biaya-card">
           <div>
@@ -493,10 +525,10 @@
 
   </section>
 
-  <script src="../js/data-lokal.js?v=202611161200"></script>
-  <script src="../js/store.js?v=202611161200"></script>
-  <script src="../js/data.js?v=202611161200"></script>
-  <script src="../js/shell.js?v=202611161200"></script>
+  <script src="../js/data-lokal.js?v=202611171000"></script>
+  <script src="../js/store.js?v=202611171000"></script>
+  <script src="../js/data.js?v=202611171000"></script>
+  <script src="../js/shell.js?v=202611171000"></script>
   <script>
     var _rdData = null;
     var PIC_WA = '6280000000003';
@@ -578,12 +610,6 @@
       document.getElementById('rd-tipe').textContent      = d.tipe ? 'Tipe ' + d.tipe : '—';
       document.getElementById('rd-luas').textContent      = d.luas || '—';
       document.getElementById('rd-status-asn').textContent = d.statusAsn || '—';
-      document.getElementById('rd-biaya').textContent     = ru(d.biaya);
-      var bln = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-      var now = new Date();
-      document.getElementById('rd-periode').textContent   = isTanah
-        ? 'Tahun ' + now.getFullYear()
-        : 'Periode ' + bln[now.getMonth()] + ' ' + now.getFullYear();
 
       // tanah-specific labels
       document.getElementById('rd-info-title').textContent = isTanah ? 'Informasi Lahan Daerah' : 'Informasi Rumah Dinas';
@@ -591,7 +617,7 @@
       document.getElementById('rd-luas-label').textContent = isTanah ? 'Luas Lahan' : 'Luas Bangunan';
       document.getElementById('rd-tipe-label').textContent = isTanah ? 'Peruntukan' : 'Tipe / Golongan';
       if(isTanah) document.getElementById('rd-tipe').textContent = d.keperluan || '—';
-      document.getElementById('rd-tagihan-label').textContent = isTanah ? 'Tagihan Tahun Ini' : 'Tagihan Bulan Ini';
+      document.getElementById('rd-tagihan-label').textContent = isTanah ? 'Tagihan Tahun Ini' : 'Total Tagihan';
       document.getElementById('rd-masa-row').style.display = isTanah ? '' : 'none';
       document.getElementById('rd-asn-row').style.display  = isTanah ? 'none' : '';
       if(isTanah) document.getElementById('rd-masa').textContent = d.masa || '—';
@@ -599,27 +625,74 @@
       var lunas = sudahBayarRD(d.id);
       document.getElementById('rd-status-bayar').innerHTML =
         '<span class="rd-badge ' + (lunas?'lunas':'belum') + '">' +
-        (lunas ? 'Lunas' : 'Belum Bayar') + '</span>';
+        (lunas ? 'Lunas ' + (isTanah ? 'Tahun' : 'Bulan') + ' Ini' : 'Belum Bayar') + '</span>';
+
+      var now = new Date(), cur = periodeIni();
+      _pb = { year: now.getFullYear(), sel: {}, paid: periodeLunasRD(d.id), tanah: isTanah };
+      if(!_pb.paid[cur]) _pb.sel[cur] = true;
+      document.getElementById('pb-card').style.display = isTanah ? 'none' : 'block';
 
       renderRiwayat(d.id);
       document.getElementById('rd-result').style.display = 'block';
+      document.getElementById('ck-footer').style.display = 'block';
+      renderPeriode();
+    }
 
-      var footer = document.getElementById('ck-footer');
-      var btn    = document.getElementById('ck-bayar-btn');
-      footer.style.display = 'block';
+    var BLN_PENDEK = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    var _pb = null;
 
-      if(lunas){
-        btn.disabled = true;
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Sudah Lunas ' + (isTanah ? 'Tahun' : 'Bulan') + ' Ini';
-      } else {
-        btn.disabled = false;
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Bayar Sekarang · ' + ru(d.biaya);
+    function pbKey(y, m){ return y + '-' + ('0' + (m + 1)).slice(-2); }
+    function pbSelected(){ return Object.keys(_pb.sel).sort(); }
+    function pbLabel(per){ var p = per.split('-'); return BLN_PENDEK[+p[1]-1] + ' ' + p[0]; }
+
+    function pbYear(step){
+      var y = new Date().getFullYear(), ny = _pb.year + step;
+      if(ny < y - 1 || ny > y + 1) return;
+      _pb.year = ny;
+      renderPeriode();
+    }
+    function pbToggle(per){
+      if(_pb.paid[per]) return;
+      if(_pb.sel[per]) delete _pb.sel[per]; else _pb.sel[per] = true;
+      renderPeriode();
+    }
+
+    function renderPeriode(){
+      var d = _rdData, y = new Date().getFullYear(), cur = periodeIni();
+      if(!_pb.tanah){
+        document.getElementById('pb-yr').textContent = _pb.year;
+        document.getElementById('pb-prev').disabled = _pb.year <= y - 1;
+        document.getElementById('pb-next').disabled = _pb.year >= y + 1;
+        var html = '';
+        for(var m = 0; m < 12; m++){
+          var per = pbKey(_pb.year, m), paid = _pb.paid[per], sel = _pb.sel[per];
+          var note = paid ? '✓ Lunas' : sel ? 'Dipilih' : (per === cur ? 'Bulan ini' : '&nbsp;');
+          html += '<button class="pb-m' + (paid ? ' paid' : sel ? ' sel' : '') + '" onclick="pbToggle(\'' + per + '\')"'
+            + (paid ? ' disabled' : '') + '>' + BLN_PENDEK[m] + '<small>' + note + '</small></button>';
+        }
+        document.getElementById('pb-grid').innerHTML = html;
       }
+
+      var list = pbSelected(), n = list.length, total = n * d.biaya;
+      document.getElementById('rd-biaya').textContent = ru(n ? total : d.biaya);
+      document.getElementById('rd-periode').textContent = _pb.tanah
+        ? 'Tahun ' + y
+        : !n ? 'Belum ada periode dipilih · ' + ru(d.biaya) + ' / bulan'
+        : (n <= 3 ? list.map(pbLabel).join(', ') : n + ' bulan (' + pbLabel(list[0]) + ' – ' + pbLabel(list[n-1]) + ')')
+          + (n > 1 ? ' · ' + ru(d.biaya) + ' × ' + n : '');
+
+      var btn = document.getElementById('ck-bayar-btn');
+      var ok = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> ';
+      var shield = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> ';
+      btn.disabled = !n;
+      if(n) btn.innerHTML = shield + 'Bayar ' + (_pb.tanah ? '' : n + ' Bulan ') + '· ' + ru(total);
+      else btn.innerHTML = _pb.tanah ? ok + 'Sudah Lunas Tahun Ini' : 'Pilih periode bayar';
     }
 
     function renderRiwayat(id){
       var bln = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-      var rows = pembayaranRD().filter(function(p){ return p.id === id; });
+      var rows = pembayaranRD().filter(function(p){ return p.id === id; })
+        .sort(function(a, b){ return String(b.periode).localeCompare(String(a.periode)); });
       var el = document.getElementById('rd-riwayat');
       if(!rows.length){
         el.innerHTML = '<div class="rd-rw-empty">Belum ada pembayaran yang tercatat.</div>';
@@ -637,21 +710,23 @@
     }
 
     function bayarRumahDinas(){
-      if(!_rdData) return;
-      openSheet(
-        'Rumah Dinas – ' + _rdData.alamat,
-        ru(_rdData.biaya),
-        function(metode){
-          simpanBayarRD(_rdData, metode);
-          goSukses({
-            nama:   _rdData.nama,
-            item:   'Sewa Rumah Dinas',
-            alamat: _rdData.alamat,
-            total:  ru(_rdData.biaya),
-            metode: metode
-          });
-        }
-      );
+      if(!_rdData || !_pb) return;
+      var list = pbSelected();
+      if(!list.length) return;
+      var d = _rdData, total = ru(list.length * d.biaya);
+      var perTxt = _pb.tanah ? 'Tahun ' + new Date().getFullYear() : list.map(pbLabel).join(', ');
+      var jenis = (_pb.tanah ? 'Sewa Lahan' : 'Sewa Rumah Dinas') + ' · ' + perTxt;
+      openSheet(jenis, total, function(metode){
+        simpanBayarRD(d, metode, list);
+        goSukses({
+          jenis:  jenis,
+          total:  total,
+          metode: metode,
+          sub:    'Retribusi <b>' + d.alamat + '</b> telah dibayar.<br>Periode: ' + perTxt + '.',
+          back:   'cek-retribusi' + (d.skTerbit === false ? '' : '?id=' + encodeURIComponent(d.id)),
+          backLabel: 'Kembali ke Tagihan'
+        });
+      });
     }
 
     function copyKodeBayar(){

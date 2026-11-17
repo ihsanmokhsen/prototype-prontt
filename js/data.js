@@ -131,17 +131,24 @@ function cariTagihanRD(idPegawai){
 function pembayaranRD(){
   return PRONTT.payments();
 }
-function sudahBayarRD(idPegawai){
-  var per = periodeIni();
+function sudahBayarRD(idPegawai, periode){
+  var per = periode || periodeIni();
   return pembayaranRD().some(function(p){ return p.id === idPegawai && p.periode === per; });
 }
-function simpanBayarRD(tagihan, metode){
+function periodeLunasRD(idPegawai){
+  var set = {};
+  pembayaranRD().forEach(function(p){ if (p.id === idPegawai && p.periode) set[p.periode] = true; });
+  return set;
+}
+function simpanBayarRD(tagihan, metode, periodes){
   var now = new Date();
-  var rec = PRONTT.addPayment({
-    ref: 'RD-' + now.getTime(),
-    id: tagihan.id, nama: tagihan.nama, alamat: tagihan.alamat, tipe: tagihan.tipe,
-    nominal: tagihan.biaya, metode: metode, periode: periodeIni(), tanggal: now.toISOString()
+  var list = (periodes && periodes.length) ? periodes : [periodeIni()];
+  list.forEach(function(per, i){
+    PRONTT.addPayment({
+      ref: 'RD-' + now.getTime() + '-' + i,
+      id: tagihan.id, nama: tagihan.nama, alamat: tagihan.alamat, tipe: tagihan.tipe,
+      nominal: tagihan.biaya, metode: metode, periode: per, tanggal: now.toISOString()
+    });
   });
   if (tagihan.appId) PRONTT.aktifkanApp(tagihan.appId, metode);
-  return rec;
 }
