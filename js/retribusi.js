@@ -101,6 +101,8 @@ function initList(){
   document.getElementById('il-sub').textContent = L.sub;
   var rd = document.getElementById('il-rd');
   if(rd) rd.hidden = key !== 'gedung';
+  var lahan = document.getElementById('il-lahan');
+  if(lahan) lahan.hidden = key !== 'tanah';
   renderFilters();
   applyFilter();
 }
