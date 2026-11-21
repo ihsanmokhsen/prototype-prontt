@@ -99,6 +99,8 @@ function initList(){
   var L = LISTS[key];
   document.getElementById('il-title').textContent = L.title;
   document.getElementById('il-sub').textContent = L.sub;
+  var rd = document.getElementById('il-rd');
+  if(rd) rd.hidden = key !== 'gedung';
   renderFilters();
   applyFilter();
 }

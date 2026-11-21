@@ -321,12 +321,12 @@
 
     <div class="ck-hero">
       <div class="ck-appbar">
-        <button class="back" onclick="location.href='retribusi'">
+        <button class="back" onclick="location.href='itemlist?cat=gedung'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <div>
           <h1>Bayar Sewa Rumah Dinas</h1>
-          <div class="sub">Rumah Dinas BPAD Provinsi NTT</div>
+          <div class="sub">Rumah Dinas Provinsi NTT</div>
         </div>
       </div>
     </div>
@@ -395,7 +395,7 @@
         <a class="ck-wa-btn" id="ck-wa-link" href="https://wa.me/6280000000003" target="_blank" rel="noopener">Chat WA</a>
       </div>
 
-      <a class="ck-new" id="ck-new" href="retribusi">
+      <a class="ck-new" id="ck-new" href="itemlist?cat=gedung&f=rd">
         <div class="ck-new-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 12v6M9 15h6"/></svg>
         </div>
@@ -547,7 +547,7 @@
       var a = document.getElementById('ck-wa-link');
       if(!a) return;
       var id = (document.getElementById('ck-idsewa').value||'').trim().toUpperCase();
-      var msg = 'Halo PIC OPD Rumah Dinas BPAD Provinsi NTT, saya ingin meminta kode bayar retribusi sewa rumah dinas.';
+      var msg = 'Halo PIC OPD Rumah Dinas Provinsi NTT, saya ingin meminta kode bayar retribusi sewa rumah dinas.';
       if(id) msg += ' ID Penghuni saya: ' + id + '.';
       a.href = 'https://wa.me/' + PIC_WA + '?text=' + encodeURIComponent(msg);
     }
