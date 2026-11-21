@@ -30,7 +30,7 @@ var ICP = {
   klinik:'<path d="M10 2v6L5.5 16A2 2 0 007.3 19h9.4a2 2 0 001.8-3L14 8V2M9 2h6"/>'
 };
 var DESCT = {
-  rumahdinas:'{} milik Pemprov NTT, dikelola BPAD. Sewa dibayar tiap bulan setelah SK penghuni terbit.',
+  rumahdinas:'{} milik Pemprov NTT. Sewa dibayar tiap bulan setelah SK penghuni terbit.',
   gedung:'Sewa {} milik Pemprov NTT untuk kegiatan sesuai peruntukan. Data contoh presentasi.',
   tanah:'Sewa pemanfaatan {} milik daerah untuk usaha atau kegiatan sesuai peruntukan.',
   labkesehatan:'Sewa {} untuk kegiatan penelitian dan pelayanan laboratorium kesehatan.',

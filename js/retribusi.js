@@ -14,12 +14,14 @@ function itemCard(key, g, i){
   var L = LISTS[key];
   var art = g.art || scene(g.sky||L.sky, g.ground||L.ground, ICP[key]);
   var media = g.img ? '<img src="'+g.img+'" alt="'+g.n+'" loading="lazy">' : art;
-  var stat = L.sewa ? '<div class="istat"><span class="chip '+chipCls(g.st)+'">'+g.st+'</span><span class="istok">Stok: '+g.stok+' unit</span></div>' : '';
+  var chip = L.sewa ? '<span class="chip '+chipCls(g.st)+'">'+g.st+'</span>' : '<span class="ich">&rsaquo;</span>';
+  var stok = L.sewa ? '<span class="istok">Stok '+g.stok+'</span>' : '';
   return '<button class="icard'+(L.sewa&&g.st!=='Tersedia'?' dis':'')+'" onclick="openItem('+i+')">'
-    + '<div class="iimg">'+media+'<span class="itag">'+g.tag+'</span></div>'
-    + '<div class="ibody"><div class="iname">'+g.n+'</div>'
-    + '<div class="isub">'+g.loc+' &middot; '+g.cap+'</div>'+stat
-    + '<div class="ifoot"><div class="iprice">'+rupiah(g.p)+' <span>/ '+unitShort(g.un)+'</span></div><span class="ibtn">Detail &rarr;</span></div>'
+    + '<div class="iimg">'+media+'</div>'
+    + '<div class="ibody"><div class="itop"><span class="itag">'+g.tag+'</span>'+stok+'</div>'
+    + '<div class="iname">'+g.n+'</div>'
+    + '<div class="isub">'+g.loc+' &middot; '+g.cap+'</div>'
+    + '<div class="ifoot"><div class="iprice">'+rupiah(g.p)+' <span>/ '+unitShort(g.un)+'</span></div>'+chip+'</div>'
     + '</div></button>';
 }
 function priceBand(p){ return p < 100000 ? 'low' : (p <= 1000000 ? 'mid' : 'high'); }
@@ -33,6 +35,7 @@ function renderFilters(){
       opts.push(['rd','Rumah Dinas ('+rumah.length+')']);
       listState.tags = [];
       rumah.forEach(function(g){ if(listState.tags.indexOf(g.tag) < 0) listState.tags.push(g.tag); });
+      listState.tags.sort();
       listState.tags.forEach(function(t, i){
         var n = rumah.filter(function(g){ return g.tag === t && g.st === 'Tersedia'; }).length;
         opts.push(['t:'+i, t.split(' · ')[0]+' · '+n+' kosong']);
@@ -194,9 +197,9 @@ function renderDetail(){
   if(tiperow){
     tiperow.hidden = !g.tipe;
     if(g.tipe){
-      document.getElementById('rd-tipe').textContent = 'Tipe '+g.tipe+' · '+g.peruntukan;
+      document.getElementById('rd-tipe').textContent = 'Tipe '+g.tipe+(g.peruntukan && g.peruntukan !== g.luas ? ' · '+g.peruntukan : '');
       document.getElementById('rd-luasrow').hidden = false;
-      document.getElementById('rd-luas').textContent = g.luas ? g.luas+' m²' : g.cap;
+      document.getElementById('rd-luas').textContent = typeof g.luas === 'number' ? g.luas+' m²' : (g.luas || g.cap);
       var luasLahanRow = document.getElementById('rd-luaslahanrow');
       if(luasLahanRow){
         luasLahanRow.hidden = !g.luas_lahan;
@@ -221,10 +224,14 @@ function renderDetail(){
   if(sewa){
     sr.hidden = false;
     if(butuhPermohonan){
+      // data rumah dinas per OPD: unit_total = jumlah unit, stok = unit kosong
+      var stokTxt = g.unit_total != null
+        ? g.unit_total+' unit · '+(g.unit_dihuni||0)+' dihuni · '+g.stok+' kosong'
+        : (g.stok||1)+' unit';
       sr.innerHTML = '<span class="chip '+chipCls(g.st)+'">'+g.st+'</span>'
-        + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Stok aset: '+(g.stok||1)+' unit</span>';
+        + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Stok aset: '+stokTxt+'</span>';
       stokrow.hidden = false;
-      document.getElementById('rd-stok').textContent = (g.stok||1)+' unit';
+      document.getElementById('rd-stok').textContent = stokTxt;
     } else {
       sr.innerHTML = '<span class="chip tersedia">Bayar Langsung</span>'
         + '<span style="font-size:11.5px;color:var(--muted);font-weight:600">Tanpa permohonan &amp; SK</span>';
