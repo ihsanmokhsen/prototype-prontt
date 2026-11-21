@@ -33,13 +33,15 @@
   .screen-wrap{
     position:relative;
     width:100%; max-width:390px; height:100vh; height:100dvh;
-    background:var(--screen); overflow:hidden;
+    background:var(--screen); overflow:hidden; overflow:clip;
     display:flex; flex-direction:column;
   }
   .statusbar .dots{display:flex;gap:5px;align-items:center}
   .statusbar .dots svg{width:16px;height:16px}
 
-  .viewport{position:relative;flex:1;overflow:hidden}
+  /* clip, bukan hidden: layar nonaktif digeser 16px untuk animasi; dengan hidden wadah bisa
+     ikut tergulir ke samping sehingga semua isi halaman tampak mepet ke kiri */
+  .viewport{position:relative;flex:1;overflow:hidden;overflow:clip}
   .screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;visibility:hidden;
     transform:translateX(16px);transition:opacity .28s ease, transform .28s ease, visibility .28s}
   .screen.active{opacity:1;visibility:visible;transform:none}
@@ -416,7 +418,7 @@
     color:var(--muted);font-family:var(--ff-body);font-weight:500;font-size:11px;transition:color .18s;padding:4px 2px;
     border-right:1px solid #d2d8dd}
   .tab:last-child{border-right:none}
-  .tab img{width:32px;height:32px;object-fit:contain;opacity:.85}
+  .tab img{width:32px;height:32px;object-fit:contain;opacity:.85;mix-blend-mode:multiply;border-radius:50%;clip-path:circle(46%)}
   .tab.on{color:var(--blue-600)}
   .tab.on img{opacity:1}
 
@@ -669,12 +671,104 @@
   .tab img{width:28px;height:28px}
   .tab.on{color:var(--blue-700)}
 
+  /* ===== tema berwarna: biru NTT + aksen emas, tiap kategori punya warna sendiri ===== */
+  :root{
+    --c-blue:#0099DD;  --c-blue-50:#e3f4fd;
+    --c-green:#16a36a; --c-green-50:#e2f6ec;
+    --c-orange:#f08a24;--c-orange-50:#fff0e0;
+    --c-pink:#e2508a;  --c-pink-50:#fde8f0;
+    --c-purple:#7c5ce0;--c-purple-50:#efeafd;
+    --c-teal:#12a5a5;  --c-teal-50:#ddf5f4;
+  }
+  .screen-wrap{background:linear-gradient(180deg,#e9f5fd 0%,#f4f2fd 55%,#fdf6ec 100%)}
+  .screen:not(#splash){background:transparent}
+
+  /* header utama: pita biru bergradasi */
+  .app-header{background:linear-gradient(120deg,#0b4f96 0%,#0f6fc0 45%,#0099DD 80%,#33CAE5 100%);
+    border-bottom:3px solid var(--gold);box-shadow:0 6px 18px rgba(11,79,150,.22)}
+  .app-header::after{content:'';position:absolute;right:-40px;bottom:-60px;width:150px;height:150px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,213,74,.22),rgba(255,213,74,0) 70%);pointer-events:none}
+  .app-header{overflow:hidden}
+  .brand-name{color:#fff}
+  .brand-name span{color:#ffd54a}
+  .brand-tag{color:rgba(255,255,255,.82)}
+  .brand-emblem{mix-blend-mode:normal;background:#fff;border-radius:50%;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.18);position:relative;z-index:1}
+  .page-title{background:linear-gradient(90deg,#0b4f96,#0099DD 60%,#7c5ce0);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* kartu sambutan */
+  .welcome,.profile-card{background:linear-gradient(130deg,#0b4f96 0%,#0f6fc0 40%,#0099DD 75%,#2bc0d9 100%)}
+  .welcome::before,.profile-card::before{content:'';position:absolute;left:-30px;bottom:-50px;width:120px;height:120px;border-radius:50%;
+    background:rgba(255,213,74,.22);pointer-events:none}
+  .welcome-avatar{background:linear-gradient(135deg,#ffd54a,#f6a723);color:#5a3c05;border-color:rgba(255,255,255,.5)}
+
+  /* kartu layanan beranda: warna per kartu */
+  .dash-head{color:var(--ink-2)}
+  .dash-card{--acc:var(--c-blue);--acc-50:var(--c-blue-50);
+    background:linear-gradient(165deg,var(--acc-50) 0%,#fff 72%);border:1px solid var(--acc-50)}
+  .dash-grid > .dash-card:nth-child(2){--acc:var(--c-orange);--acc-50:var(--c-orange-50)}
+  .dash-grid > .dash-card:nth-child(3){--acc:var(--c-green);--acc-50:var(--c-green-50)}
+  .dash-grid > .dash-card:nth-child(4){--acc:var(--c-purple);--acc-50:var(--c-purple-50)}
+  .dash-card .dc-label{color:var(--acc)}
+  .dash-card.wide{background:linear-gradient(90deg,var(--acc-50) 0%,#fff 70%)}
+
+  /* kategori retribusi: warna per kelompok */
+  .cat{--acc:var(--c-blue);--acc-50:var(--c-blue-50);border:1px solid var(--acc-50);
+    background:linear-gradient(180deg,var(--acc-50) 0px,#fff 64px)}
+  .cat:nth-of-type(2){--acc:var(--c-green);--acc-50:var(--c-green-50)}
+  .cat:nth-of-type(3){--acc:var(--c-pink);--acc-50:var(--c-pink-50)}
+  .cat:nth-of-type(4){--acc:var(--c-purple);--acc-50:var(--c-purple-50)}
+  .cat:nth-of-type(5){--acc:var(--c-orange);--acc-50:var(--c-orange-50)}
+  .cat .ct{color:var(--acc)}
+  .cat .ct .bar{background:var(--acc)}
+  .citem{background:var(--acc-50);border:1px solid transparent}
+  .citem:hover{background:#fff;border-color:var(--acc)}
+
+  /* appbar halaman dalam */
+  .appbar .back{background:linear-gradient(135deg,#0f6fc0,#0099DD);color:#fff;box-shadow:0 4px 12px rgba(15,111,192,.28)}
+  .appbar h1{color:#0b4f96}
+
+  /* daftar item & filter */
+  .fchip.on{background:linear-gradient(135deg,#0f6fc0,#0099DD);border-color:transparent;box-shadow:0 4px 10px rgba(15,111,192,.25)}
+  .itag{display:inline-block;max-width:100%;background:var(--c-blue-50);color:#0b6fb0;padding:1px 7px;border-radius:999px}
+  .menucard{border:1px solid var(--c-orange-50);background:linear-gradient(90deg,var(--c-orange-50) 0%,#fff 75%)}
+  .menucard .ic.blue{background:linear-gradient(135deg,#f6a723,#f08a24);color:#fff}
+
+  /* tombol utama */
+  .btn-blue{background:linear-gradient(120deg,#0f6fc0 0%,#0099DD 60%,#33CAE5 100%)}
+
+  /* tab bar */
+  .tab.on{color:#0f6fc0;position:relative}
+  .tab.on::before{content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:26px;height:3px;border-radius:0 0 3px 3px;
+    background:linear-gradient(90deg,#0099DD,#f6a723)}
+
+  /* ===== ikon SVG berwarna (pengganti gambar PNG/JPG berlatar kotak) ===== */
+  .gi{--g2:#0f6fc0;display:grid;place-items:center;width:52px;height:52px;flex:0 0 auto;color:var(--g2);background:none}
+  .gi svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .g-blue{--g1:#4cc3f0;--g2:#0f6fc0}
+  .g-green{--g1:#4ed39a;--g2:#0e9160}
+  .g-orange{--g1:#ffc34d;--g2:#ee7a16}
+  .g-pink{--g1:#ff8fb8;--g2:#d63c7a}
+  .g-purple{--g1:#a98bff;--g2:#6343d6}
+  .g-teal{--g1:#4fdcd0;--g2:#0f9393}
+  .g-red{--g1:#ff9a8a;--g2:#e0453a}
+  .citem .gi{color:var(--g2);transition:transform .18s}
+  .citem:hover .gi{transform:scale(1.06)}
+  .dash-card .gi{width:60px;height:60px;margin-bottom:4px}
+  .dash-card .gi svg{width:52px;height:52px}
+  .dash-card.wide .gi{width:44px;height:44px;margin:0}
+  .dash-card.wide .gi svg{width:36px;height:36px}
+
+  /* ikon tab bar */
+  .tab .ti{width:28px;height:28px;fill:none;stroke:var(--faint);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+  .tab.on .ti{stroke:#0f6fc0;fill:rgba(0,153,221,.14)}
+  .tab:hover .ti{stroke:#0f6fc0}
+
   /* ===== tampilan HP: aplikasi layar penuh, tanpa bingkai perangkat ===== */
   @media (max-width:560px){
     html,body{height:100%;overflow:hidden}
     body{display:block;padding:0;background:var(--screen)}
     .stage{display:block;width:100%;height:100vh;height:100dvh;gap:0}
-    .screen-wrap{height:100%;border-radius:0}
+    .screen-wrap{height:100%;border-radius:0;max-width:none}
     .screen{padding-top:env(safe-area-inset-top,0px)}
     .tabbar{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
     .sheet{padding-bottom:calc(26px + env(safe-area-inset-bottom,0px))}

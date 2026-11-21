@@ -2,10 +2,10 @@
    bingkai perangkat, status bar, tab bar, dan sheet pembayaran. */
 
 var SHELL_TABS = [
-  {id:'dashboard', label:'Beranda', img:'https://app.iwana.id/assets/prontt/prontt-beranda.jpg', href:'../index.html#dashboard'},
-  {id:'pesan', label:'Pesan', img:'https://app.iwana.id/assets/prontt/prontt-pesanan.jpg', href:'../index.html#pesan'},
-  {id:'riwayat', label:'Riwayat', img:'https://app.iwana.id/assets/prontt/prontt-riwayat.jpg', href:'../index.html#riwayat'},
-  {id:'akun', label:'Akun', img:'https://app.iwana.id/assets/prontt/prontt-akun.jpg', href:'../index.html#akun'}
+  {id:'dashboard', label:'Beranda', svg:'<path d="M3 10.5L12 3l9 7.5V20a2 2 0 01-2 2h-4v-7H9v7H5a2 2 0 01-2-2z"/>', href:'../index.html#dashboard'},
+  {id:'pesan', label:'Pesan', svg:'<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/>', href:'../index.html#pesan'},
+  {id:'riwayat', label:'Riwayat', svg:'<path d="M3 12a9 9 0 109-9 9.7 9.7 0 00-6.7 2.8L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/>', href:'../index.html#riwayat'},
+  {id:'akun', label:'Akun', svg:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>', href:'../index.html#akun'}
 ];
 
 var STATUS_DOTS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20v-12M18 20V4" stroke-linecap="round"/></svg>'
@@ -43,7 +43,7 @@ function buildTabs(){
   document.querySelectorAll('[data-tabbar]').forEach(function(nav){
     nav.innerHTML = SHELL_TABS.map(function(t){
       return '<button class="tab" onclick="location.href=\''+t.href+'\'">'
-        + '<img src="'+t.img+'" alt="'+t.label+'">'
+        + '<svg class="ti" viewBox="0 0 24 24" aria-hidden="true">'+t.svg+'</svg>'
         + '<span>'+t.label+'</span></button>';
     }).join('');
   });

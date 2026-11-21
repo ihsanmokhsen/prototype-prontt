@@ -1,16 +1,16 @@
   var MAIN = ['dashboard','retribusi','riwayat','pesan','akun'];
   var TABS = [
-    {id:'dashboard', label:'Beranda', img:'https://app.iwana.id/assets/prontt/prontt-beranda.jpg'},
-    {id:'pesan', label:'Pesan', img:'https://app.iwana.id/assets/prontt/prontt-pesanan.jpg'},
-    {id:'riwayat', label:'Riwayat', img:'https://app.iwana.id/assets/prontt/prontt-riwayat.jpg'},
-    {id:'akun', label:'Akun', img:'https://app.iwana.id/assets/prontt/prontt-akun.jpg'}
+    {id:'dashboard', label:'Beranda', svg:'<path d="M3 10.5L12 3l9 7.5V20a2 2 0 01-2 2h-4v-7H9v7H5a2 2 0 01-2-2z"/>'},
+    {id:'pesan', label:'Pesan', svg:'<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/>'},
+    {id:'riwayat', label:'Riwayat', svg:'<path d="M3 12a9 9 0 109-9 9.7 9.7 0 00-6.7 2.8L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/>'},
+    {id:'akun', label:'Akun', svg:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>'}
   ];
   function buildTabs(){
     document.querySelectorAll('[data-tabbar]').forEach(function(nav){
       var cur = nav.closest('.screen').id;
       nav.innerHTML = TABS.map(function(t){
         return '<button class="tab '+(t.id===cur?'on':'')+'" onclick="go(\''+t.id+'\')">'+
-          '<img src="'+t.img+'" alt="'+t.label+'" style="width:32px;height:32px;object-fit:contain">'+
+          '<svg class="ti" viewBox="0 0 24 24" aria-hidden="true">'+t.svg+'</svg>'+
           '<span>'+t.label+'</span></button>';
       }).join('');
     });
